@@ -2,16 +2,16 @@
 
 ## Keep Following
 
-Mod for the game [Don't Starve Together][]:
-
-`Shift` + `LMB` on the player or entities below to keep following:
+Mod for the game [Don't Starve Together][] which adds behaviour to follow other
+players or supported entities below:
 
 - Chester/Hutch
 - Critter
 - Glommer
 - Pig
 
-Use `WASD` movement keys to stop.
+`Shift` + `LMB` on players/entities to start following. Use `WASD` movement keys
+to stop.
 
 ## License
 
