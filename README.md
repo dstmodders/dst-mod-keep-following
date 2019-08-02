@@ -1,9 +1,10 @@
 # dst-mod-keep-following
 
-## Keep Following
+## Overview
 
-Mod for the game [Don't Starve Together][] which adds behaviour to follow other
-players or supported entities below:
+Mod for the game [Don't Starve Together][] which is available through the
+[Steam Workshop][] to allow player follow others or supported
+entities below:
 
 - Chester/Hutch
 - Critter
@@ -36,3 +37,4 @@ Below are the features yet to be implemented:
 Released under the [Unlicense](https://unlicense.org/).
 
 [don't starve together]: https://www.klei.com/games/dont-starve-together
+[steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
