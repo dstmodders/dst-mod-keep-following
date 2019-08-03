@@ -1,4 +1,3 @@
-local _FOLLOW_TASK_TIME = 0.3
 local _IS_KEY_LSHIFT_DOWN = false
 
 local KeepFollowing = Class(function(self, inst)
@@ -11,6 +10,7 @@ local KeepFollowing = Class(function(self, inst)
     self.ismastersim = false
     self.isnear = false
     self.leader = nil
+    self.tasktime = 0.3
 
     --replaced by GetModConfigData
     self.targetdistance = 2.5
@@ -90,7 +90,7 @@ function KeepFollowing:StartFollowing(entity)
             ))
         end
 
-        self.inst:DoTaskInTime(_FOLLOW_TASK_TIME, function()
+        self.inst:DoTaskInTime(self.tasktime, function()
             if self:IsFollowing() then
                 if distance >= self.targetdistance then
                     self.isnear = false
