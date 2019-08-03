@@ -10,7 +10,7 @@ local KeepFollowing = Class(function(self, inst)
     self.ismastersim = false
     self.isnear = false
     self.leader = nil
-    self.tasktime = 0.3
+    self.tasktime = 0
 
     --replaced by GetModConfigData
     self.targetdistance = 2.5
@@ -71,7 +71,6 @@ end
 
 function KeepFollowing:StartFollowing(entity)
     local distance
-    local head
 
     if not self:IsFollowing() then
         self:SetLeader(entity)
@@ -94,11 +93,15 @@ function KeepFollowing:StartFollowing(entity)
             if self:IsFollowing() then
                 if distance >= self.targetdistance then
                     self.isnear = false
-                    self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
                 elseif not self.isnear and distance < self.targetdistance then
                     self.isnear = true
+                end
+
+                if not self.isnear then
                     self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
-                    self:DebugString(string.format("near leader. Distance: %0.2f", distance))
+                    if self.tasktime == 0 then
+                        self.tasktime = 0.3
+                    end
                 end
 
                 self:StartFollowing(entity)
@@ -113,6 +116,7 @@ function KeepFollowing:StopFollowing()
         self.inst:CancelAllPendingTasks()
         self.isfollowing = false
         self.leader = nil
+        self.tasktime = 0
     end
 end
 
