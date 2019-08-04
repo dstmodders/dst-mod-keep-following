@@ -95,6 +95,7 @@ function KeepFollowing:StartFollowing(entity)
                     self.isnear = false
                 elseif not self.isnear and distance < self.targetdistance then
                     self.isnear = true
+                    self.tasktime = 0
                 end
 
                 if not self.isnear then
