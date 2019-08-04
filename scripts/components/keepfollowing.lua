@@ -145,7 +145,7 @@ function KeepFollowing:AddInputHandlers()
     TheInput:AddMouseButtonHandler(function(button, down, x, y)
         if self:InGame() and _IS_KEY_LSHIFT_DOWN and button == 1000 and down then
             local leader = KeepFollowing:GetLeaderUnderMouse()
-            if leader then
+            if leader and ((self.leader and self.leader ~= leader) or not self.leader) then
                 self:StopFollowing()
                 self:StartFollowing(leader)
             end
