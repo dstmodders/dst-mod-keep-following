@@ -1,7 +1,11 @@
 name = "Keep Following"
-version = "0.1.0"
+version = "0.2.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[Shift +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. WASD to stop.]]
+    [[Shift +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. WASD to stop.]] .. "\n\n" ..
+    [[v0.2.0:]] .. "\n" ..
+    [[- Fixed delay after approaching a leader]] .. "\n" ..
+    [[- Fixed delay before following a new leader]] .. "\n" ..
+    [[- Removed leader reinitialization if a leader didn't change]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
