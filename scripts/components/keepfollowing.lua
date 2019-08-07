@@ -1,3 +1,4 @@
+local _IS_KEY_LCTRL_DOWN = false
 local _IS_KEY_LSHIFT_DOWN = false
 
 local KeepFollowing = Class(function(self, inst)
@@ -9,6 +10,7 @@ local KeepFollowing = Class(function(self, inst)
     self.isfollowing = false
     self.ismastersim = false
     self.isnear = false
+    self.ispushing = false
     self.leader = nil
     self.tasktime = 0
 
@@ -57,7 +59,6 @@ end
 
 function KeepFollowing:GetLeaderUnderMouse()
     local entity = TheInput:GetWorldEntityUnderMouse()
-
     if entity and self:CanBeLeader(entity) then
         return entity
     end
@@ -82,11 +83,19 @@ function KeepFollowing:StartFollowing(entity)
         if not self:IsFollowing() then
             self.isfollowing = true
 
-            self:DebugString(string.format(
-                "started following leader. Distance: %0.2f. Target: %0.2f",
-                distance,
-                self.targetdistance
-            ))
+            if not self.ispushing then
+                self:DebugString(string.format(
+                    "started following leader. Distance: %0.2f. Target: %0.2f",
+                    distance,
+                    self.targetdistance
+                ))
+            else
+                self:DebugString(string.format(
+                    "started following/pushing leader. Distance: %0.2f. Target: 0",
+                    distance,
+                    self.targetdistance
+                ))
+            end
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
@@ -98,11 +107,13 @@ function KeepFollowing:StartFollowing(entity)
                     self.tasktime = 0
                 end
 
-                if not self.isnear then
+                if not self.ispushing and not self.isnear then
                     self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
                     if self.tasktime == 0 then
                         self.tasktime = 0.3
                     end
+                elseif self.ispushing then
+                    self.inst.components.locomotor:GoToPoint(entity:GetPosition())
                 end
 
                 self:StartFollowing(entity)
@@ -113,7 +124,12 @@ end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        self:DebugString(string.format("stopped following %s", self.leader:GetDisplayName()))
+        if not self.ispushing then
+            self:DebugString(string.format("stopped following %s", self.leader:GetDisplayName()))
+        else
+            self:DebugString(string.format("stopped following/pushing %s", self.leader:GetDisplayName()))
+        end
+
         self.inst:CancelAllPendingTasks()
         self.isfollowing = false
         self.leader = nil
@@ -134,6 +150,18 @@ function KeepFollowing:AddInputHandlers()
         end
     end)
 
+    TheInput:AddKeyDownHandler(KEY_LCTRL, function()
+        if self:InGame() then
+            _IS_KEY_LCTRL_DOWN = true
+        end
+    end)
+
+    TheInput:AddKeyUpHandler(KEY_LCTRL, function()
+        if self:InGame() then
+            _IS_KEY_LCTRL_DOWN = false
+        end
+    end)
+
     TheInput:AddKeyHandler(function()
         if self:InGame() and IsMoveButtonDown() then
             if self:IsFollowing() then
@@ -145,7 +173,11 @@ function KeepFollowing:AddInputHandlers()
     TheInput:AddMouseButtonHandler(function(button, down, x, y)
         if self:InGame() and _IS_KEY_LSHIFT_DOWN and button == 1000 and down then
             local leader = KeepFollowing:GetLeaderUnderMouse()
-            if leader and ((self.leader and self.leader ~= leader) or not self.leader) then
+            local isnotsameleader = ((self.leader and self.leader ~= leader) or not self.leader)
+            local ispushing = (_IS_KEY_LCTRL_DOWN and true or false)
+
+            if leader and (isnotsameleader or self.ispushing ~= ispushing) then
+                self.ispushing = ispushing
                 self:StopFollowing()
                 self:StartFollowing(leader)
             end
