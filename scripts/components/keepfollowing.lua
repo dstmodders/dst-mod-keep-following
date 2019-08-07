@@ -1,5 +1,6 @@
 local _IS_KEY_LCTRL_DOWN = false
 local _IS_KEY_LSHIFT_DOWN = false
+local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local KeepFollowing = Class(function(self, inst)
     self.inst = inst
@@ -57,13 +58,21 @@ function KeepFollowing:GetLeader()
     return self.leader
 end
 
-function KeepFollowing:GetLeaderUnderMouse()
-    local entity = TheInput:GetWorldEntityUnderMouse()
-    if entity and self:CanBeLeader(entity) then
-        return entity
+function KeepFollowing:FindClosestInvisiblePlayerInRange(x, y, z, range)
+    local closestPlayer
+    local rangesq = range * range
+
+    for _, v in ipairs(AllPlayers) do
+        if not v.entity:IsVisible() then
+            local distsq = v:GetDistanceSqToPoint(x, y, z)
+            if distsq < rangesq then
+                rangesq = distsq
+                closestPlayer = v
+            end
+        end
     end
 
-    return nil
+    return closestPlayer, closestPlayer ~= nil and rangesq or nil
 end
 
 function KeepFollowing:IsFollowing()
@@ -170,13 +179,34 @@ function KeepFollowing:AddInputHandlers()
         end
     end)
 
-    TheInput:AddMouseButtonHandler(function(button, down, x, y)
+    TheInput:AddMouseButtonHandler(function(button, down)
         if self:InGame() and _IS_KEY_LSHIFT_DOWN and button == 1000 and down then
-            local leader = KeepFollowing:GetLeaderUnderMouse()
+            local entity = TheInput:GetWorldEntityUnderMouse()
+            local leader
+
+            if not entity then
+                return
+            end
+
+            if self:CanBeLeader(entity) then
+                leader = entity
+            elseif entity:HasTag("tent") then
+                local x, y, z = entity.Transform:GetWorldPosition()
+                local player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
+
+                if player and player:HasTag("sleeping") then
+                    leader = player
+                end
+            end
+
+            if not leader then
+                return
+            end
+
             local isnotsameleader = ((self.leader and self.leader ~= leader) or not self.leader)
             local ispushing = (_IS_KEY_LCTRL_DOWN and true or false)
 
-            if leader and (isnotsameleader or self.ispushing ~= ispushing) then
+            if isnotsameleader or self.ispushing ~= ispushing then
                 self.ispushing = ispushing
                 self:StopFollowing()
                 self:StartFollowing(leader)
