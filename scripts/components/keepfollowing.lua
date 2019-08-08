@@ -85,11 +85,13 @@ function KeepFollowing:GetTentSleeper(entity)
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
     else
+        self:DebugString("sleepingbag component is not available, looking for sleeping players nearby")
         local x, y, z = entity.Transform:GetWorldPosition()
         player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
     end
 
     if player and player:HasTag("sleeping") then
+        self:DebugString(string.format("found sleeper %s", player:GetDisplayName()))
         return player
     end
 
@@ -210,6 +212,7 @@ function KeepFollowing:AddInputHandlers()
             end
 
             if entity:HasTag("tent") then
+                self:DebugString(string.format("attempting to get a %s sleeper", entity:GetDisplayName()))
                 leader = self:GetTentSleeper(entity)
             elseif self:CanBeLeader(entity) then
                 leader = entity
