@@ -75,6 +75,27 @@ function KeepFollowing:FindClosestInvisiblePlayerInRange(x, y, z, range)
     return closestPlayer, closestPlayer ~= nil and rangesq or nil
 end
 
+function KeepFollowing:GetTentSleeper(entity)
+    local player
+
+    if not entity:HasTag("tent") then
+        return nil
+    end
+
+    if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
+        player = entity.components.sleepingbag.sleeper
+    else
+        local x, y, z = entity.Transform:GetWorldPosition()
+        player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
+    end
+
+    if player and player:HasTag("sleeping") then
+        return player
+    end
+
+    return nil
+end
+
 function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
@@ -188,15 +209,10 @@ function KeepFollowing:AddInputHandlers()
                 return
             end
 
-            if self:CanBeLeader(entity) then
+            if entity:HasTag("tent") then
+                leader = self:GetTentSleeper(entity)
+            elseif self:CanBeLeader(entity) then
                 leader = entity
-            elseif entity:HasTag("tent") then
-                local x, y, z = entity.Transform:GetWorldPosition()
-                local player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
-
-                if player and player:HasTag("sleeping") then
-                    leader = player
-                end
             end
 
             if not leader then
