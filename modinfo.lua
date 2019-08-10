@@ -1,11 +1,13 @@
 name = "Keep Following"
-version = "0.2.0"
+version = "0.3.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[Shift +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. WASD to stop.]] .. "\n\n" ..
-    [[v0.2.0:]] .. "\n" ..
-    [[- Fixed delay after approaching a leader]] .. "\n" ..
-    [[- Fixed delay before following a new leader]] .. "\n" ..
-    [[- Removed leader reinitialization if a leader didn't change]]
+    [[Shift +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. ]] ..
+    [[Ctrl + Shift +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
+    [[You can also use the above key combinations on a Tent used by another player to keep ]] ..
+    [[following or pushing him.]] .. "\n\n" ..
+    [[v0.3.0:]] .. "\n" ..
+    [[- Added support for following/pushing a Tent sleeper]] .. "\n" ..
+    [[- Added support for pushing]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
@@ -38,5 +40,5 @@ end
 
 configuration_options = {
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
-    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close you can approach the target"),
+    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close you can approach the target but ignored when pushing"),
 }
