@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Support for following/pushing a Tent sleeper
+- Support for pushing
+
 ## [0.2.0][] - 2019-08-17
 
 ### Removed
