@@ -1,3 +1,11 @@
+--Globals
+local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
+local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
+local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
+local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
+local TheInput = GLOBAL.TheInput
+
+--Other
 local _DEBUG = GetModConfigData("debug")
 
 local function DebugString(string)
@@ -12,6 +20,13 @@ end
 
 local function IsClient()
     return IsDST() and GLOBAL.TheNet:GetIsClient()
+end
+
+local function IsMoveButtonDown()
+    return TheInput:IsControlPressed(CONTROL_MOVE_UP)
+        or TheInput:IsControlPressed(CONTROL_MOVE_DOWN)
+        or TheInput:IsControlPressed(CONTROL_MOVE_LEFT)
+        or TheInput:IsControlPressed(CONTROL_MOVE_RIGHT)
 end
 
 local function OnPlayerActivated(player)
@@ -29,6 +44,16 @@ local function OnPlayerActivated(player)
     end
 
     DebugString(string.format("player %s activated", player:GetDisplayName()))
+
+    TheInput:AddKeyHandler(function()
+        if player.components.keepfollowing:InGame() and IsMoveButtonDown() then
+            if player.components.keepfollowing:IsFollowing() then
+                player.components.keepfollowing:StopFollowing()
+            end
+        end
+    end)
+
+    DebugString("added movement keys handler")
 end
 
 local function OnPlayerDeactivated(player)

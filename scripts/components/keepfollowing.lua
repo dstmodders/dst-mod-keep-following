@@ -23,13 +23,6 @@ local KeepFollowing = Class(function(self, inst)
     inst:StartUpdatingComponent(self)
 end)
 
-local function IsMoveButtonDown()
-    return TheInput:IsControlPressed(CONTROL_MOVE_UP)
-        or TheInput:IsControlPressed(CONTROL_MOVE_DOWN)
-        or TheInput:IsControlPressed(CONTROL_MOVE_LEFT)
-        or TheInput:IsControlPressed(CONTROL_MOVE_RIGHT)
-end
-
 function KeepFollowing:InGame()
     return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
 end
@@ -191,14 +184,6 @@ function KeepFollowing:AddInputHandlers()
     TheInput:AddKeyUpHandler(KEY_LCTRL, function()
         if self:InGame() then
             _IS_KEY_LCTRL_DOWN = false
-        end
-    end)
-
-    TheInput:AddKeyHandler(function()
-        if self:InGame() and IsMoveButtonDown() then
-            if self:IsFollowing() then
-                self:StopFollowing()
-            end
         end
     end)
 
