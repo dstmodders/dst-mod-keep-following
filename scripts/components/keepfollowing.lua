@@ -95,6 +95,10 @@ function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
 
+function KeepFollowing:IsPushing()
+    return self.leader and self.ispushing
+end
+
 function KeepFollowing:StartFollowing(entity)
     local distance
 
@@ -108,19 +112,11 @@ function KeepFollowing:StartFollowing(entity)
         if not self:IsFollowing() then
             self.isfollowing = true
 
-            if not self.ispushing then
-                self:DebugString(string.format(
-                    "started following leader. Distance: %0.2f. Target: %0.2f",
-                    distance,
-                    self.targetdistance
-                ))
-            else
-                self:DebugString(string.format(
-                    "started following/pushing leader. Distance: %0.2f. Target: 0",
-                    distance,
-                    self.targetdistance
-                ))
-            end
+            self:DebugString(string.format(
+                "started following leader. Distance: %0.2f. Target: %0.2f",
+                distance,
+                self.targetdistance
+            ))
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
@@ -132,13 +128,9 @@ function KeepFollowing:StartFollowing(entity)
                     self.tasktime = 0
                 end
 
-                if not self.ispushing and not self.isnear then
-                    self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
-                    if self.tasktime == 0 then
-                        self.tasktime = 0.3
-                    end
-                elseif self.ispushing then
-                    self.inst.components.locomotor:GoToPoint(entity:GetPosition())
+                self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
+                if self.tasktime == 0 then
+                    self.tasktime = 0.3
                 end
 
                 self:StartFollowing(entity)
@@ -147,16 +139,50 @@ function KeepFollowing:StartFollowing(entity)
     end
 end
 
-function KeepFollowing:StopFollowing()
-    if self.leader then
-        if not self.ispushing then
-            self:DebugString(string.format("stopped following %s", self.leader:GetDisplayName()))
-        else
-            self:DebugString(string.format("stopped following/pushing %s", self.leader:GetDisplayName()))
+function KeepFollowing:StartPushing(entity)
+    local distance
+
+    if not self:IsPushing() then
+        self:SetLeader(entity)
+    end
+
+    if self.leader and self.inst.components.locomotor ~= nil then
+        distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
+
+        if not self:IsPushing() then
+            self.ispushing = true
+
+            self:DebugString(string.format(
+                "started pushing leader",
+                distance,
+                self.targetdistance
+            ))
         end
 
+        self.inst:DoTaskInTime(self.tasktime, function()
+            if self:IsPushing() then
+                self.inst.components.locomotor:GoToPoint(entity:GetPosition())
+                self:StartPushing(entity)
+            end
+        end)
+    end
+end
+
+function KeepFollowing:StopFollowing()
+    if self.leader then
+        self:DebugString(string.format("stopped following %s", self.leader:GetDisplayName()))
         self.inst:CancelAllPendingTasks()
         self.isfollowing = false
+        self.leader = nil
+        self.tasktime = 0
+    end
+end
+
+function KeepFollowing:StopPushing()
+    if self.leader then
+        self:DebugString(string.format("stopped pushing %s", self.leader:GetDisplayName()))
+        self.inst:CancelAllPendingTasks()
+        self.ispushing = false
         self.leader = nil
         self.tasktime = 0
     end
@@ -207,11 +233,12 @@ function KeepFollowing:AddInputHandlers()
                 return
             end
 
-            local isnotsameleader = ((self.leader and self.leader ~= leader) or not self.leader)
             local ispushing = (_IS_KEY_LCTRL_DOWN and true or false)
 
-            if isnotsameleader or self.ispushing ~= ispushing then
-                self.ispushing = ispushing
+            if ispushing then
+                self:StopPushing()
+                self:StartPushing(leader)
+            else
                 self:StopFollowing()
                 self:StartFollowing(leader)
             end

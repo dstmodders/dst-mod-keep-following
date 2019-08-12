@@ -50,6 +50,10 @@ local function OnPlayerActivated(player)
             if player.components.keepfollowing:IsFollowing() then
                 player.components.keepfollowing:StopFollowing()
             end
+
+            if player.components.keepfollowing:IsPushing() then
+                player.components.keepfollowing:StopPushing()
+            end
         end
     end)
 
