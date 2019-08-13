@@ -1,5 +1,3 @@
-local _IS_KEY_LCTRL_DOWN = false
-local _IS_KEY_LSHIFT_DOWN = false
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local KeepFollowing = Class(function(self, inst)
@@ -17,8 +15,6 @@ local KeepFollowing = Class(function(self, inst)
 
     --replaced by GetModConfigData
     self.targetdistance = 2.5
-
-    self:AddInputHandlers()
 
     inst:StartUpdatingComponent(self)
 end)
@@ -186,64 +182,6 @@ function KeepFollowing:StopPushing()
         self.leader = nil
         self.tasktime = 0
     end
-end
-
-function KeepFollowing:AddInputHandlers()
-    TheInput:AddKeyDownHandler(KEY_LSHIFT, function()
-        if self:InGame() then
-            _IS_KEY_LSHIFT_DOWN = true
-        end
-    end)
-
-    TheInput:AddKeyUpHandler(KEY_LSHIFT, function()
-        if self:InGame() then
-            _IS_KEY_LSHIFT_DOWN = false
-        end
-    end)
-
-    TheInput:AddKeyDownHandler(KEY_LCTRL, function()
-        if self:InGame() then
-            _IS_KEY_LCTRL_DOWN = true
-        end
-    end)
-
-    TheInput:AddKeyUpHandler(KEY_LCTRL, function()
-        if self:InGame() then
-            _IS_KEY_LCTRL_DOWN = false
-        end
-    end)
-
-    TheInput:AddMouseButtonHandler(function(button, down)
-        if self:InGame() and _IS_KEY_LSHIFT_DOWN and button == 1000 and down then
-            local entity = TheInput:GetWorldEntityUnderMouse()
-            local leader
-
-            if not entity then
-                return
-            end
-
-            if entity:HasTag("tent") then
-                self:DebugString(string.format("attempting to get a %s sleeper", entity:GetDisplayName()))
-                leader = self:GetTentSleeper(entity)
-            elseif self:CanBeLeader(entity) then
-                leader = entity
-            end
-
-            if not leader then
-                return
-            end
-
-            local ispushing = (_IS_KEY_LCTRL_DOWN and true or false)
-
-            if ispushing then
-                self:StopPushing()
-                self:StartPushing(leader)
-            else
-                self:StopFollowing()
-                self:StartFollowing(leader)
-            end
-        end
-    end)
 end
 
 function KeepFollowing:EnableDebug()
