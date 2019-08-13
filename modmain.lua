@@ -1,8 +1,10 @@
 --Globals
+local ACTIONS = GLOBAL.ACTIONS
 local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
+local KEY_LSHIFT = GLOBAL.KEY_LSHIFT
 local TheInput = GLOBAL.TheInput
 
 --Other
@@ -27,6 +29,10 @@ local function IsMoveButtonDown()
         or TheInput:IsControlPressed(CONTROL_MOVE_DOWN)
         or TheInput:IsControlPressed(CONTROL_MOVE_LEFT)
         or TheInput:IsControlPressed(CONTROL_MOVE_RIGHT)
+end
+
+local function IsOurAction(action)
+    return action == ACTIONS.FOLLOW
 end
 
 local function OnPlayerActivated(player)
@@ -91,5 +97,67 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
 
     DebugString("AddPrefabPostInit fired")
 end
+
+local function ActionFollow(act)
+    if not act.doer or not act.target or not act.doer.components.keepfollowing then
+        return false
+    end
+
+    local keepfollowing = act.doer.components.keepfollowing
+    keepfollowing:StopFollowing()
+    keepfollowing:StartFollowing(act.target)
+
+    return true
+end
+
+local function PlayerControllerPostInit(self, player)
+    local ThePlayer = GLOBAL.ThePlayer
+
+    if player ~= ThePlayer then
+        return
+    end
+
+    local OldGetLeftMouseAction = self.GetLeftMouseAction
+    local OldOnLeftClick = self.OnLeftClick
+
+    local function NewGetLeftMouseAction(self)
+        local act = OldGetLeftMouseAction(self)
+
+        if act and act.target then
+            local keepfollowing = act.doer.components.keepfollowing
+            if keepfollowing:CanBeLeader(act.target) then
+                if TheInput:IsKeyDown(KEY_LSHIFT) then
+                    act.action = ACTIONS.FOLLOW
+                end
+            end
+        end
+
+        self.LMBaction = act
+
+        return self.LMBaction
+    end
+
+    local function NewOnLeftClick(self, down)
+        if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+            return OldOnLeftClick(self, down)
+        end
+
+        local act = self:GetLeftMouseAction()
+        if act then
+            if IsOurAction(act.action) then
+                act.action.fn(act)
+            end
+        end
+
+        OldOnLeftClick(self, down)
+    end
+
+    self.GetLeftMouseAction = NewGetLeftMouseAction
+    self.OnLeftClick = NewOnLeftClick
+end
+
+AddAction("FOLLOW", "Follow", ActionFollow)
+
+AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
