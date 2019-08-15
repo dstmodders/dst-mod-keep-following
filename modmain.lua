@@ -4,6 +4,7 @@ local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
+local KEY_LCTRL = GLOBAL.KEY_LCTRL
 local KEY_LSHIFT = GLOBAL.KEY_LSHIFT
 local TheInput = GLOBAL.TheInput
 
@@ -32,7 +33,7 @@ local function IsMoveButtonDown()
 end
 
 local function IsOurAction(action)
-    return action == ACTIONS.FOLLOW
+    return action == ACTIONS.FOLLOW or action == ACTIONS.PUSH
 end
 
 local function OnPlayerActivated(player)
@@ -110,6 +111,18 @@ local function ActionFollow(act)
     return true
 end
 
+local function ActionPush(act)
+    if not act.doer or not act.target or not act.doer.components.keepfollowing then
+        return false
+    end
+
+    local keepfollowing = act.doer.components.keepfollowing
+    keepfollowing:StopPushing()
+    keepfollowing:StartPushing(act.target)
+
+    return true
+end
+
 local function PlayerControllerPostInit(self, player)
     local ThePlayer = GLOBAL.ThePlayer
 
@@ -126,8 +139,10 @@ local function PlayerControllerPostInit(self, player)
         if act and act.target then
             local keepfollowing = act.doer.components.keepfollowing
             if keepfollowing:CanBeLeader(act.target) then
-                if TheInput:IsKeyDown(KEY_LSHIFT) then
+                if TheInput:IsKeyDown(KEY_LSHIFT) and not TheInput:IsKeyDown(KEY_LCTRL) then
                     act.action = ACTIONS.FOLLOW
+                elseif TheInput:IsKeyDown(KEY_LSHIFT) and TheInput:IsKeyDown(KEY_LCTRL) then
+                    act.action = ACTIONS.PUSH
                 end
             end
         end
@@ -157,6 +172,7 @@ local function PlayerControllerPostInit(self, player)
 end
 
 AddAction("FOLLOW", "Follow", ActionFollow)
+AddAction("PUSH", "Push", ActionPush)
 
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 
