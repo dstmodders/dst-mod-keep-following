@@ -71,6 +71,8 @@ function KeepFollowing:GetTentSleeper(entity)
         return nil
     end
 
+    self:DebugString(string.format("attempting to get a %s sleeper", entity:GetDisplayName()))
+
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
     else
