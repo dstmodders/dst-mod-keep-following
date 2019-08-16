@@ -33,7 +33,10 @@ local function IsMoveButtonDown()
 end
 
 local function IsOurAction(action)
-    return action == ACTIONS.FOLLOW or action == ACTIONS.PUSH or action == ACTIONS.TENTFOLLOW
+    return action == ACTIONS.FOLLOW
+        or action == ACTIONS.PUSH
+        or action == ACTIONS.TENTFOLLOW
+        or action == ACTIONS.TENTPUSH
 end
 
 local function OnPlayerActivated(player)
@@ -139,6 +142,22 @@ local function ActionTentFollow(act)
     return true
 end
 
+local function ActionTentPush(act)
+    if not act.doer or not act.target or not act.doer.components.keepfollowing then
+        return false
+    end
+
+    local keepfollowing = act.doer.components.keepfollowing
+    local leader = keepfollowing:GetTentSleeper(act.target)
+
+    if leader then
+        keepfollowing:StopPushing()
+        keepfollowing:StartPushing(leader)
+    end
+
+    return true
+end
+
 local function PlayerControllerPostInit(self, player)
     local ThePlayer = GLOBAL.ThePlayer
 
@@ -158,6 +177,8 @@ local function PlayerControllerPostInit(self, player)
             if act.target:HasTag("tent") then
                 if TheInput:IsKeyDown(KEY_LSHIFT) and not TheInput:IsKeyDown(KEY_LCTRL) then
                     act.action = ACTIONS.TENTFOLLOW
+                elseif TheInput:IsKeyDown(KEY_LSHIFT) and TheInput:IsKeyDown(KEY_LCTRL) then
+                    act.action = ACTIONS.TENTPUSH
                 end
             end
 
@@ -183,7 +204,7 @@ local function PlayerControllerPostInit(self, player)
         local act = self:GetLeftMouseAction()
         if act then
             if IsOurAction(act.action) then
-                act.action.fn(act)
+                return act.action.fn(act)
             end
         end
 
@@ -197,6 +218,7 @@ end
 AddAction("FOLLOW", "Follow", ActionFollow)
 AddAction("PUSH", "Push", ActionPush)
 AddAction("TENTFOLLOW", "Follow player in", ActionTentFollow)
+AddAction("TENTPUSH", "Push player in", ActionTentPush)
 
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 
