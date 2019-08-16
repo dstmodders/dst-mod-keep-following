@@ -67,7 +67,7 @@ end
 function KeepFollowing:GetTentSleeper(entity)
     local player
 
-    if not entity:HasTag("tent") then
+    if not entity:HasTag("tent") or not entity:HasTag("hassleeper") then
         return nil
     end
 

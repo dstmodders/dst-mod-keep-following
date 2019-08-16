@@ -174,7 +174,7 @@ local function PlayerControllerPostInit(self, player)
         if act and act.target then
             local keepfollowing = act.doer.components.keepfollowing
 
-            if act.target:HasTag("tent") then
+            if act.target:HasTag("tent") and act.target:HasTag("hassleeper") then
                 if TheInput:IsKeyDown(KEY_LSHIFT) and not TheInput:IsKeyDown(KEY_LCTRL) then
                     act.action = ACTIONS.TENTFOLLOW
                 elseif TheInput:IsKeyDown(KEY_LSHIFT) and TheInput:IsKeyDown(KEY_LCTRL) then
