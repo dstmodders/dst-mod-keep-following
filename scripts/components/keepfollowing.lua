@@ -11,6 +11,7 @@ local KeepFollowing = Class(function(self, inst)
     self.isnear = false
     self.ispushing = false
     self.leader = nil
+    self.playercontroller = nil
     self.tasktime = 0
 
     --replaced by GetModConfigData
@@ -99,12 +100,13 @@ end
 
 function KeepFollowing:StartFollowing(entity)
     local distance
+    local pos
 
     if not self:IsFollowing() then
         self:SetLeader(entity)
     end
 
-    if self.leader and self.inst.components.locomotor ~= nil then
+    if self.leader and self.playercontroller then
         distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
 
         if not self:IsFollowing() then
@@ -126,14 +128,19 @@ function KeepFollowing:StartFollowing(entity)
                     self.tasktime = 0
                 end
 
-                if self.inst.components.locomotor ~= nil then
-                    self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
-                    if self.tasktime == 0 then
-                        self.tasktime = 0.3
-                    end
+                pos = self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25)
 
-                    self:StartFollowing(entity)
+                if self.playercontroller.locomotor then
+                    self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+                else
+                    SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
                 end
+
+                if self.tasktime == 0 then
+                    self.tasktime = 0.3
+                end
+
+                self:StartFollowing(entity)
             end
         end)
     end
@@ -141,12 +148,13 @@ end
 
 function KeepFollowing:StartPushing(entity)
     local distance
+    local pos
 
     if not self:IsPushing() then
         self:SetLeader(entity)
     end
 
-    if self.leader and self.inst.components.locomotor ~= nil then
+    if self.leader and self.playercontroller then
         distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
 
         if not self:IsPushing() then
@@ -161,10 +169,15 @@ function KeepFollowing:StartPushing(entity)
 
         self.inst:DoTaskInTime(self.tasktime, function()
             if self:IsPushing() then
-                if self.inst.components.locomotor ~= nil then
-                    self.inst.components.locomotor:GoToPoint(entity:GetPosition())
-                    self:StartPushing(entity)
+                pos = entity:GetPosition()
+
+                if self.playercontroller.locomotor then
+                    self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+                else
+                    SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
                 end
+
+                self:StartPushing(entity)
             end
         end)
     end

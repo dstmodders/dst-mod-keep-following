@@ -203,6 +203,11 @@ local function PlayerControllerPostInit(self, player)
 
         local act = self:GetLeftMouseAction()
         if act then
+            local keepfollowing = act.doer.components.keepfollowing
+            if keepfollowing then
+                keepfollowing.playercontroller = self
+            end
+
             if IsOurAction(act.action) then
                 return act.action.fn(act)
             end
