@@ -126,12 +126,14 @@ function KeepFollowing:StartFollowing(entity)
                     self.tasktime = 0
                 end
 
-                self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
-                if self.tasktime == 0 then
-                    self.tasktime = 0.3
-                end
+                if self.inst.components.locomotor ~= nil then
+                    self.inst.components.locomotor:GoToPoint(self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25))
+                    if self.tasktime == 0 then
+                        self.tasktime = 0.3
+                    end
 
-                self:StartFollowing(entity)
+                    self:StartFollowing(entity)
+                end
             end
         end)
     end
@@ -159,8 +161,10 @@ function KeepFollowing:StartPushing(entity)
 
         self.inst:DoTaskInTime(self.tasktime, function()
             if self:IsPushing() then
-                self.inst.components.locomotor:GoToPoint(entity:GetPosition())
-                self:StartPushing(entity)
+                if self.inst.components.locomotor ~= nil then
+                    self.inst.components.locomotor:GoToPoint(entity:GetPosition())
+                    self:StartPushing(entity)
+                end
             end
         end)
     end
