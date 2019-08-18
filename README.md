@@ -11,11 +11,11 @@ supported entities below:
 - Glommer
 - Pig
 
-`Shift` + `LMB` on players/entities to keep following.
-
-`Ctrl` + `Shift` + `LMB` to keep pushing and ignore the target distance.
-
-`WASD` movement keys to stop.
+| Keys                     | Actions                                        |
+|--------------------------|------------------------------------------------|
+| `Shift` + `LMB`          | to keep following                              |
+| `Ctrl` + `Shift` + `LMB` | to keep pushing and ignore the target distance |
+| `WASD`                   | to stop                                        |
 
 You can also use the above key combinations on a Tent used by another player to
 keep following or pushing him.
@@ -28,6 +28,7 @@ Currently, this mod is still in development so it only has these features:
 - [x] Enable/Disable debug mode
 - [x] Keep following/pushing players in a Tent
 - [x] Keep following/pushing players/entities
+- [x] Lag compensation on/off support
 
 ## Roadmap
 
