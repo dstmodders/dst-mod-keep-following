@@ -1,16 +1,14 @@
 name = "Keep Following"
-version = "0.4.0"
+version = "0.5.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[Shift +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. ]] ..
-    [[Ctrl + Shift +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
+    [[LCtrl +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. ]] ..
+    [[LCtrl + LAlt +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent used by another player to keep ]] ..
     [[following or pushing him.]] .. "\n\n" ..
-    [[v0.4.0:]] .. "\n" ..
-    [[- Added corresponding actions]] .. "\n" ..
-    [[- Added support for disabled lag compensation]] .. "\n" ..
-    [[- Changed follow and push behaviours to become separated]] .. "\n" ..
-    [[- Changed input handlers to be inside modmain]] .. "\n" ..
-    [[- Fixed crash when lag compensation is being turned off]]
+    [[v0.5.0:]] .. "\n" ..
+    [[- Added support for action and push keys configuration]] .. "\n" ..
+    [[- Changed default action and push keys]] .. "\n" ..
+    [[- Fixed crash when entering/leaving cave]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
