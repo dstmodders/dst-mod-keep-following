@@ -12,7 +12,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
 author = "Demonblink"
 api_version = 10
 forumthread = ""
-priority = -0.011835465557 -- -0.01 .. workshop ID
+priority = 0.001835465557 --0.00 .. workshop ID
 
 icon = "modicon.tex"
 icon_atlas = "modicon.xml"
