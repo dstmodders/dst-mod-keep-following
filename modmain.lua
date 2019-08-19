@@ -25,11 +25,11 @@ local function IsClient()
     return IsDST() and GLOBAL.TheNet:GetIsClient()
 end
 
-local function IsMoveButtonDown()
-    return TheInput:IsControlPressed(CONTROL_MOVE_UP)
-        or TheInput:IsControlPressed(CONTROL_MOVE_DOWN)
-        or TheInput:IsControlPressed(CONTROL_MOVE_LEFT)
-        or TheInput:IsControlPressed(CONTROL_MOVE_RIGHT)
+local function IsMoveButton(control)
+    return control == CONTROL_MOVE_UP
+        or control == CONTROL_MOVE_DOWN
+        or control == CONTROL_MOVE_LEFT
+        or control == CONTROL_MOVE_RIGHT
 end
 
 local function IsOurAction(action)
@@ -54,20 +54,6 @@ local function OnPlayerActivated(player)
     end
 
     DebugString(string.format("player %s activated", player:GetDisplayName()))
-
-    TheInput:AddKeyHandler(function()
-        if player.components.keepfollowing:InGame() and IsMoveButtonDown() then
-            if player.components.keepfollowing:IsFollowing() then
-                player.components.keepfollowing:StopFollowing()
-            end
-
-            if player.components.keepfollowing:IsPushing() then
-                player.components.keepfollowing:StopPushing()
-            end
-        end
-    end)
-
-    DebugString("added movement keys handler")
 end
 
 local function OnPlayerDeactivated(player)
@@ -166,6 +152,7 @@ local function PlayerControllerPostInit(self, player)
     end
 
     local OldGetLeftMouseAction = self.GetLeftMouseAction
+    local OldOnControl = self.OnControl
     local OldOnLeftClick = self.OnLeftClick
 
     local function NewGetLeftMouseAction(self)
@@ -216,8 +203,28 @@ local function PlayerControllerPostInit(self, player)
         OldOnLeftClick(self, down)
     end
 
+    local function NewOnControl(self, control, down)
+        if IsMoveButton(control) then
+            local keepfollowing = player.components.keepfollowing
+            if keepfollowing and keepfollowing:InGame() then
+                if keepfollowing:IsFollowing() then
+                    keepfollowing:StopFollowing()
+                end
+
+                if keepfollowing:IsPushing() then
+                    keepfollowing:StopPushing()
+                end
+            end
+        end
+
+        return OldOnControl(self, control, down)
+    end
+
     self.GetLeftMouseAction = NewGetLeftMouseAction
+    self.OnControl = NewOnControl
     self.OnLeftClick = NewOnLeftClick
+
+    DebugString("playercontroller initialized")
 end
 
 AddAction("FOLLOW", "Follow", ActionFollow)
