@@ -4,12 +4,17 @@ local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
-local KEY_LCTRL = GLOBAL.KEY_LCTRL
-local KEY_LSHIFT = GLOBAL.KEY_LSHIFT
 local TheInput = GLOBAL.TheInput
 
---Other
+--GetModConfigData
+local function GetKeyFromConfig(config)
+    local key = GetModConfigData(config)
+    return key and (type(key) == "number" and key or GLOBAL[key]) or -1
+end
+
 local _DEBUG = GetModConfigData("debug")
+local _KEY_ACTION = GetKeyFromConfig("key_action")
+local _KEY_PUSH = GetKeyFromConfig("key_push")
 
 local function DebugString(string)
     if _DEBUG then
@@ -162,17 +167,17 @@ local function PlayerControllerPostInit(self, player)
             local keepfollowing = act.doer.components.keepfollowing
 
             if act.target:HasTag("tent") and act.target:HasTag("hassleeper") then
-                if TheInput:IsKeyDown(KEY_LSHIFT) and not TheInput:IsKeyDown(KEY_LCTRL) then
+                if TheInput:IsKeyDown(_KEY_ACTION) and not TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.TENTFOLLOW
-                elseif TheInput:IsKeyDown(KEY_LSHIFT) and TheInput:IsKeyDown(KEY_LCTRL) then
+                elseif TheInput:IsKeyDown(_KEY_ACTION) and TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.TENTPUSH
                 end
             end
 
             if keepfollowing:CanBeLeader(act.target) then
-                if TheInput:IsKeyDown(KEY_LSHIFT) and not TheInput:IsKeyDown(KEY_LCTRL) then
+                if TheInput:IsKeyDown(_KEY_ACTION) and not TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.FOLLOW
-                elseif TheInput:IsKeyDown(KEY_LSHIFT) and TheInput:IsKeyDown(KEY_LCTRL) then
+                elseif TheInput:IsKeyDown(_KEY_ACTION) and TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.PUSH
                 end
             end
