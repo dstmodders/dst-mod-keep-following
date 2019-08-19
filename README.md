@@ -11,10 +11,10 @@ supported entities below:
 - Glommer
 - Pig
 
-| Keys                     | Actions                                        |
+| Default Keys             | Actions                                        |
 |--------------------------|------------------------------------------------|
-| `Shift` + `LMB`          | to keep following                              |
-| `Ctrl` + `Shift` + `LMB` | to keep pushing and ignore the target distance |
+| `LCtrl` + `LMB`          | to keep following                              |
+| `LCtrl` + `LAlt` + `LMB` | to keep pushing and ignore the target distance |
 | `WASD`                   | to stop                                        |
 
 You can also use the above key combinations on a Tent used by another player to
@@ -22,9 +22,10 @@ keep following or pushing him.
 
 ## Supported features
 
-Currently, this mod is still in development so it only has these features:
+Currently, this mod is still in development and has these features so far:
 
-- [x] Choosing the target distance: `1.5m`, `2.5m` or `3.5m`
+- [x] Choose both action and push keys
+- [x] Choose the target distance: `1.5m`, `2.5m` or `3.5m`
 - [x] Enable/Disable debug mode
 - [x] Keep following/pushing players in a Tent
 - [x] Keep following/pushing players/entities
@@ -34,10 +35,9 @@ Currently, this mod is still in development so it only has these features:
 
 Below are the features yet to be implemented:
 
-- [ ] Add more configurations
 - [ ] Auto-hide in a Bush Hat if equipped
 - [ ] Auto-hide in a Snurtle Shell Armor if in the inventory
-- [ ] Follow players through wormholes and possibly cave entrances
+- [ ] Follow players through wormholes
 - [ ] Improve pathfinding precision
 
 ## License
