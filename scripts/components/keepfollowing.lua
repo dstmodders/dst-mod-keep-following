@@ -34,6 +34,7 @@ function KeepFollowing:CanBeLeader(entity)
         or entity:HasTag("critter")
         or entity:HasTag("glommer")
         or entity:HasTag("hutch")
+        or entity:HasTag("manrabbit")
         or entity:HasTag("pig")
 end
 
