@@ -53,6 +53,7 @@ end
 configuration_options = {
     AddConfig("Action key", "key_action", keylist, "KEY_LSHIFT", "Key used for both following and pushing"),
     AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key"),
-    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close you can approach the target but ignored when pushing"),
+    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close can you approach the leader? Ignored when pushing"),
+    AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from leader inside the target distance. Ignored when pushing"),
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
 }

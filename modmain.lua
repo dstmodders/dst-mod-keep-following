@@ -52,6 +52,7 @@ local function OnPlayerActivated(player)
     player.components.keepfollowing.modname = modname
 
     --GetModConfigData
+    player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
     player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
 
     if _DEBUG then

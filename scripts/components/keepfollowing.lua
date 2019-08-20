@@ -15,6 +15,7 @@ local KeepFollowing = Class(function(self, inst)
     self.tasktime = 0
 
     --replaced by GetModConfigData
+    self.keeptargetdistance = false
     self.targetdistance = 2.5
 
     inst:StartUpdatingComponent(self)
@@ -129,16 +130,18 @@ function KeepFollowing:StartFollowing(entity)
                     self.tasktime = 0
                 end
 
-                pos = self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25)
+                if not self.isnear or self.keeptargetdistance then
+                    pos = self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25)
 
-                if self.playercontroller.locomotor then
-                    self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-                else
-                    SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-                end
+                    if self.playercontroller.locomotor then
+                        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+                    else
+                        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+                    end
 
-                if self.tasktime == 0 then
-                    self.tasktime = 0.3
+                    if self.tasktime == 0 then
+                        self.tasktime = 0.3
+                    end
                 end
 
                 self:StartFollowing(entity)
