@@ -1,21 +1,21 @@
 name = "Keep Following"
-version = "0.5.0"
+version = "0.6.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[LCtrl +  (LMB) on the player, Chester/Hutch, Critter, Glommer or Pig to keep following. ]] ..
-    [[LCtrl + LAlt +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
-    [[You can also use the above key combinations on a Tent used by another player to keep ]] ..
-    [[following or pushing him.]] .. "\n\n" ..
-    [[v0.5.0:]] .. "\n" ..
-    [[- Added support for action and push keys configuration]] .. "\n" ..
-    [[- Changed default action and push keys]] .. "\n" ..
-    [[- Fixed crash when entering/leaving cave]]
+    [[By default, RShift +  (LMB) on the player, Bunnyman/Pig, Chester/Hutch, Critter or Glommer to keep following. ]] ..
+    [[RShift + RCtrl +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
+    [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
+    [[v0.6.0:]] .. "\n" ..
+    [[- Added support for Bunnymen]] .. "\n" ..
+    [[- Added support for keeping the target distance configuration]] .. "\n" ..
+    [[- Changed the default action and push keys back to original]] .. "\n" ..
+    [[- Improved compatibility with some other mods]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
 
---Advanced Controls is using the default 0 priority. We need to load our mod before them, so its "Attack actions only
---key" wouldn't interfere with us. The "1835465557" part is the workshop ID of this mod so other mods had enough "space
---for manoeuvre" in loading priority
+--Advanced Controls is using the default 0 priority. We need to load our mod before them, so its
+--"Attack actions only key" wouldn't interfere with us. The "1835465557" part is the workshop ID of
+--this mod so other mods had enough "space for manoeuvre" in loading priority
 priority = -0.011835465557
 
 icon = "modicon.tex"
