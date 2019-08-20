@@ -6,19 +6,19 @@ Mod for the game [Don't Starve Together][] which is available through the
 [Steam Workshop][] and allows players to follow/push others or one of the
 supported entities below:
 
+- Bunnyman/Pig
 - Chester/Hutch
 - Critter
 - Glommer
-- Pig
 
-| Default Keys             | Actions                                        |
-|--------------------------|------------------------------------------------|
-| `LCtrl` + `LMB`          | to keep following                              |
-| `LCtrl` + `LAlt` + `LMB` | to keep pushing and ignore the target distance |
-| `WASD`                   | to stop                                        |
+| Default Keys               | Actions                                        |
+|----------------------------|------------------------------------------------|
+| `LShift` + `LMB`           | to keep following                              |
+| `LShift` + `LCtrl` + `LMB` | to keep pushing and ignore the target distance |
+| `WASD`                     | to stop                                        |
 
-You can also use the above key combinations on a Tent used by another player to
-keep following or pushing him.
+You can also use the above key combinations on a Tent/Siesta Lean-to used by
+another player to keep following or pushing him.
 
 ## Supported features
 
