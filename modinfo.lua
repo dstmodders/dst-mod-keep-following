@@ -12,7 +12,11 @@ description = [[Version: ]] .. version .. "\n\n" ..
 author = "Demonblink"
 api_version = 10
 forumthread = ""
-priority = 0.001835465557 --0.00 .. workshop ID
+
+--Advanced Controls is using the default 0 priority. We need to load our mod before them, so its "Attack actions only
+--key" wouldn't interfere with us. The "1835465557" part is the workshop ID of this mod so other mods had enough "space
+--for manoeuvre" in loading priority
+priority = -0.011835465557
 
 icon = "modicon.tex"
 icon_atlas = "modicon.xml"
