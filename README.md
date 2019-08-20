@@ -24,10 +24,11 @@ another player to keep following or pushing him.
 
 Currently, this mod is still in development and has these features so far:
 
-- [x] Choose both action and push keys
-- [x] Choose the target distance: `1.5m`, `2.5m` or `3.5m`
+- [x] Configure both action and push keys
+- [x] Configure the target distance: `1.5m`, `2.5m` or `3.5m`
+- [x] Configure to keep the target distance from leader
 - [x] Enable/Disable debug mode
-- [x] Keep following/pushing players in a Tent
+- [x] Keep following/pushing players in a Tent/Siesta Lean-to
 - [x] Keep following/pushing players/entities
 - [x] Lag compensation on/off support
 
