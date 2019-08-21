@@ -1,8 +1,10 @@
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local _CAN_BE_LEADER_TAGS = {
+    "abigail",
     "catcoon",
     "chester",
+    "companion",
     "critter",
     "hutch",
     "koalefant",
