@@ -1,5 +1,14 @@
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
+local _CAN_BE_LEADER_TAGS = {
+    "chester",
+    "critter",
+    "hutch",
+    "manrabbit",
+    "pig",
+    "player"
+}
+
 local KeepFollowing = Class(function(self, inst)
     self.inst = inst
 
@@ -30,13 +39,11 @@ function KeepFollowing:CanBeLeader(entity)
         return false
     end
 
-    return entity:HasTag("player")
-        or entity:HasTag("chester")
-        or entity:HasTag("critter")
-        or entity:HasTag("glommer")
-        or entity:HasTag("hutch")
-        or entity:HasTag("manrabbit")
-        or entity:HasTag("pig")
+    for _, tag in pairs(_CAN_BE_LEADER_TAGS) do
+        if entity:HasTag(tag) then
+            return true
+        end
+    end
 end
 
 function KeepFollowing:SetLeader(entity)
