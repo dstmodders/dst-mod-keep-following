@@ -210,7 +210,11 @@ local function PlayerControllerPostInit(self, player)
 
             if IsOurAction(act.action) then
                 return act.action.fn(act)
+            else
+                KeepFollowingStop()
             end
+        else
+            KeepFollowingStop()
         end
 
         OldOnLeftClick(self, down)
