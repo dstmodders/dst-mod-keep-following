@@ -1,14 +1,12 @@
 name = "Keep Following"
-version = "0.6.0"
+version = "0.7.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[By default, RShift +  (LMB) on the player, Bunnyman/Pig, Chester/Hutch, Critter or Glommer to keep following. ]] ..
-    [[RShift + RCtrl +  (LMB) to keep pushing. WASD to stop.]] .. "\n\n" ..
+    [[By default, Shift +  (LMB) on the player, Abigail/Big Bernie, Bunnyman/Pig, Chester/Hutch, Critter, Glommer and some animals to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.6.0:]] .. "\n" ..
-    [[- Added support for Bunnymen]] .. "\n" ..
-    [[- Added support for keeping the target distance configuration]] .. "\n" ..
-    [[- Changed the default action and push keys back to original]] .. "\n" ..
-    [[- Improved compatibility with some other mods]]
+    [[v0.7.0:]] .. "\n" ..
+    [[- Added support for Abigail and Big Bernie]] .. "\n" ..
+    [[- Added support for Catcoon, Koalefant, Volt Goat and Mosling]] .. "\n" ..
+    [[- Added support for stopping following/pushing on LMB click]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
