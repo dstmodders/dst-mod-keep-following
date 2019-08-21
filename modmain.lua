@@ -157,6 +157,13 @@ local function PlayerControllerPostInit(self, player)
         return
     end
 
+    local function KeepFollowingStop()
+        local keepfollowing = player.components.keepfollowing
+        if keepfollowing then
+            keepfollowing:Stop()
+        end
+    end
+
     local OldGetLeftMouseAction = self.GetLeftMouseAction
     local OldOnControl = self.OnControl
     local OldOnLeftClick = self.OnLeftClick
@@ -196,7 +203,7 @@ local function PlayerControllerPostInit(self, player)
 
         local act = self:GetLeftMouseAction()
         if act then
-            local keepfollowing = act.doer.components.keepfollowing
+            local keepfollowing = player.components.keepfollowing
             if keepfollowing then
                 keepfollowing.playercontroller = self
             end
@@ -211,16 +218,7 @@ local function PlayerControllerPostInit(self, player)
 
     local function NewOnControl(self, control, down)
         if IsMoveButton(control) then
-            local keepfollowing = player.components.keepfollowing
-            if keepfollowing and keepfollowing:InGame() then
-                if keepfollowing:IsFollowing() then
-                    keepfollowing:StopFollowing()
-                end
-
-                if keepfollowing:IsPushing() then
-                    keepfollowing:StopPushing()
-                end
-            end
+            KeepFollowingStop()
         end
 
         return OldOnControl(self, control, down)

@@ -1,3 +1,4 @@
+local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local _CAN_BE_LEADER_TAGS = {
@@ -105,6 +106,14 @@ function KeepFollowing:GetTentSleeper(entity)
     return nil
 end
 
+function KeepFollowing:WalkToPoint(pos)
+    if self.playercontroller.locomotor then
+        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+    else
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+    end
+end
+
 function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
@@ -113,12 +122,11 @@ function KeepFollowing:IsPushing()
     return self.leader and self.ispushing
 end
 
-function KeepFollowing:StartFollowing(entity)
+function KeepFollowing:StartFollowing(leader)
     local distance
-    local pos
 
     if not self:IsFollowing() then
-        self:SetLeader(entity)
+        self:SetLeader(leader)
     end
 
     if self.leader and self.playercontroller then
@@ -144,31 +152,23 @@ function KeepFollowing:StartFollowing(entity)
                 end
 
                 if not self.isnear or self.keeptargetdistance then
-                    pos = self.inst:GetPositionAdjacentTo(entity, self.targetdistance - 0.25)
-
-                    if self.playercontroller.locomotor then
-                        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-                    else
-                        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-                    end
-
+                    self:WalkToPoint(self.inst:GetPositionAdjacentTo(leader, self.targetdistance - 0.25))
                     if self.tasktime == 0 then
-                        self.tasktime = 0.3
+                        self.tasktime = _DEFAULT_TASK_TIME
                     end
                 end
 
-                self:StartFollowing(entity)
+                self:StartFollowing(leader)
             end
         end)
     end
 end
 
-function KeepFollowing:StartPushing(entity)
+function KeepFollowing:StartPushing(leader)
     local distance
-    local pos
 
     if not self:IsPushing() then
-        self:SetLeader(entity)
+        self:SetLeader(leader)
     end
 
     if self.leader and self.playercontroller then
@@ -186,15 +186,8 @@ function KeepFollowing:StartPushing(entity)
 
         self.inst:DoTaskInTime(self.tasktime, function()
             if self:IsPushing() then
-                pos = entity:GetPosition()
-
-                if self.playercontroller.locomotor then
-                    self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-                else
-                    SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-                end
-
-                self:StartPushing(entity)
+                self:WalkToPoint(leader:GetPosition())
+                self:StartPushing(leader)
             end
         end)
     end
@@ -217,6 +210,18 @@ function KeepFollowing:StopPushing()
         self.ispushing = false
         self.leader = nil
         self.tasktime = 0
+    end
+end
+
+function KeepFollowing:Stop()
+    if self:InGame() then
+        if self:IsFollowing() then
+            self:StopFollowing()
+        end
+
+        if self:IsPushing() then
+            self:StopPushing()
+        end
     end
 end
 
