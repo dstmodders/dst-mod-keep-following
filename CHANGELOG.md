@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.7.0][] - 2019-08-22
+
+### Added
+
+- Support for Abigail and Big Bernie
+- Support for Catcoon, Koalefant, Volt Goat and Mosling
+- Support for stopping following/pushing on LMB click
+
 ## [0.6.0][] - 2019-08-20
 
 ### Added
@@ -71,7 +79,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.3.0...v0.4.0
