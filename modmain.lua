@@ -189,7 +189,6 @@ local function PlayerControllerPostInit(self, player)
 
     local OldGetLeftMouseAction = self.GetLeftMouseAction
     local OldOnControl = self.OnControl
-    local OldOnLeftClick = self.OnLeftClick
 
     local function NewGetLeftMouseAction(self)
         local act = OldGetLeftMouseAction(self)
@@ -219,21 +218,16 @@ local function PlayerControllerPostInit(self, player)
         return self.LMBaction
     end
 
-    local function NewOnLeftClick(self, down)
-        if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
-            return OldOnLeftClick(self, down)
-        end
-
-        OurLeftMouseAction(player)
-        OldOnLeftClick(self, down)
-    end
-
     local function NewOnControl(self, control, down)
         if IsMoveButton(control) then
             KeepFollowingStop()
         end
 
         if control == CONTROL_PRIMARY then
+            if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+                return OldOnControl(self, control, down)
+            end
+
             OurLeftMouseAction(player)
         end
 
@@ -242,7 +236,6 @@ local function PlayerControllerPostInit(self, player)
 
     self.GetLeftMouseAction = NewGetLeftMouseAction
     self.OnControl = NewOnControl
-    self.OnLeftClick = NewOnLeftClick
 
     DebugString("playercontroller initialized")
 end
