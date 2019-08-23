@@ -4,6 +4,7 @@ local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
+local CONTROL_PRIMARY = GLOBAL.CONTROL_PRIMARY
 local TheInput = GLOBAL.TheInput
 
 --GetModConfigData
@@ -164,6 +165,24 @@ local function PlayerControllerPostInit(self, player)
         end
     end
 
+    local function OurLeftMouseAction(player)
+        local act = self:GetLeftMouseAction()
+        if act then
+            local keepfollowing = player.components.keepfollowing
+            if keepfollowing then
+                keepfollowing.playercontroller = self
+            end
+
+            if IsOurAction(act.action) then
+                return act.action.fn(act)
+            else
+                KeepFollowingStop()
+            end
+        else
+            KeepFollowingStop()
+        end
+    end
+
     local OldGetLeftMouseAction = self.GetLeftMouseAction
     local OldOnControl = self.OnControl
     local OldOnLeftClick = self.OnLeftClick
@@ -201,22 +220,7 @@ local function PlayerControllerPostInit(self, player)
             return OldOnLeftClick(self, down)
         end
 
-        local act = self:GetLeftMouseAction()
-        if act then
-            local keepfollowing = player.components.keepfollowing
-            if keepfollowing then
-                keepfollowing.playercontroller = self
-            end
-
-            if IsOurAction(act.action) then
-                return act.action.fn(act)
-            else
-                KeepFollowingStop()
-            end
-        else
-            KeepFollowingStop()
-        end
-
+        OurLeftMouseAction(player)
         OldOnLeftClick(self, down)
     end
 
@@ -225,7 +229,11 @@ local function PlayerControllerPostInit(self, player)
             KeepFollowingStop()
         end
 
-        return OldOnControl(self, control, down)
+        if control == CONTROL_PRIMARY then
+            OurLeftMouseAction(player)
+        end
+
+        OldOnControl(self, control, down)
     end
 
     self.GetLeftMouseAction = NewGetLeftMouseAction
