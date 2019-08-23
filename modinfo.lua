@@ -1,17 +1,18 @@
 name = "Keep Following"
-version = "0.7.0"
+version = "0.8.0"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player, Abigail/Big Bernie, Bunnyman/Pig, Chester/Hutch, Critter, Glommer and some animals to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.7.0:]] .. "\n" ..
-    [[- Added support for Abigail and Big Bernie]] .. "\n" ..
-    [[- Added support for Catcoon, Koalefant, Volt Goat and Mosling]] .. "\n" ..
-    [[- Added support for stopping following/pushing on LMB click]]
+    [[v0.8.0:]] .. "\n" ..
+    [[- Added support for more animals]] .. "\n" ..
+    [[- Changed mod icon]] .. "\n" ..
+    [[- Improved compatibility with some other mods]] .. "\n" ..
+    [[- Improved debug output]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
 
---Advanced Controls is using the default 0 priority. We need to load our mod before them, so its
+--Advanced Controls is using the default 0 priority. We need to load our mod after theirs, so its
 --"Attack actions only key" wouldn't interfere with us. The "1835465557" part is the workshop ID of
 --this mod so other mods had enough "space for manoeuvre" in loading priority
 priority = -0.011835465557
@@ -26,6 +27,11 @@ dst_compatible = true
 reign_of_giants_compatible = false
 shipwrecked_compatible = false
 
+folder_name = folder_name or "dst-mod-keep-following"
+if not folder_name:find("workshop-") then
+    name = name .. " (dev)"
+end
+
 local boolean = {
     { description = "Yes", data = true },
     { description = "No", data = false }
@@ -38,7 +44,16 @@ local target_distance = {
 }
 
 local string = ""
-local keys = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift", "Tab", "Capslock", "Space", "Minus", "Equals", "Backspace", "Insert", "Home", "Delete", "End", "Pageup", "Pagedown", "Print", "Scrollock", "Pause", "Period", "Slash", "Semicolon", "Leftbracket", "Rightbracket", "Backslash", "Up", "Down", "Left", "Right" }
+local keys = {
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+    "LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift",
+    "Tab", "Capslock", "Space", "Minus", "Equals", "Backspace",
+    "Insert", "Home", "Delete", "End", "Pageup", "Pagedown", "Print", "Scrollock", "Pause",
+    "Period", "Slash", "Semicolon", "Leftbracket", "Rightbracket", "Backslash",
+    "Up", "Down", "Left", "Right"
+}
+
 local keylist = {}
 for i = 1, #keys do
     keylist[i] = { description = keys[i], data = "KEY_" .. string.upper(keys[i]) }
