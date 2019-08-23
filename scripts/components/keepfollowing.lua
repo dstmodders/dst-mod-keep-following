@@ -66,7 +66,7 @@ end
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
-        self:DebugString(string.format("new leader %s", self.leader:GetDisplayName()))
+        self:DebugString("new leader", self.leader:GetDisplayName())
     end
 end
 
@@ -98,7 +98,7 @@ function KeepFollowing:GetTentSleeper(entity)
         return nil
     end
 
-    self:DebugString(string.format("attempting to get a %s sleeper", entity:GetDisplayName()))
+    self:DebugString("attempting to get a", entity:GetDisplayName(), "sleeper")
 
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
@@ -109,7 +109,7 @@ function KeepFollowing:GetTentSleeper(entity)
     end
 
     if player and player:HasTag("sleeping") then
-        self:DebugString(string.format("found sleeper %s", player:GetDisplayName()))
+        self:DebugString("found sleeper", player:GetDisplayName())
         return player
     end
 
@@ -145,8 +145,8 @@ function KeepFollowing:StartFollowing(leader)
         if not self:IsFollowing() then
             self.isfollowing = true
 
-            self:DebugString(string.format(
-                "started following leader. Distance: %0.2f. Target: %0.2f",
+            self:DebugString("started following leader", string.format(
+                "Distance: %0.2f. Target: %0.2f",
                 distance,
                 self.targetdistance
             ))
@@ -175,23 +175,15 @@ function KeepFollowing:StartFollowing(leader)
 end
 
 function KeepFollowing:StartPushing(leader)
-    local distance
-
     if not self:IsPushing() then
         self:SetLeader(leader)
     end
 
     if self.leader and self.playercontroller then
-        distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
-
         if not self:IsPushing() then
             self.ispushing = true
 
-            self:DebugString(string.format(
-                "started pushing leader",
-                distance,
-                self.targetdistance
-            ))
+            self:DebugString("started pushing leader")
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
@@ -205,7 +197,7 @@ end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        self:DebugString(string.format("stopped following %s", self.leader:GetDisplayName()))
+        self:DebugString("stopped following", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
         self.isfollowing = false
         self.leader = nil
@@ -215,7 +207,7 @@ end
 
 function KeepFollowing:StopPushing()
     if self.leader then
-        self:DebugString(string.format("stopped pushing %s", self.leader:GetDisplayName()))
+        self:DebugString("stopped pushing", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
         self.ispushing = false
         self.leader = nil
@@ -243,9 +235,13 @@ function KeepFollowing:DisableDebug()
     self.debug = false
 end
 
-function KeepFollowing:DebugString(string)
+function KeepFollowing:DebugString(...)
     if self.debug then
-        print(string.format("Mod (%s): %s", self.modname, tostring(string)))
+        local msg = string.format("[%s]", self.modname)
+        for i = 1, arg.n do
+            msg = msg .. " " .. tostring(arg[i])
+        end
+        print(msg)
     end
 end
 

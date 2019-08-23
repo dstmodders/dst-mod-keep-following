@@ -6,6 +6,7 @@ local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = GLOBAL.CONTROL_PRIMARY
 local TheInput = GLOBAL.TheInput
+local TheSim = GLOBAL.TheSim
 
 --GetModConfigData
 local function GetKeyFromConfig(config)
@@ -17,14 +18,18 @@ local _DEBUG = GetModConfigData("debug")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
 
-local function DebugString(string)
+local function DebugString(...)
     if _DEBUG then
-        print(string.format("Mod (%s): %s", modname, tostring(string)))
+        local msg = string.format("[%s]", modname)
+        for i = 1, arg.n do
+            msg = msg .. " " .. tostring(arg[i])
+        end
+        print(msg)
     end
 end
 
 local function IsDST()
-    return GLOBAL.TheSim:GetGameID() == "DST"
+    return TheSim:GetGameID() == "DST"
 end
 
 local function IsClient()
@@ -60,17 +65,16 @@ local function OnPlayerActivated(player)
         player.components.keepfollowing:EnableDebug()
     end
 
-    DebugString(string.format("player %s activated", player:GetDisplayName()))
+    DebugString("player", player:GetDisplayName(), "activated")
 end
 
 local function OnPlayerDeactivated(player)
     player:RemoveComponent("keepfollowing")
-
-    DebugString(string.format("player %s deactivated", player:GetDisplayName()))
+    DebugString("player", player:GetDisplayName(), "deactivated")
 end
 
 local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
-    DebugString(string.format("game ID - %s", GLOBAL.TheSim:GetGameID()))
+    DebugString("game ID -", TheSim:GetGameID())
 
     if IsDST() then
         env.AddPrefabPostInit("world", function(world)
