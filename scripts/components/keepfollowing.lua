@@ -3,17 +3,27 @@ local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local _CAN_BE_LEADER_TAGS = {
     "abigail",
+    "berrythief", --Gobbler
     "catcoon",
     "chester",
     "companion",
     "critter",
+    "deer",
+    "fruitdragon", --Saladmander
+    "grassgekko",
     "hutch",
     "koalefant",
-    "lightninggoat",
+    "lightninggoat", --Volt Goat
     "manrabbit",
+    "monkey", --Splumonkey
     "mossling",
+    "mufflehat", --Slurper
+    "penguin", --Pengull
     "pig",
-    "player"
+    "player",
+    "rocky", --Rock Lobster
+    "slurtle",
+    "snurtle"
 }
 
 local KeepFollowing = Class(function(self, inst)
