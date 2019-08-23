@@ -4,17 +4,7 @@
 
 Mod for the game [Don't Starve Together][] which is available through the
 [Steam Workshop][] and allows players to follow/push others or one of the
-supported entities below:
-
-- Abigail/Big Bernie
-- Bunnyman/Pig
-- Catcoon
-- Chester/Hutch
-- Critter
-- Glommer
-- Koalefant
-- Mosling
-- Volt Goat
+supported entities.
 
 | Default Keys             | Actions                                        |
 |--------------------------|------------------------------------------------|
@@ -25,6 +15,27 @@ To stop following either use `WASD` movement keys or click `LMB`.
 
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
+
+## Supported entities
+
+- Abigail/Bernie
+- Bunnyman/Pig
+- Catcoon
+- Chester/Hutch
+- Critter
+- Deer
+- Glommer
+- Gobbler
+- Grass Gekko
+- Koalefant
+- Mosling
+- Pengull
+- Rock Lobster
+- Saladmander
+- Slurper
+- Snurtle/Slurtle
+- Splumonkey
+- Volt Goat
 
 ## Supported features
 
