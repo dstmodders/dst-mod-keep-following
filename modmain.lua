@@ -1,17 +1,18 @@
 --Globals
-local ACTIONS = GLOBAL.ACTIONS
-local CONTROL_MOVE_DOWN = GLOBAL.CONTROL_MOVE_DOWN
-local CONTROL_MOVE_LEFT = GLOBAL.CONTROL_MOVE_LEFT
-local CONTROL_MOVE_RIGHT = GLOBAL.CONTROL_MOVE_RIGHT
-local CONTROL_MOVE_UP = GLOBAL.CONTROL_MOVE_UP
-local CONTROL_PRIMARY = GLOBAL.CONTROL_PRIMARY
-local TheInput = GLOBAL.TheInput
-local TheSim = GLOBAL.TheSim
+local _G = GLOBAL
+local ACTIONS = _G.ACTIONS
+local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
+local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
+local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
+local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
+local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
+local TheInput = _G.TheInput
+local TheSim = _G.TheSim
 
 --GetModConfigData
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
-    return key and (type(key) == "number" and key or GLOBAL[key]) or -1
+    return key and (type(key) == "number" and key or _G[key]) or -1
 end
 
 local _DEBUG = GetModConfigData("debug")
@@ -33,7 +34,7 @@ local function IsDST()
 end
 
 local function IsClient()
-    return IsDST() and GLOBAL.TheNet:GetIsClient()
+    return IsDST() and _G.TheNet:GetIsClient()
 end
 
 local function IsMoveButton(control)
@@ -79,13 +80,13 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
     if IsDST() then
         env.AddPrefabPostInit("world", function(world)
             world:ListenForEvent("playeractivated", function(world, player)
-                if player == GLOBAL.ThePlayer then
+                if player == _G.ThePlayer then
                     onActivatedFn(player)
                 end
             end)
 
             world:ListenForEvent("playerdeactivated", function(world, player)
-                if player == GLOBAL.ThePlayer then
+                if player == _G.ThePlayer then
                     onDeactivatedFn(player)
                 end
             end)
@@ -156,7 +157,7 @@ local function ActionTentPush(act)
 end
 
 local function PlayerControllerPostInit(self, player)
-    local ThePlayer = GLOBAL.ThePlayer
+    local ThePlayer = _G.ThePlayer
 
     if player ~= ThePlayer then
         return
