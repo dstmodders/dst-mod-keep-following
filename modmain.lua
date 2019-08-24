@@ -19,14 +19,18 @@ local _DEBUG = GetModConfigData("debug")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
 
-local function DebugString(...)
-    if _DEBUG then
-        local msg = string.format("[%s]", modname)
-        for i = 1, arg.n do
-            msg = msg .. " " .. tostring(arg[i])
-        end
-        print(msg)
+local DebugFn = _DEBUG and function(...)
+    local msg = string.format("[%s]", modname)
+    for i = 1, arg.n do
+        msg = msg .. " " .. tostring(arg[i])
     end
+    print(msg)
+end or function()
+    --nil
+end
+
+local function DebugString(...)
+    DebugFn(...)
 end
 
 local function IsDST()
@@ -54,6 +58,7 @@ end
 local function OnPlayerActivated(player)
     player:AddComponent("keepfollowing")
 
+    player.components.keepfollowing.debugfn = DebugFn
     player.components.keepfollowing.isclient = IsClient()
     player.components.keepfollowing.isdst = IsDST()
     player.components.keepfollowing.modname = modname
@@ -61,10 +66,6 @@ local function OnPlayerActivated(player)
     --GetModConfigData
     player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
     player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
-
-    if _DEBUG then
-        player.components.keepfollowing:EnableDebug()
-    end
 
     DebugString("player", player:GetDisplayName(), "activated")
 end

@@ -29,7 +29,7 @@ local _CAN_BE_LEADER_TAGS = {
 local KeepFollowing = Class(function(self, inst)
     self.inst = inst
 
-    self.debug = false
+    self.debugfn = nil
     self.isclient = false
     self.isdst = false
     self.isfollowing = false
@@ -227,22 +227,8 @@ function KeepFollowing:Stop()
     end
 end
 
-function KeepFollowing:EnableDebug()
-    self.debug = true
-end
-
-function KeepFollowing:DisableDebug()
-    self.debug = false
-end
-
 function KeepFollowing:DebugString(...)
-    if self.debug then
-        local msg = string.format("[%s]", self.modname)
-        for i = 1, arg.n do
-            msg = msg .. " " .. tostring(arg[i])
-        end
-        print(msg)
-    end
+    self.debugfn(...)
 end
 
 return KeepFollowing
