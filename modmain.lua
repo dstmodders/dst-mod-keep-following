@@ -6,6 +6,8 @@ local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
+local RPC = _G.RPC
+local SendRPCToServer = _G.SendRPCToServer
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
 
@@ -18,6 +20,10 @@ end
 local _DEBUG = GetModConfigData("debug")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
+local _PUSHING_LAG_COMPENSATION = GetModConfigData("pushing_lag_compensation")
+
+--Other
+local _MOVEMENT_PREDICTION_PREVIOUS_STATE
 
 local DebugFn = _DEBUG and function(...)
     local msg = string.format("[%s]", modname)
@@ -53,6 +59,35 @@ local function IsOurAction(action)
         or action == ACTIONS.PUSH
         or action == ACTIONS.TENTFOLLOW
         or action == ACTIONS.TENTPUSH
+end
+
+local function IsOurFollowAction(action)
+    return action == ACTIONS.FOLLOW or action == ACTIONS.TENTFOLLOW
+end
+
+local function IsOurPushAction(action)
+    return action == ACTIONS.PUSH or action == ACTIONS.TENTPUSH
+end
+
+local function IsMovementPredictionEnabled()
+    return _G.ThePlayer.components.locomotor ~= nil
+end
+
+local function MovementPrediction(enable)
+    local ThePlayer = _G.ThePlayer
+
+    if enable then
+        local x, _, z = ThePlayer.Transform:GetWorldPosition()
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
+        ThePlayer:EnableMovementPrediction(true)
+        DebugString("movement prediction enabled")
+        return true
+    elseif ThePlayer.components and ThePlayer.components.locomotor then
+        ThePlayer.components.locomotor:Stop()
+        ThePlayer:EnableMovementPrediction(false)
+        DebugString("movement prediction disabled")
+        return false
+    end
 end
 
 local function OnPlayerActivated(player)
@@ -166,7 +201,18 @@ local function PlayerControllerPostInit(self, player)
 
     local function KeepFollowingStop()
         local keepfollowing = player.components.keepfollowing
-        if keepfollowing then
+        if not keepfollowing then
+            return
+        end
+
+        if keepfollowing:IsFollowing() then
+            keepfollowing:Stop()
+        elseif keepfollowing:IsPushing() then
+            if _PUSHING_LAG_COMPENSATION then
+                MovementPrediction(_MOVEMENT_PREDICTION_PREVIOUS_STATE)
+                _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
+            end
+
             keepfollowing:Stop()
         end
     end
@@ -175,12 +221,31 @@ local function PlayerControllerPostInit(self, player)
         local act = self:GetLeftMouseAction()
         if act then
             local keepfollowing = player.components.keepfollowing
+            local action = act.action
+
             if keepfollowing then
                 keepfollowing.playercontroller = self
             end
 
-            if IsOurAction(act.action) then
-                return act.action.fn(act)
+            if _PUSHING_LAG_COMPENSATION and IsOurPushAction(action) then
+                if _MOVEMENT_PREDICTION_PREVIOUS_STATE == nil then
+                    _MOVEMENT_PREDICTION_PREVIOUS_STATE = IsMovementPredictionEnabled()
+                end
+
+                if _MOVEMENT_PREDICTION_PREVIOUS_STATE then
+                    MovementPrediction(false)
+                end
+
+                return action.fn(act)
+            elseif _PUSHING_LAG_COMPENSATION and IsOurFollowAction(action) then
+                if _MOVEMENT_PREDICTION_PREVIOUS_STATE ~= nil then
+                    MovementPrediction(_MOVEMENT_PREDICTION_PREVIOUS_STATE)
+                    _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
+                end
+
+                return action.fn(act)
+            elseif IsOurAction(action) then
+                return action.fn(act)
             else
                 KeepFollowingStop()
             end
