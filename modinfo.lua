@@ -65,9 +65,10 @@ end
 
 configuration_options = {
     AddConfig("Action key", "key_action", keylist, "KEY_LSHIFT", "Key used for both following and pushing"),
-    AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key"),
-    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close can you approach the leader? Ignored when pushing"),
-    AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from leader inside the target distance. Ignored when pushing"),
+    AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
+    AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
+    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
+    AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
     AddConfig("Pushing lag compensation", "pushing_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
 }

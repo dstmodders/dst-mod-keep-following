@@ -6,6 +6,7 @@ local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
+local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local RPC = _G.RPC
 local SendRPCToServer = _G.SendRPCToServer
 local TheInput = _G.TheInput
@@ -20,6 +21,7 @@ end
 local _DEBUG = GetModConfigData("debug")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
+local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 local _PUSHING_LAG_COMPENSATION = GetModConfigData("pushing_lag_compensation")
 
 --Other
@@ -217,44 +219,45 @@ local function PlayerControllerPostInit(self, player)
         end
     end
 
-    local function OurLeftMouseAction(player)
-        local act = self:GetLeftMouseAction()
-        if act then
-            local keepfollowing = player.components.keepfollowing
-            local action = act.action
+    local function OurMouseAction(player, act)
+        if not act then
+            KeepFollowingStop()
+            return
+        end
 
-            if keepfollowing then
-                keepfollowing.playercontroller = self
+        local keepfollowing = player.components.keepfollowing
+        local action = act.action
+
+        if keepfollowing then
+            keepfollowing.playercontroller = self
+        end
+
+        if _PUSHING_LAG_COMPENSATION and IsOurPushAction(action) then
+            if _MOVEMENT_PREDICTION_PREVIOUS_STATE == nil then
+                _MOVEMENT_PREDICTION_PREVIOUS_STATE = IsMovementPredictionEnabled()
             end
 
-            if _PUSHING_LAG_COMPENSATION and IsOurPushAction(action) then
-                if _MOVEMENT_PREDICTION_PREVIOUS_STATE == nil then
-                    _MOVEMENT_PREDICTION_PREVIOUS_STATE = IsMovementPredictionEnabled()
-                end
-
-                if _MOVEMENT_PREDICTION_PREVIOUS_STATE then
-                    MovementPrediction(false)
-                end
-
-                return action.fn(act)
-            elseif _PUSHING_LAG_COMPENSATION and IsOurFollowAction(action) then
-                if _MOVEMENT_PREDICTION_PREVIOUS_STATE ~= nil then
-                    MovementPrediction(_MOVEMENT_PREDICTION_PREVIOUS_STATE)
-                    _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
-                end
-
-                return action.fn(act)
-            elseif IsOurAction(action) then
-                return action.fn(act)
-            else
-                KeepFollowingStop()
+            if _MOVEMENT_PREDICTION_PREVIOUS_STATE then
+                MovementPrediction(false)
             end
+
+            return action.fn(act)
+        elseif _PUSHING_LAG_COMPENSATION and IsOurFollowAction(action) then
+            if _MOVEMENT_PREDICTION_PREVIOUS_STATE ~= nil then
+                MovementPrediction(_MOVEMENT_PREDICTION_PREVIOUS_STATE)
+                _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
+            end
+
+            return action.fn(act)
+        elseif IsOurAction(action) then
+            return action.fn(act)
         else
             KeepFollowingStop()
         end
     end
 
     local OldGetLeftMouseAction = self.GetLeftMouseAction
+    local OldGetRightMouseAction = self.GetRightMouseAction
     local OldOnControl = self.OnControl
 
     local function NewGetLeftMouseAction(self)
@@ -262,20 +265,28 @@ local function PlayerControllerPostInit(self, player)
 
         if act and act.target then
             local keepfollowing = act.doer.components.keepfollowing
+            local target = act.target
 
-            if act.target:HasTag("tent") and act.target:HasTag("hassleeper") then
-                if TheInput:IsKeyDown(_KEY_ACTION) and not TheInput:IsKeyDown(_KEY_PUSH) then
+            if TheInput:IsKeyDown(_KEY_ACTION)
+                and target:HasTag("tent")
+                and target:HasTag("hassleeper")
+            then
+                if _PUSH_WITH_RMB then
                     act.action = ACTIONS.TENTFOLLOW
-                elseif TheInput:IsKeyDown(_KEY_ACTION) and TheInput:IsKeyDown(_KEY_PUSH) then
+                elseif TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.TENTPUSH
+                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
+                    act.action = ACTIONS.TENTFOLLOW
                 end
             end
 
-            if keepfollowing:CanBeLeader(act.target) then
-                if TheInput:IsKeyDown(_KEY_ACTION) and not TheInput:IsKeyDown(_KEY_PUSH) then
+            if TheInput:IsKeyDown(_KEY_ACTION) and keepfollowing:CanBeLeader(target) then
+                if _PUSH_WITH_RMB then
                     act.action = ACTIONS.FOLLOW
-                elseif TheInput:IsKeyDown(_KEY_ACTION) and TheInput:IsKeyDown(_KEY_PUSH) then
+                elseif TheInput:IsKeyDown(_KEY_PUSH) then
                     act.action = ACTIONS.PUSH
+                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
+                    act.action = ACTIONS.FOLLOW
                 end
             end
         end
@@ -283,6 +294,32 @@ local function PlayerControllerPostInit(self, player)
         self.LMBaction = act
 
         return self.LMBaction
+    end
+
+    local function NewGetRightMouseAction(self)
+        local act = OldGetRightMouseAction(self)
+
+        if act and act.target then
+            local keepfollowing = act.doer.components.keepfollowing
+            local target = act.target
+
+            if TheInput:IsKeyDown(_KEY_ACTION)
+                and target:HasTag("tent")
+                and target:HasTag("hassleeper")
+            then
+                act.action = ACTIONS.TENTPUSH
+            end
+
+            if keepfollowing:CanBeLeader(target) then
+                if TheInput:IsKeyDown(_KEY_ACTION) then
+                    act.action = ACTIONS.PUSH
+                end
+            end
+        end
+
+        self.RMBaction = act
+
+        return self.RMBaction
     end
 
     local function NewOnControl(self, control, down)
@@ -295,7 +332,13 @@ local function PlayerControllerPostInit(self, player)
                 return OldOnControl(self, control, down)
             end
 
-            OurLeftMouseAction(player)
+            OurMouseAction(player, self:GetLeftMouseAction())
+        elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY then
+            if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+                return OldOnControl(self, control, down)
+            end
+
+            OurMouseAction(player, self:GetRightMouseAction())
         end
 
         OldOnControl(self, control, down)
@@ -303,6 +346,10 @@ local function PlayerControllerPostInit(self, player)
 
     self.GetLeftMouseAction = NewGetLeftMouseAction
     self.OnControl = NewOnControl
+
+    if _PUSH_WITH_RMB then
+        self.GetRightMouseAction = NewGetRightMouseAction
+    end
 
     DebugString("playercontroller initialized")
 end
