@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.9.0][] - 2019-08-25
+
+### Added
+
+- Support for Balloon
+- Support for pushing lag compensation
+- Support for pushing with RMB
+
+### Changed
+
+- Improved debug output
+
 ## [0.8.0][] - 2019-08-23
 
 ### Added
@@ -91,7 +103,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.5.0...v0.6.0
