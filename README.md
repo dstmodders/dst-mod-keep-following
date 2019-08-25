@@ -18,7 +18,10 @@ another player to keep following or pushing him.
 
 ## Supported entities
 
+Currently supports following entities:
+
 - Abigail/Bernie
+- Balloon
 - Bunnyman/Pig
 - Catcoon
 - Chester/Hutch
@@ -37,17 +40,20 @@ another player to keep following or pushing him.
 - Splumonkey
 - Volt Goat
 
-## Supported features
+## Configuration
 
-Currently, this mod is still in development and has these features so far:
+Don't like the default behaviour? Choose your own configuration to match your
+needs:
 
-- [x] Configure both action and push keys
-- [x] Configure the target distance: `1.5m`, `2.5m` or `3.5m`
-- [x] Configure to keep the target distance from the leader
-- [x] Enable/Disable debug mode
-- [x] Keep following/pushing players in a Tent/Siesta Lean-to
-- [x] Keep following/pushing players/entities
-- [x] Lag compensation on/off support
+| Configuration                | Options          | Description                                                                                   |
+|------------------------------|------------------|-----------------------------------------------------------------------------------------------|
+| **Action key**               | _[keys]_         | Key used for both following and pushing                                                       |
+| **Push key**                 | _[keys]_         | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
+| **Push with RMB**            | _Yes/No_         | Use RMB in combination with action key for pushing instead                                    |
+| **Target Distance**          | _1.5m/2.5m/3.5m_ | How close can you approach the leader? Ignored when pushing                                   |
+| **Keep target distance**     | _Yes/No_         | Move away from a leader inside the target distance. Ignored when pushing                      |
+| **Pushing lag compensation** | _Yes/No_         | Automatically disables lag compensation while pushing and restores the previous state after   |
+| **Debug**                    | _Yes/No_         | Enables/Disables the debug mode                                                               |
 
 ## Roadmap
 
@@ -55,8 +61,8 @@ Below are the features yet to be implemented:
 
 - [ ] Auto-hide in a Bush Hat if equipped
 - [ ] Auto-hide in a Snurtle Shell Armor if in the inventory
-- [ ] Follow players through wormholes
-- [ ] Improve pathfinding precision
+- [ ] Follow players through wormholes and possibly cave entrances
+- [ ] Improve pathfinder precision
 
 ## License
 
