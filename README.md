@@ -57,12 +57,14 @@ needs:
 
 ## Roadmap
 
-Below are the features yet to be implemented:
+Below are the features/improvements yet to be implemented:
 
 - [ ] Auto-hide in a Bush Hat if equipped
 - [ ] Auto-hide in a Snurtle Shell Armor if in the inventory
 - [ ] Follow players through wormholes and possibly cave entrances
 - [ ] Improve pathfinder precision
+- [ ] Improve picking/following/pushing LMB conflicts with some other mods
+- [ ] Improve pushing lag compensation behaviour
 
 ## License
 
