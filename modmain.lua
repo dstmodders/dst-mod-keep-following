@@ -1,4 +1,6 @@
---Globals
+--
+-- Globals
+--
 local _G = GLOBAL
 local ACTIONS = _G.ACTIONS
 local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
@@ -12,7 +14,14 @@ local SendRPCToServer = _G.SendRPCToServer
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
 
---GetModConfigData
+--
+-- Private
+--
+local _MOVEMENT_PREDICTION_PREVIOUS_STATE
+
+--
+-- GetModConfigData-related
+--
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
     return key and (type(key) == "number" and key or _G[key]) or -1
@@ -24,8 +33,9 @@ local _KEY_PUSH = GetKeyFromConfig("key_push")
 local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 local _PUSHING_LAG_COMPENSATION = GetModConfigData("pushing_lag_compensation")
 
---Other
-local _MOVEMENT_PREDICTION_PREVIOUS_STATE
+--
+-- Debugging-related
+--
 
 local DebugFn = _DEBUG and function(...)
     local msg = string.format("[%s]", modname)
@@ -40,6 +50,10 @@ end
 local function DebugString(...)
     DebugFn(...)
 end
+
+--
+-- Helpers
+--
 
 local function IsDST()
     return TheSim:GetGameID() == "DST"
@@ -92,51 +106,9 @@ local function MovementPrediction(enable)
     end
 end
 
-local function OnPlayerActivated(player)
-    player:AddComponent("keepfollowing")
-
-    player.components.keepfollowing.debugfn = DebugFn
-    player.components.keepfollowing.isclient = IsClient()
-    player.components.keepfollowing.isdst = IsDST()
-    player.components.keepfollowing.modname = modname
-
-    --GetModConfigData
-    player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
-    player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
-
-    DebugString("player", player:GetDisplayName(), "activated")
-end
-
-local function OnPlayerDeactivated(player)
-    player:RemoveComponent("keepfollowing")
-    DebugString("player", player:GetDisplayName(), "deactivated")
-end
-
-local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
-    DebugString("game ID -", TheSim:GetGameID())
-
-    if IsDST() then
-        env.AddPrefabPostInit("world", function(world)
-            world:ListenForEvent("playeractivated", function(world, player)
-                if player == _G.ThePlayer then
-                    onActivatedFn(player)
-                end
-            end)
-
-            world:ListenForEvent("playerdeactivated", function(world, player)
-                if player == _G.ThePlayer then
-                    onDeactivatedFn(player)
-                end
-            end)
-        end)
-    else
-        env.AddPlayerPostInit(function(player)
-            onActivatedFn(player)
-        end)
-    end
-
-    DebugString("AddPrefabPostInit fired")
-end
+--
+-- Actions
+--
 
 local function ActionFollow(act)
     if not act.doer or not act.target or not act.doer.components.keepfollowing then
@@ -192,6 +164,61 @@ local function ActionTentPush(act)
     end
 
     return true
+end
+
+AddAction("FOLLOW", "Follow", ActionFollow)
+AddAction("PUSH", "Push", ActionPush)
+AddAction("TENTFOLLOW", "Follow player in", ActionTentFollow)
+AddAction("TENTPUSH", "Push player in", ActionTentPush)
+
+--
+-- Player-related
+--
+
+local function OnPlayerActivated(player)
+    player:AddComponent("keepfollowing")
+
+    player.components.keepfollowing.debugfn = DebugFn
+    player.components.keepfollowing.isclient = IsClient()
+    player.components.keepfollowing.isdst = IsDST()
+    player.components.keepfollowing.modname = modname
+
+    --GetModConfigData
+    player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
+    player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
+
+    DebugString("player", player:GetDisplayName(), "activated")
+end
+
+local function OnPlayerDeactivated(player)
+    player:RemoveComponent("keepfollowing")
+    DebugString("player", player:GetDisplayName(), "deactivated")
+end
+
+local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
+    DebugString("game ID -", TheSim:GetGameID())
+
+    if IsDST() then
+        env.AddPrefabPostInit("world", function(world)
+            world:ListenForEvent("playeractivated", function(world, player)
+                if player == _G.ThePlayer then
+                    onActivatedFn(player)
+                end
+            end)
+
+            world:ListenForEvent("playerdeactivated", function(world, player)
+                if player == _G.ThePlayer then
+                    onDeactivatedFn(player)
+                end
+            end)
+        end)
+    else
+        env.AddPlayerPostInit(function(player)
+            onActivatedFn(player)
+        end)
+    end
+
+    DebugString("AddPrefabPostInit fired")
 end
 
 local function PlayerControllerPostInit(self, player)
@@ -354,11 +381,5 @@ local function PlayerControllerPostInit(self, player)
     DebugString("playercontroller initialized")
 end
 
-AddAction("FOLLOW", "Follow", ActionFollow)
-AddAction("PUSH", "Push", ActionPush)
-AddAction("TENTFOLLOW", "Follow player in", ActionTentFollow)
-AddAction("TENTPUSH", "Push player in", ActionTentPush)
-
-AddComponentPostInit("playercontroller", PlayerControllerPostInit)
-
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
+AddComponentPostInit("playercontroller", PlayerControllerPostInit)
