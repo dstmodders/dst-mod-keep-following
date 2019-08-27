@@ -45,15 +45,15 @@ Currently supports following entities:
 Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
-| Configuration                | Options          | Description                                                                                   |
-|------------------------------|------------------|-----------------------------------------------------------------------------------------------|
-| **Action key**               | _[keys]_         | Key used for both following and pushing                                                       |
-| **Push key**                 | _[keys]_         | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
-| **Push with RMB**            | _Yes/No_         | Use RMB in combination with action key for pushing instead                                    |
-| **Target Distance**          | _1.5m/2.5m/3.5m_ | How close can you approach the leader? Ignored when pushing                                   |
-| **Keep target distance**     | _Yes/No_         | Move away from a leader inside the target distance. Ignored when pushing                      |
-| **Pushing lag compensation** | _Yes/No_         | Automatically disables lag compensation while pushing and restores the previous state after   |
-| **Debug**                    | _Yes/No_         | Enables/Disables the debug mode                                                               |
+| Configuration                | Options          | Default  | Description                                                                                   |
+|------------------------------|------------------|----------|--------------------------------------------------------------------------------|
+| **Action key**               | _[keys]_         | _LShift_ | Key used for both following and pushing                                                       |
+| **Push key**                 | _[keys]_         | _LCtrl_  | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
+| **Push with RMB**            | _Yes/No_         | _No_     | Use RMB in combination with action key for pushing instead                                    |
+| **Target Distance**          | _1.5m/2.5m/3.5m_ | _2.5m_   | How close can you approach the leader? Ignored when pushing                                   |
+| **Keep target distance**     | _Yes/No_         | _No_     | Move away from a leader inside the target distance. Ignored when pushing                      |
+| **Pushing lag compensation** | _Yes/No_         | _Yes_    | Automatically disables lag compensation while pushing and restores the previous state after   |
+| **Debug**                    | _Yes/No_         | _No_     | Enables/Disables the debug mode                                                               |
 
 ## Roadmap
 
