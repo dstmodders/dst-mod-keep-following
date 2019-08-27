@@ -30,6 +30,11 @@ local _CAN_BE_LEADER_TAGS = {
 local KeepFollowing = Class(function(self, inst)
     self.inst = inst
 
+    self:Init()
+    inst:StartUpdatingComponent(self)
+end)
+
+function KeepFollowing:Init()
     self.debugfn = nil
     self.isclient = false
     self.isdst = false
@@ -44,13 +49,23 @@ local KeepFollowing = Class(function(self, inst)
     --replaced by GetModConfigData
     self.keeptargetdistance = false
     self.targetdistance = 2.5
-
-    inst:StartUpdatingComponent(self)
-end)
+end
 
 function KeepFollowing:InGame()
     return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
 end
+
+function KeepFollowing:WalkToPoint(pos)
+    if self.playercontroller.locomotor then
+        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+    else
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+    end
+end
+
+--
+-- Leader-related
+--
 
 function KeepFollowing:CanBeLeader(entity)
     if entity == self.inst then
@@ -74,6 +89,10 @@ end
 function KeepFollowing:GetLeader()
     return self.leader
 end
+
+--
+-- Tent-related
+--
 
 function KeepFollowing:FindClosestInvisiblePlayerInRange(x, y, z, range)
     local closestPlayer
@@ -117,20 +136,12 @@ function KeepFollowing:GetTentSleeper(entity)
     return nil
 end
 
-function KeepFollowing:WalkToPoint(pos)
-    if self.playercontroller.locomotor then
-        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-    else
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-    end
-end
+--
+-- Following
+--
 
 function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
-end
-
-function KeepFollowing:IsPushing()
-    return self.leader and self.ispushing
 end
 
 function KeepFollowing:StartFollowing(leader)
@@ -175,6 +186,24 @@ function KeepFollowing:StartFollowing(leader)
     end
 end
 
+function KeepFollowing:StopFollowing()
+    if self.leader then
+        self:DebugString("stopped following", self.leader:GetDisplayName())
+        self.inst:CancelAllPendingTasks()
+        self.isfollowing = false
+        self.leader = nil
+        self.tasktime = 0
+    end
+end
+
+--
+-- Pushing
+--
+
+function KeepFollowing:IsPushing()
+    return self.leader and self.ispushing
+end
+
 function KeepFollowing:StartPushing(leader)
     if not self:IsPushing() then
         self:SetLeader(leader)
@@ -196,16 +225,6 @@ function KeepFollowing:StartPushing(leader)
     end
 end
 
-function KeepFollowing:StopFollowing()
-    if self.leader then
-        self:DebugString("stopped following", self.leader:GetDisplayName())
-        self.inst:CancelAllPendingTasks()
-        self.isfollowing = false
-        self.leader = nil
-        self.tasktime = 0
-    end
-end
-
 function KeepFollowing:StopPushing()
     if self.leader then
         self:DebugString("stopped pushing", self.leader:GetDisplayName())
@@ -215,6 +234,10 @@ function KeepFollowing:StopPushing()
         self.tasktime = 0
     end
 end
+
+--
+-- Other
+--
 
 function KeepFollowing:Stop()
     if self:InGame() then
@@ -227,6 +250,10 @@ function KeepFollowing:Stop()
         end
     end
 end
+
+--
+-- Debugging-related
+--
 
 function KeepFollowing:DebugString(...)
     self.debugfn(...)
