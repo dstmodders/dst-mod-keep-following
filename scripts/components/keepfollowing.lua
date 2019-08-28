@@ -45,6 +45,7 @@ function KeepFollowing:Init()
     self.leader = nil
     self.playercontroller = nil
     self.tasktime = 0
+    self.world = TheWorld
 
     --replaced by GetModConfigData
     self.keeptargetdistance = false

@@ -175,17 +175,22 @@ AddAction("TENTPUSH", "Push player in", ActionTentPush)
 -- Player-related
 --
 
-local function OnPlayerActivated(player)
+local function OnPlayerActivated(player, world)
     player:AddComponent("keepfollowing")
 
-    player.components.keepfollowing.debugfn = DebugFn
-    player.components.keepfollowing.isclient = IsClient()
-    player.components.keepfollowing.isdst = IsDST()
-    player.components.keepfollowing.modname = modname
+    local keepfollowing = player.components.keepfollowing
 
-    --GetModConfigData
-    player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
-    player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
+    if keepfollowing then
+        keepfollowing.debugfn = DebugFn
+        keepfollowing.isclient = IsClient()
+        keepfollowing.isdst = IsDST()
+        keepfollowing.modname = modname
+        keepfollowing.world = world
+
+        --GetModConfigData
+        keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
+        keepfollowing.targetdistance = GetModConfigData("target_distance")
+    end
 
     DebugString("Player", player:GetDisplayName(), "activated")
 end
@@ -202,11 +207,11 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
         env.AddPrefabPostInit("world", function(world)
             world:ListenForEvent("playeractivated", function(world, player)
                 if player == _G.ThePlayer then
-                    onActivatedFn(player)
+                    onActivatedFn(player, world)
                 end
             end)
 
-            world:ListenForEvent("playerdeactivated", function(world, player)
+            world:ListenForEvent("playerdeactivated", function(_, player)
                 if player == _G.ThePlayer then
                     onDeactivatedFn(player)
                 end
@@ -222,9 +227,7 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
 end
 
 local function PlayerControllerPostInit(self, player)
-    local ThePlayer = _G.ThePlayer
-
-    if player ~= ThePlayer then
+    if player ~= _G.ThePlayer then
         return
     end
 
