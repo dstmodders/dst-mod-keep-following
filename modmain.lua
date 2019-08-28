@@ -96,12 +96,12 @@ local function MovementPrediction(enable)
         local x, _, z = ThePlayer.Transform:GetWorldPosition()
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
         ThePlayer:EnableMovementPrediction(true)
-        DebugString("movement prediction enabled")
+        DebugString("Movement prediction enabled")
         return true
     elseif ThePlayer.components and ThePlayer.components.locomotor then
         ThePlayer.components.locomotor:Stop()
         ThePlayer:EnableMovementPrediction(false)
-        DebugString("movement prediction disabled")
+        DebugString("Movement prediction disabled")
         return false
     end
 end
@@ -187,16 +187,16 @@ local function OnPlayerActivated(player)
     player.components.keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
     player.components.keepfollowing.targetdistance = GetModConfigData("target_distance")
 
-    DebugString("player", player:GetDisplayName(), "activated")
+    DebugString("Player", player:GetDisplayName(), "activated")
 end
 
 local function OnPlayerDeactivated(player)
     player:RemoveComponent("keepfollowing")
-    DebugString("player", player:GetDisplayName(), "deactivated")
+    DebugString("Player", player:GetDisplayName(), "deactivated")
 end
 
 local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
-    DebugString("game ID -", TheSim:GetGameID())
+    DebugString("Game ID -", TheSim:GetGameID())
 
     if IsDST() then
         env.AddPrefabPostInit("world", function(world)
@@ -218,7 +218,7 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
         end)
     end
 
-    DebugString("AddPrefabPostInit fired")
+    DebugString("AddPlayerPostInit initialized")
 end
 
 local function PlayerControllerPostInit(self, player)
@@ -378,7 +378,7 @@ local function PlayerControllerPostInit(self, player)
         self.GetRightMouseAction = NewGetRightMouseAction
     end
 
-    DebugString("playercontroller initialized")
+    DebugString("PlayerControllerPostInit initialized")
 end
 
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
