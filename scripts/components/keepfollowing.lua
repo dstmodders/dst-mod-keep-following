@@ -48,8 +48,8 @@ function KeepFollowing:Init()
     self.world = TheWorld
 
     --replaced by GetModConfigData
-    self.keeptargetdistance = false
-    self.targetdistance = 2.5
+    self.configkeeptargetdistance = false
+    self.configtargetdistance = 2.5
 end
 
 function KeepFollowing:IsMasterSim()
@@ -165,21 +165,21 @@ function KeepFollowing:StartFollowing(leader)
             self:DebugString(string.format(
                 "Started following leader. Distance: %0.2f. Target: %0.2f",
                 distance,
-                self.targetdistance
+                self.configtargetdistance
             ))
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
             if self:IsFollowing() then
-                if distance >= self.targetdistance then
+                if distance >= self.configtargetdistance then
                     self.isnear = false
-                elseif not self.isnear and distance < self.targetdistance then
+                elseif not self.isnear and distance < self.configtargetdistance then
                     self.isnear = true
                     self.tasktime = 0
                 end
 
-                if not self.isnear or self.keeptargetdistance then
-                    self:WalkToPoint(self.inst:GetPositionAdjacentTo(leader, self.targetdistance - 0.25))
+                if not self.isnear or self.configkeeptargetdistance then
+                    self:WalkToPoint(self.inst:GetPositionAdjacentTo(leader, self.configtargetdistance - 0.25))
                     if self.tasktime == 0 then
                         self.tasktime = _DEFAULT_TASK_TIME
                     end

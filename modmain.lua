@@ -1,6 +1,7 @@
 --
 -- Globals
 --
+
 local _G = GLOBAL
 local ACTIONS = _G.ACTIONS
 local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
@@ -17,11 +18,13 @@ local TheSim = _G.TheSim
 --
 -- Private
 --
+
 local _MOVEMENT_PREDICTION_PREVIOUS_STATE
 
 --
 -- GetModConfigData-related
 --
+
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
     return key and (type(key) == "number" and key or _G[key]) or -1
@@ -219,8 +222,8 @@ local function OnPlayerActivated(player, world)
         keepfollowing.world = world
 
         --GetModConfigData
-        keepfollowing.keeptargetdistance = GetModConfigData("keep_target_distance")
-        keepfollowing.targetdistance = GetModConfigData("target_distance")
+        keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
+        keepfollowing.configtargetdistance = GetModConfigData("target_distance")
     end
 
     DebugString("Player", player:GetDisplayName(), "activated")
