@@ -39,7 +39,7 @@ function KeepFollowing:Init()
     self.isclient = false
     self.isdst = false
     self.isfollowing = false
-    self.ismastersim = false
+    self.ismastersim = TheWorld.ismastersim
     self.isnear = false
     self.ispushing = false
     self.leader = nil
@@ -50,6 +50,10 @@ function KeepFollowing:Init()
     --replaced by GetModConfigData
     self.keeptargetdistance = false
     self.targetdistance = 2.5
+end
+
+function KeepFollowing:IsMasterSim()
+    return self.ismastersim
 end
 
 function KeepFollowing:InGame()
