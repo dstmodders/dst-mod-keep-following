@@ -43,14 +43,20 @@ function KeepFollowing:Init()
     self.isnear = false
     self.ispushing = false
     self.leader = nil
+    self.movementpredictionstate = nil
     self.playercontroller = nil
     self.tasktime = 0
     self.world = TheWorld
 
     --replaced by GetModConfigData
     self.configkeeptargetdistance = false
+    self.configpushinglagcompensation = true
     self.configtargetdistance = 2.5
 end
+
+--
+-- General
+--
 
 function KeepFollowing:IsMasterSim()
     return self.ismastersim
@@ -66,6 +72,75 @@ function KeepFollowing:WalkToPoint(pos)
     else
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
     end
+end
+
+function KeepFollowing:Stop()
+    if self:InGame() then
+        if self:IsFollowing() then
+            self:StopFollowing()
+        end
+
+        if self:IsPushing() then
+            if self.configpushinglagcompensation and not self:IsMasterSim() then
+                self:MovementPredictionOnStop()
+            end
+
+            self:StopPushing()
+        end
+    end
+end
+
+--
+-- Movement prediction
+--
+
+function KeepFollowing:IsMovementPredictionEnabled()
+    local state = self.inst.components.locomotor ~= nil
+    self:DebugString("Checking movement prediction current state...")
+    self:DebugString("Current state:", state and "enabled" or "disabled")
+    return state
+end
+
+function KeepFollowing:MovementPrediction(enable)
+    if enable then
+        local x, _, z = self.inst.Transform:GetWorldPosition()
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
+        self.inst:EnableMovementPrediction(true)
+        self:DebugString("Movement prediction: enabled")
+        return true
+    elseif self.inst.components and self.inst.components.locomotor then
+        self.inst.components.locomotor:Stop()
+        self.inst:EnableMovementPrediction(false)
+        self:DebugString("Movement prediction: disabled")
+        return false
+    end
+end
+
+function KeepFollowing:MovementPredictionOnPush()
+    local state = self:IsMovementPredictionEnabled()
+
+    if self.movementpredictionstate == nil then
+        self:DebugString("Setting movement prediction previous state...")
+        self.movementpredictionstate = state
+        self:DebugString("Previous state:", state and "enabled" or "disabled")
+    end
+
+    if self.movementpredictionstate then
+        self:MovementPrediction(false)
+    end
+end
+
+function KeepFollowing:MovementPredictionOnFollow()
+    local state = self.movementpredictionstate
+    if state ~= nil then
+        self:MovementPrediction(state)
+        self.movementpredictionstate = nil
+    end
+end
+
+function KeepFollowing:MovementPredictionOnStop()
+    self:MovementPrediction(self.movementpredictionstate)
+    self.movementpredictionstate = nil
 end
 
 --
@@ -153,6 +228,10 @@ function KeepFollowing:StartFollowing(leader)
     local distance
 
     if not self:IsFollowing() then
+        if self.configpushinglagcompensation and not self:IsMasterSim() then
+            self:MovementPredictionOnFollow()
+        end
+
         self:SetLeader(leader)
     end
 
@@ -211,6 +290,10 @@ end
 
 function KeepFollowing:StartPushing(leader)
     if not self:IsPushing() then
+        if self.configpushinglagcompensation and not self:IsMasterSim() then
+            self:MovementPredictionOnPush()
+        end
+
         self:SetLeader(leader)
     end
 
@@ -237,22 +320,6 @@ function KeepFollowing:StopPushing()
         self.ispushing = false
         self.leader = nil
         self.tasktime = 0
-    end
-end
-
---
--- Other
---
-
-function KeepFollowing:Stop()
-    if self:InGame() then
-        if self:IsFollowing() then
-            self:StopFollowing()
-        end
-
-        if self:IsPushing() then
-            self:StopPushing()
-        end
     end
 end
 

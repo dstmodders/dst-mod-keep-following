@@ -10,16 +10,8 @@ local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
 local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
-local RPC = _G.RPC
-local SendRPCToServer = _G.SendRPCToServer
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
-
---
--- Private
---
-
-local _MOVEMENT_PREDICTION_PREVIOUS_STATE
 
 --
 -- GetModConfigData-related
@@ -34,7 +26,6 @@ local _DEBUG = GetModConfigData("debug")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
 local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
-local _PUSHING_LAG_COMPENSATION = GetModConfigData("pushing_lag_compensation")
 
 --
 -- Debugging-related
@@ -86,57 +77,6 @@ end
 
 local function IsOurPushAction(action)
     return action == ACTIONS.PUSH or action == ACTIONS.TENTPUSH
-end
-
-local function IsMovementPredictionEnabled()
-    local state = _G.ThePlayer.components.locomotor ~= nil
-    DebugString("Checking movement prediction current state...")
-    DebugString("Current state:", state and "enabled" or "disabled")
-    return state
-end
-
-local function MovementPrediction(enable)
-    local ThePlayer = _G.ThePlayer
-
-    if enable then
-        local x, _, z = ThePlayer.Transform:GetWorldPosition()
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
-        ThePlayer:EnableMovementPrediction(true)
-        DebugString("Movement prediction: enabled")
-        return true
-    elseif ThePlayer.components and ThePlayer.components.locomotor then
-        ThePlayer.components.locomotor:Stop()
-        ThePlayer:EnableMovementPrediction(false)
-        DebugString("Movement prediction: disabled")
-        return false
-    end
-end
-
-local function MovementPredictionOnPush()
-    local state = IsMovementPredictionEnabled()
-
-    if _MOVEMENT_PREDICTION_PREVIOUS_STATE == nil then
-        DebugString("Setting movement prediction previous state...")
-        _MOVEMENT_PREDICTION_PREVIOUS_STATE = state
-        DebugString("Previous state:", state and "enabled" or "disabled")
-    end
-
-    if _MOVEMENT_PREDICTION_PREVIOUS_STATE then
-        MovementPrediction(false)
-    end
-end
-
-local function MovementPredictionOnFollow()
-    local state = _MOVEMENT_PREDICTION_PREVIOUS_STATE
-    if state ~= nil then
-        MovementPrediction(state)
-        _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
-    end
-end
-
-local function MovementPredictionOnStop()
-    MovementPrediction(_MOVEMENT_PREDICTION_PREVIOUS_STATE)
-    _MOVEMENT_PREDICTION_PREVIOUS_STATE = nil
 end
 
 --
@@ -223,6 +163,7 @@ local function OnPlayerActivated(player, world)
 
         --GetModConfigData
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
+        keepfollowing.configpushinglagcompensation = GetModConfigData("pushing_lag_compensation")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
     end
 
@@ -271,14 +212,6 @@ local function PlayerControllerPostInit(self, player)
             return
         end
 
-        if _PUSHING_LAG_COMPENSATION
-            and not keepfollowing:IsMasterSim()
-            and keepfollowing:InGame()
-            and keepfollowing:IsPushing()
-        then
-            MovementPredictionOnStop()
-        end
-
         keepfollowing:Stop()
     end
 
@@ -296,17 +229,6 @@ local function PlayerControllerPostInit(self, player)
         end
 
         if IsOurAction(action) then
-            if _PUSHING_LAG_COMPENSATION
-                and not keepfollowing:IsMasterSim()
-                and keepfollowing:InGame()
-            then
-                if IsOurPushAction(action) then
-                    MovementPredictionOnPush()
-                elseif IsOurFollowAction(action) then
-                    MovementPredictionOnFollow()
-                end
-            end
-
             return action.fn(act)
         else
             KeepFollowingStop()
