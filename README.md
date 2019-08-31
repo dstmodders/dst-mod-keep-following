@@ -64,7 +64,6 @@ Below are the features/improvements yet to be implemented:
 - [ ] Follow players through wormholes and possibly cave entrances
 - [ ] Improve pathfinder precision
 - [ ] Improve picking/following/pushing LMB conflicts with some other mods
-- [ ] Improve pushing lag compensation behaviour
 
 ## License
 
