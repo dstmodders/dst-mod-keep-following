@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Changed
+
+- Improved debug output
+- Improved mod icon quality
+- Improved pushing lag compensation behaviour
+
+### Fixed
+
+- Lag compensation state restoration after pushing
+
 ## [0.9.0][] - 2019-08-25
 
 ### Added
