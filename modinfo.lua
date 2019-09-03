@@ -1,13 +1,13 @@
 name = "Keep Following"
-version = "0.9.0"
+version = "0.10.0"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player, Abigail/Big Bernie, Bunnyman/Pig, Chester/Hutch, Critter, Glommer and some animals to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.9.0:]] .. "\n" ..
-    [[- Added support for Balloon]] .. "\n" ..
-    [[- Added support for pushing lag compensation]] .. "\n" ..
-    [[- Added support for pushing with RMB]] .. "\n" ..
-    [[- Improved debug output]]
+    [[v0.10.0:]] .. "\n" ..
+    [[- Fixed lag compensation state restoration after pushing]] .. "\n" ..
+    [[- Improved debug output]] .. "\n" ..
+    [[- Improved mod icon quality]] .. "\n" ..
+    [[- Improved pushing lag compensation behaviour]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
