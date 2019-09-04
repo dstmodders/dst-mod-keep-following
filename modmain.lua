@@ -142,7 +142,7 @@ end
 AddAction("FOLLOW", "Follow", ActionFollow)
 AddAction("PUSH", "Push", ActionPush)
 AddAction("TENTFOLLOW", "Follow player in", ActionTentFollow)
-AddAction("TENTPUSH", "Push player in", ActionTentPush)
+AddAction("TENTPUSH", _PUSH_WITH_RMB and "Push player" or "Push player in", ActionTentPush)
 
 --
 -- Player-related
@@ -201,6 +201,59 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
     DebugString("AddPlayerPostInit initialized")
 end
 
+local function PlayerActionPickerPostInit(self, player)
+    if player ~= _G.ThePlayer then
+        return
+    end
+
+    local OldDoGetMouseActions = self.DoGetMouseActions
+
+    local function NewDoGetMouseActions(position, target)
+        local lmb, rmb = OldDoGetMouseActions(position, target)
+        local keepfollowing = player.components.keepfollowing
+
+        if TheInput:IsKeyDown(_KEY_ACTION) and lmb and lmb.target then
+            target = lmb.target
+
+            if target:HasTag("tent") and target:HasTag("hassleeper") then
+                if _PUSH_WITH_RMB then
+                    lmb = self:SortActionList({ ACTIONS.TENTFOLLOW }, target)[1]
+                elseif TheInput:IsKeyDown(_KEY_PUSH) then
+                    lmb = self:SortActionList({ ACTIONS.TENTPUSH }, target)[1]
+                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
+                    lmb = self:SortActionList({ ACTIONS.TENTFOLLOW }, target)[1]
+                end
+            end
+
+            if keepfollowing:CanBeLeader(target) then
+                if _PUSH_WITH_RMB then
+                    lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
+                elseif TheInput:IsKeyDown(_KEY_PUSH) then
+                    lmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
+                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
+                    lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
+                end
+            end
+
+            if _PUSH_WITH_RMB then
+                if target:HasTag("tent") and target:HasTag("hassleeper") then
+                    rmb = self:SortActionList({ ACTIONS.TENTPUSH }, target)[1]
+                end
+
+                if keepfollowing:CanBeLeader(target) then
+                    rmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
+                end
+            end
+        end
+
+        return lmb, rmb
+    end
+
+    self.DoGetMouseActions = NewDoGetMouseActions
+
+    DebugString("PlayerActionPickerPostInit initialized")
+end
+
 local function PlayerControllerPostInit(self, player)
     if player ~= _G.ThePlayer then
         return
@@ -235,71 +288,7 @@ local function PlayerControllerPostInit(self, player)
         end
     end
 
-    local OldGetLeftMouseAction = self.GetLeftMouseAction
-    local OldGetRightMouseAction = self.GetRightMouseAction
     local OldOnControl = self.OnControl
-
-    local function NewGetLeftMouseAction(self)
-        local act = OldGetLeftMouseAction(self)
-
-        if act and act.target then
-            local keepfollowing = act.doer.components.keepfollowing
-            local target = act.target
-
-            if TheInput:IsKeyDown(_KEY_ACTION)
-                and target:HasTag("tent")
-                and target:HasTag("hassleeper")
-            then
-                if _PUSH_WITH_RMB then
-                    act.action = ACTIONS.TENTFOLLOW
-                elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    act.action = ACTIONS.TENTPUSH
-                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    act.action = ACTIONS.TENTFOLLOW
-                end
-            end
-
-            if TheInput:IsKeyDown(_KEY_ACTION) and keepfollowing:CanBeLeader(target) then
-                if _PUSH_WITH_RMB then
-                    act.action = ACTIONS.FOLLOW
-                elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    act.action = ACTIONS.PUSH
-                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    act.action = ACTIONS.FOLLOW
-                end
-            end
-        end
-
-        self.LMBaction = act
-
-        return self.LMBaction
-    end
-
-    local function NewGetRightMouseAction(self)
-        local act = OldGetRightMouseAction(self)
-
-        if act and act.target then
-            local keepfollowing = act.doer.components.keepfollowing
-            local target = act.target
-
-            if TheInput:IsKeyDown(_KEY_ACTION)
-                and target:HasTag("tent")
-                and target:HasTag("hassleeper")
-            then
-                act.action = ACTIONS.TENTPUSH
-            end
-
-            if keepfollowing:CanBeLeader(target) then
-                if TheInput:IsKeyDown(_KEY_ACTION) then
-                    act.action = ACTIONS.PUSH
-                end
-            end
-        end
-
-        self.RMBaction = act
-
-        return self.RMBaction
-    end
 
     local function NewOnControl(self, control, down)
         if IsMoveButton(control) then
@@ -323,15 +312,11 @@ local function PlayerControllerPostInit(self, player)
         OldOnControl(self, control, down)
     end
 
-    self.GetLeftMouseAction = NewGetLeftMouseAction
     self.OnControl = NewOnControl
-
-    if _PUSH_WITH_RMB then
-        self.GetRightMouseAction = NewGetRightMouseAction
-    end
 
     DebugString("PlayerControllerPostInit initialized")
 end
 
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
+AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
