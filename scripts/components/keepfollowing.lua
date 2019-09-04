@@ -3,7 +3,9 @@ local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 local _CAN_BE_LEADER_TAGS = {
     "abigail",
+    "babybeefalo",
     "balloon",
+    "beefalo",
     "berrythief", --Gobbler
     "catcoon",
     "chester",
