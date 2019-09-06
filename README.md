@@ -22,6 +22,7 @@ Currently supports following entities:
 
 - Abigail/Bernie
 - Balloon
+- Beefalo/Baby Beefalo
 - Bunnyman/Pig
 - Catcoon
 - Chester/Hutch
