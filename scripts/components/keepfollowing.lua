@@ -251,23 +251,31 @@ function KeepFollowing:StartFollowing(leader)
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
-            if self:IsFollowing() then
-                if distance >= self.configtargetdistance then
-                    self.isnear = false
-                elseif not self.isnear and distance < self.configtargetdistance then
-                    self.isnear = true
-                    self.tasktime = 0
-                end
-
-                if not self.isnear or self.configkeeptargetdistance then
-                    self:WalkToPoint(self.inst:GetPositionAdjacentTo(leader, self.configtargetdistance - 0.25))
-                    if self.tasktime == 0 then
-                        self.tasktime = _DEFAULT_TASK_TIME
-                    end
-                end
-
-                self:StartFollowing(leader)
+            if not self:IsFollowing() or not self.leader then
+                return
             end
+
+            if not self.leader.entity:IsValid() then
+                self:DebugString("Leader doesn't exist anymore")
+                self:Stop()
+                return
+            end
+
+            if distance >= self.configtargetdistance then
+                self.isnear = false
+            elseif not self.isnear and distance < self.configtargetdistance then
+                self.isnear = true
+                self.tasktime = 0
+            end
+
+            if not self.isnear or self.configkeeptargetdistance then
+                self:WalkToPoint(self.inst:GetPositionAdjacentTo(self.leader, self.configtargetdistance - 0.25))
+                if self.tasktime == 0 then
+                    self.tasktime = _DEFAULT_TASK_TIME
+                end
+            end
+
+            self:StartFollowing(self.leader)
         end)
     end
 end
@@ -307,10 +315,18 @@ function KeepFollowing:StartPushing(leader)
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
-            if self:IsPushing() then
-                self:WalkToPoint(leader:GetPosition())
-                self:StartPushing(leader)
+            if not self:IsPushing() or not self.leader then
+                return
             end
+
+            if not self.leader.entity:IsValid() then
+                self:DebugString("Leader doesn't exist anymore")
+                self:Stop()
+                return
+            end
+
+            self:WalkToPoint(self.leader:GetPosition())
+            self:StartPushing(self.leader)
         end)
     end
 end
