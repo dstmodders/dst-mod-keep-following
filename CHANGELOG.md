@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.11.0][] - 2019-09-06
+
+### Added
+
+- Support for Beefalo/Baby Beefalo
+
+### Fixed
+
+- Action not showing when RMB pushing is enabled
+- Behaviour when the leader doesn't exist anymore
+
 ## [0.10.0][] - 2019-09-05
 
 ### Changed
@@ -115,7 +126,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.10.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.7.0...v0.8.0
