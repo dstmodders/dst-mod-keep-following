@@ -68,7 +68,7 @@ function KeepFollowing:InGame()
     return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
 end
 
-function KeepFollowing:WalkToPoint(pos)
+function KeepFollowing:WalkToPosition(pos)
     if self.playercontroller.locomotor then
         self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
     else
@@ -269,7 +269,7 @@ function KeepFollowing:StartFollowing(leader)
             end
 
             if not self.isnear or self.configkeeptargetdistance then
-                self:WalkToPoint(self.inst:GetPositionAdjacentTo(self.leader, self.configtargetdistance - 0.25))
+                self:WalkToPosition(self.inst:GetPositionAdjacentTo(self.leader, self.configtargetdistance - 0.25))
                 if self.tasktime == 0 then
                     self.tasktime = _DEFAULT_TASK_TIME
                 end
@@ -325,7 +325,7 @@ function KeepFollowing:StartPushing(leader)
                 return
             end
 
-            self:WalkToPoint(self.leader:GetPosition())
+            self:WalkToPosition(self.leader:GetPosition())
             self:StartPushing(self.leader)
         end)
     end
