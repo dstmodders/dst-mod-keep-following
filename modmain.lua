@@ -4,6 +4,7 @@
 
 local _G = GLOBAL
 local ACTIONS = _G.ACTIONS
+local CONTROL_ACTION = _G.CONTROL_ACTION
 local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
 local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
@@ -291,7 +292,7 @@ local function PlayerControllerPostInit(self, player)
     local OldOnControl = self.OnControl
 
     local function NewOnControl(self, control, down)
-        if IsMoveButton(control) then
+        if IsMoveButton(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
 
