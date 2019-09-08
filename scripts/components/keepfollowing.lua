@@ -1,32 +1,107 @@
 local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
+-- We could have used group tags instead of mob-specific ones but this approach gives more control.
+-- Originally the list included only player-friendly ones but as the mod has matured the list was
+-- expanding based on the requests from players as there are some cases when even following/pushing
+-- ghosts and worms is useful.
 local _CAN_BE_LEADER_TAGS = {
-    "abigail",
-    "babybeefalo",
-    "balloon",
+    -- hostile creatures
+    "bat", -- Batilisk
+    "birchnutdrake", -- Birchnutter
+    "bishop",
+    "bishop_nightmare",
+    "firehound",
+    "frog",
+    "ghost",
+    "hound",
+    "icehound",
+    "knight",
+    "knight_nightmare",
+    "lavae",
+    "little_walrus", -- Wee MacTusk
+    "merm",
+    "moonpig", -- Werepig
+    "pigguard", -- Guardian Pig
+    "rook",
+    "rook_nightmare",
+    "slurper",
+    "spat", -- Ewecus
+    "spider",
+    "spider_dropper", -- Dangling Depth Dweller
+    "spider_hider", -- Cave Spider
+    "spider_spitter", -- Spitter
+    "spider_warrior",
+    "tallbird",
+    "walrus", -- MacTusk
+    "warg", -- Varg
+    "worm", -- Depths Worm
+
+    -- boss monsters
+    "bearger",
+    "beequeen",
+    "deerclops",
+    "dragonfly",
+    "klaus",
+    "leif", -- Normal Treeguard
+    "leif_sparse", -- Lumpy Treeguard
+    "minotaur", -- Ancient Guardian
+    "moose", -- Moose/Goose
+    "spiderqueen",
+    "stalker", -- Reanimated Skeleton (Caves)
+    "stalker_atrium", -- Reanimated Skeleton (Ancient Fuelweaver)
+    "stalker_forest", -- Reanimated Skeleton (Forest)
+    "toadstool",
+    "toadstool_dark", -- Misery Toadstool
+
+    -- neutral animals
     "beefalo",
-    "berrythief", --Gobbler
     "catcoon",
+    "fruitdragon", -- Saladmander
+    "koalefant",
+    "krampus",
+    "lightninggoat", -- Volt Goat
+    "monkey", -- Splumonkey/Shadow Splumonkey
+    "mossling", -- Mosling
+    "penguin", -- Pengull
+    "pig",
+    "rocky", -- Rock Lobster
+    "slurtle",
+    "snurtle",
+    "teenbird", -- Smallish Tallbird
+
+    -- passive animals
+    "babybeefalo",
+    "berrythief", -- Gobbler
+    "carrat",
     "chester",
-    "companion",
-    "critter",
     "deer",
-    "fruitdragon", --Saladmander
+    "deer_blue", -- Gem Deer (Blue)
+    "deer_red", -- Gem Deer (Red)
+    "glommer",
     "grassgekko",
     "hutch",
-    "koalefant",
-    "lightninggoat", --Volt Goat
-    "manrabbit",
-    "monkey", --Splumonkey
-    "mossling",
-    "mufflehat", --Slurper
-    "penguin", --Pengull
-    "pig",
+    "lavae_pet", -- Extra-Adorable Lavae
+    "manrabbit", -- Bunnyman/Beardlord
+    "mole",
+    "smallbird",
+
+    -- other
+    "abigail",
+    "balloon",
+    "companion",
+    "critter",
     "player",
-    "rocky", --Rock Lobster
-    "slurtle",
-    "snurtle"
+
+    -- below are the disabled ones, as they don't have collision for pushing and following doesn't
+    -- seem to be useful
+
+    --"bee",
+    --"beeguard", -- Grumble Bee (disabled intentionally)
+    --"butterfly",
+    --"killerbee",
+    --"moonbutterfly", -- Moon Moth
+    --"mosquito",
 }
 
 local KeepFollowing = Class(function(self, inst)
