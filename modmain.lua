@@ -72,14 +72,6 @@ local function IsOurAction(action)
         or action == ACTIONS.TENTPUSH
 end
 
-local function IsOurFollowAction(action)
-    return action == ACTIONS.FOLLOW or action == ACTIONS.TENTFOLLOW
-end
-
-local function IsOurPushAction(action)
-    return action == ACTIONS.PUSH or action == ACTIONS.TENTPUSH
-end
-
 --
 -- Actions
 --
@@ -255,13 +247,13 @@ local function PlayerActionPickerPostInit(self, player)
     DebugString("PlayerActionPickerPostInit initialized")
 end
 
-local function PlayerControllerPostInit(self, player)
-    if player ~= _G.ThePlayer then
+local function PlayerControllerPostInit(_self, _player)
+    if _player ~= _G.ThePlayer then
         return
     end
 
     local function KeepFollowingStop()
-        local keepfollowing = player.components.keepfollowing
+        local keepfollowing = _player.components.keepfollowing
         if not keepfollowing then
             return
         end
@@ -279,7 +271,7 @@ local function PlayerControllerPostInit(self, player)
         local action = act.action
 
         if keepfollowing then
-            keepfollowing.playercontroller = self
+            keepfollowing.playercontroller = _self
         end
 
         if IsOurAction(action) then
@@ -289,7 +281,7 @@ local function PlayerControllerPostInit(self, player)
         end
     end
 
-    local OldOnControl = self.OnControl
+    local OldOnControl = _self.OnControl
 
     local function NewOnControl(self, control, down)
         if IsMoveButton(control) or control == CONTROL_ACTION then
@@ -301,19 +293,19 @@ local function PlayerControllerPostInit(self, player)
                 return OldOnControl(self, control, down)
             end
 
-            OurMouseAction(player, self:GetLeftMouseAction())
+            OurMouseAction(_player, self:GetLeftMouseAction())
         elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY then
             if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
 
-            OurMouseAction(player, self:GetRightMouseAction())
+            OurMouseAction(_player, self:GetRightMouseAction())
         end
 
         OldOnControl(self, control, down)
     end
 
-    self.OnControl = NewOnControl
+    _self.OnControl = NewOnControl
 
     DebugString("PlayerControllerPostInit initialized")
 end
