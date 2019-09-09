@@ -4,7 +4,9 @@ local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 -- We could have used group tags instead of mob-specific ones but this approach gives more control.
 -- Originally the list included only player-friendly ones but as the mod has matured the list was
 -- expanding based on the requests from players as there are some cases when even following/pushing
--- ghosts and worms is useful.
+-- bosses, ghosts and worms is useful.
+--
+-- When "Mobs" configuration option is set to "All" this hand-picked list will be ignored.
 local _CAN_BE_LEADER_TAGS = {
     -- hostile creatures
     "bat", -- Batilisk
@@ -92,16 +94,6 @@ local _CAN_BE_LEADER_TAGS = {
     "companion",
     "critter",
     "player",
-
-    -- below are the disabled ones, as they don't have collision for pushing and following doesn't
-    -- seem to be useful
-
-    --"bee",
-    --"beeguard", -- Grumble Bee (disabled intentionally)
-    --"butterfly",
-    --"killerbee",
-    --"moonbutterfly", -- Moon Moth
-    --"mosquito",
 }
 
 local KeepFollowing = Class(function(self, inst)
@@ -127,6 +119,7 @@ function KeepFollowing:Init()
 
     --replaced by GetModConfigData
     self.configkeeptargetdistance = false
+    self.configmobs = "default"
     self.configpushlagcompensation = true
     self.configtargetdistance = 2.5
 end
@@ -224,9 +217,50 @@ end
 -- Leader-related
 --
 
-function KeepFollowing:CanBeLeader(entity)
-    if entity == self.inst then
+function KeepFollowing:CanBeFollowed(entity)
+    if not entity or (entity.entity and not entity.entity:IsValid()) then
         return false
+    end
+
+    return entity.components and entity.components.locomotor
+end
+
+function KeepFollowing:CanBePushed(entity)
+    if not entity or not entity.Physics then
+        return false
+    end
+
+    -- flyers don't collide with characters so pushing won't work anyway
+    if entity.Physics:GetCollisionGroup() == COLLISION.FLYERS then
+        return false
+    end
+
+    -- Mass is the key factor for pushing. Players have a mass of 75 while most bosses have a mass
+    -- 1000. Moleworms have a mass of 99999 and Gigantic Beehive has a mass of 999999 which makes
+    -- them act as "unpushable". If Klei's physics is correct then even those entities can be pushed
+    -- but it will take a very very long time.
+    --
+    -- The only entities with high mass that still can be useful to be pushed are bosses like
+    -- Bearger or Toadstool. They both have mass 1000 and that will be our ceil value to disable
+    -- pushing.
+    local mass = self.inst.Physics:GetMass()
+    local entitymass = entity.Physics:GetMass()
+
+    -- 1000 (boss) - 75 (player)
+    if math.abs(entitymass - mass) > 925 then
+        return false
+    end
+
+    return true
+end
+
+function KeepFollowing:CanBeLeader(entity)
+    if not entity or not entity.entity:IsValid() or entity == self.inst then
+        return false
+    end
+
+    if self.configmobs == "all" then
+        return self:CanBeFollowed(entity)
     end
 
     for _, tag in pairs(_CAN_BE_LEADER_TAGS) do

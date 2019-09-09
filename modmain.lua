@@ -156,6 +156,7 @@ local function OnPlayerActivated(player, world)
 
         --GetModConfigData
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
+        keepfollowing.configmobs = GetModConfigData("mobs")
         keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
     end
@@ -221,7 +222,7 @@ local function PlayerActionPickerPostInit(self, player)
             if keepfollowing:CanBeLeader(target) then
                 if _PUSH_WITH_RMB then
                     lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
-                elseif TheInput:IsKeyDown(_KEY_PUSH) then
+                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
                     lmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
                     lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
@@ -233,7 +234,7 @@ local function PlayerActionPickerPostInit(self, player)
                     rmb = self:SortActionList({ ACTIONS.TENTPUSH }, target)[1]
                 end
 
-                if keepfollowing:CanBeLeader(target) then
+                if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
                     rmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
                 end
             end

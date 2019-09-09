@@ -42,6 +42,11 @@ local target_distance = {
     { description = "3.5m", data = 3.5 }
 }
 
+local mobs = {
+    { description = "Default", data = "default", hover = "Default: hand-picked list based on prefabs that will suit most players" },
+    { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
+}
+
 local string = ""
 local keys = {
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
@@ -69,5 +74,6 @@ configuration_options = {
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
     AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
     AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
+    AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
 }
