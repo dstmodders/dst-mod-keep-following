@@ -156,7 +156,7 @@ local function OnPlayerActivated(player, world)
 
         --GetModConfigData
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
-        keepfollowing.configpushinglagcompensation = GetModConfigData("pushing_lag_compensation")
+        keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
     end
 

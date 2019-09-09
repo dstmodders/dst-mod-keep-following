@@ -127,7 +127,7 @@ function KeepFollowing:Init()
 
     --replaced by GetModConfigData
     self.configkeeptargetdistance = false
-    self.configpushinglagcompensation = true
+    self.configpushlagcompensation = true
     self.configtargetdistance = 2.5
 end
 
@@ -158,7 +158,7 @@ function KeepFollowing:Stop()
         end
 
         if self:IsPushing() then
-            if self.configpushinglagcompensation and not self:IsMasterSim() then
+            if self.configpushlagcompensation and not self:IsMasterSim() then
                 self:MovementPredictionOnStop()
             end
 
@@ -305,7 +305,7 @@ function KeepFollowing:StartFollowing(leader)
     local distance
 
     if not self:IsFollowing() then
-        if self.configpushinglagcompensation and not self:IsMasterSim() then
+        if self.configpushlagcompensation and not self:IsMasterSim() then
             self:MovementPredictionOnFollow()
         end
 
@@ -375,7 +375,7 @@ end
 
 function KeepFollowing:StartPushing(leader)
     if not self:IsPushing() then
-        if self.configpushinglagcompensation and not self:IsMasterSim() then
+        if self.configpushlagcompensation and not self:IsMasterSim() then
             self:MovementPredictionOnPush()
         end
 
