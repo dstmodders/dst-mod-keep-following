@@ -4,6 +4,7 @@
 
 local _G = GLOBAL
 local ACTIONS = _G.ACTIONS
+local BufferedAction = _G.BufferedAction
 local CONTROL_ACTION = _G.CONTROL_ACTION
 local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
 local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
@@ -217,31 +218,31 @@ local function PlayerActionPickerPostInit(self, player)
 
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
-                    lmb = self:SortActionList({ ACTIONS.TENTFOLLOW }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.TENTFOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = self:SortActionList({ ACTIONS.TENTPUSH }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.TENTPUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = self:SortActionList({ ACTIONS.TENTFOLLOW }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.TENTFOLLOW)
                 end
             end
 
             if keepfollowing:CanBeLeader(target) then
                 if _PUSH_WITH_RMB then
-                    lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
-                    lmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = self:SortActionList({ ACTIONS.FOLLOW }, target)[1]
+                    lmb = BufferedAction(player, target, ACTIONS.FOLLOW)
                 end
             end
 
             if _PUSH_WITH_RMB then
                 if target:HasTag("tent") and target:HasTag("hassleeper") then
-                    rmb = self:SortActionList({ ACTIONS.TENTPUSH }, target)[1]
+                    rmb = BufferedAction(player, target, ACTIONS.TENTPUSH)
                 end
 
                 if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
-                    rmb = self:SortActionList({ ACTIONS.PUSH }, target)[1]
+                    rmb = BufferedAction(player, target, ACTIONS.PUSH)
                 end
             end
         end

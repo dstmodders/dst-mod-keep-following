@@ -245,9 +245,18 @@ function KeepFollowing:CanBePushed(entity)
     -- pushing.
     local mass = self.inst.Physics:GetMass()
     local entitymass = entity.Physics:GetMass()
+    local massdiff = math.abs(entitymass - mass)
 
-    -- 1000 (boss) - 75 (player)
-    if math.abs(entitymass - mass) > 925 then
+    -- 925 = 1000 (boss) - 75 (player)
+    if massdiff > 925 then
+        return false
+    end
+
+    -- When the player becomes a ghost his mass becomes 1. In this case, we just set the ceil value
+    -- difference to 10 as there is no point to push something with a mass higher than that. But
+    -- there are Frogs, Saladmanders and Critters with mass 1 so why ruin all the fun and disable
+    -- pushing for a ghost.
+    if mass == 1 and massdiff > 10 then
         return false
     end
 
