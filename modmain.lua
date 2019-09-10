@@ -206,8 +206,14 @@ local function PlayerActionPickerPostInit(self, player)
         local lmb, rmb = OldDoGetMouseActions(position, target)
         local keepfollowing = player.components.keepfollowing
 
-        if TheInput:IsKeyDown(_KEY_ACTION) and lmb and lmb.target then
-            target = lmb.target
+        if TheInput:IsKeyDown(_KEY_ACTION) then
+            -- We could have used lmb.target but as PlayerActionPicker has leftclickoverride and
+            -- rightclickoverride we can't trust that. A good example is Woodie's Weregoose form
+            -- which overrides mouse actions.
+            target = TheInput:GetWorldEntityUnderMouse()
+            if not target then
+                return lmb, rmb
+            end
 
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
