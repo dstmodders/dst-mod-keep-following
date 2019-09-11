@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Stopping on CONTROL_ACTION
+- Support for all known mobs
+- Support for mobs configuration
+
+### Changed
+
+- Configuration `pushing_lag_compensation` to `push_lag_compensation`
+
+### Fixed
+
+- Actions not showing in Woodie's Weregoose form
+- Actions not showing when a player becomes a ghost
+
 ## [0.11.0][] - 2019-09-06
 
 ### Added
