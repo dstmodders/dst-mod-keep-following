@@ -11,50 +11,62 @@ supported entities.
 | `Shift` + `LMB`          | to keep following                              |
 | `Shift` + `Ctrl` + `LMB` | to keep pushing and ignore the target distance |
 
-To stop following either use `WASD` movement keys or click `LMB`.
+To stop following use `WASD` movement keys, `SPACEBAR` action key or click `LMB`.
 
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
 
 ## Supported entities
 
-Currently supports following entities:
+There are two modes you can choose: **Default** and **All**. This can be set in
+the **Mobs** configuration.
 
-- Abigail/Bernie
-- Balloon
-- Beefalo/Baby Beefalo
-- Bunnyman/Pig
-- Catcoon
-- Chester/Hutch
-- Critter
-- Deer
-- Glommer
-- Gobbler
-- Grass Gekko
-- Koalefant
-- Mosling
-- Pengull
-- Rock Lobster
-- Saladmander
-- Slurper
-- Snurtle/Slurtle
-- Splumonkey
-- Volt Goat
+### Default
+
+A hand-picked list based on prefabs that will suit most players. The list will
+change from time to time as the game updates and/or player requests depending on
+usefulness:
+
+- **Hostile Creatures**: Batilisk, Birchnutter, Cave Spider, Clockwork
+Bishop/Rook/Knight (Damaged), Dangling Depth Dweller, Depths Worm, Ewecus, Frog,
+Ghost, Guardian Pig, Hound (Blue/Red), Lavae, MacTusk/Wee MacTusk, Merm,
+Slurper, Spider Warrior, Spider, Spitter, Tallbird, Varg, Werepig.
+
+- **Boss Monsters**: Bearger, Beequeen, Deerclops, Dragonfly, Klaus, Treeguard
+(Normal/Lumpy), Ancient Guardian, Moose/Goose, Reanimated Skeleton
+(Caves/Forest/Ancient Fuelweaver), Spider Queen, Toadstool (Misery).
+
+- **Neutral Animals**: Beefalo, Catcoon, Saladmander, Koalefant, Krampus, Volt
+Goat, Splumonkey (Shadow), Mosling, Pengull, Pig, Rock Lobster, Slurtle,
+Snurtle, Smallish Tallbird.
+
+- **Passive Animals**: Baby Beefalo, Gobbler, Carrat, Chester, Deer, Gem Deer
+(Blue/Red), Glommer, Grass Gekko, Hutch, Extra-Adorable Lavae,
+Bunnyman (Beardlord), Mole, Smallbird.
+
+- **Other**: Abigail, Balloon, Companion, Critter, Player.
+
+### All
+
+Pretty much anything that moves can be followed and pushed. This option is for
+those who don't want to depend on mobs support updates and want to get maximum
+from this mod.
 
 ## Configuration
 
 Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
-| Configuration                | Options          | Default  | Description                                                                                   |
-|------------------------------|------------------|----------|--------------------------------------------------------------------------------|
-| **Action key**               | _[keys]_         | _LShift_ | Key used for both following and pushing                                                       |
-| **Push key**                 | _[keys]_         | _LCtrl_  | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
-| **Push with RMB**            | _Yes/No_         | _No_     | Use RMB in combination with action key for pushing instead                                    |
-| **Target Distance**          | _1.5m/2.5m/3.5m_ | _2.5m_   | How close can you approach the leader? Ignored when pushing                                   |
-| **Keep target distance**     | _Yes/No_         | _No_     | Move away from a leader inside the target distance. Ignored when pushing                      |
-| **Pushing lag compensation** | _Yes/No_         | _Yes_    | Automatically disables lag compensation while pushing and restores the previous state after   |
-| **Debug**                    | _Yes/No_         | _No_     | Enables/Disables the debug mode                                                               |
+| Configuration             | Options          | Default   | Description                                                                                   |
+|---------------------------|------------------|-----------|-----------------------------------------------------------------------------------------------|
+| **Action key**            | _[keys]_         | _LShift_  | Key used for both following and pushing                                                       |
+| **Push key**              | _[keys]_         | _LCtrl_   | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
+| **Push with RMB**         | _Yes/No_         | _No_      | Use RMB in combination with action key for pushing instead                                    |
+| **Push lag compensation** | _Yes/No_         | _Yes_     | Automatically disables lag compensation while pushing and restores the previous state after   |
+| **Target Distance**       | _1.5m/2.5m/3.5m_ | _2.5m_    | How close can you approach the leader? Ignored when pushing                                   |
+| **Keep target distance**  | _Yes/No_         | _No_      | Move away from a leader inside the target distance. Ignored when pushing                      |
+| **Mobs**                  | _Default/All_    | _Default_ | Which mobs can be followed and pushed?                                                        |
+| **Debug**                 | _Yes/No_         | _No_      | Enables/Disables the debug mode                                                               |
 
 ## Roadmap
 
