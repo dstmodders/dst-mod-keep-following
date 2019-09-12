@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.12.0][] - 2019-09-16
+
 ### Added
 
-- Stopping on CONTROL_ACTION
+- Stopping on `CONTROL_ACTION`
 - Support for all known mobs
 - Support for mobs configuration
 
@@ -141,7 +143,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.11.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.8.0...v0.9.0
