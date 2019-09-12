@@ -1,12 +1,15 @@
 name = "Keep Following"
-version = "0.11.0"
+version = "0.12.0"
 description = [[Version: ]] .. version .. "\n\n" ..
-    [[By default, Shift +  (LMB) on the player, Abigail/Big Bernie, Bunnyman/Pig, Chester/Hutch, Critter, Glommer and some animals to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
+    [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.11.0:]] .. "\n" ..
-    [[- Added support for Beefalo/Baby Beefalo]] .. "\n" ..
-    [[- Fixed action not showing when RMB pushing is enabled]] .. "\n" ..
-    [[- Fixed behaviour when the leader doesn't exist anymore]]
+    [[v0.12.0:]] .. "\n" ..
+    [[- Added stopping on CONTROL_ACTION]] .. "\n" ..
+    [[- Added support for all known mobs]] .. "\n" ..
+    [[- Added support for mobs configuration]] .. "\n" ..
+    [[- Changed some configuration options]] .. "\n" ..
+    [[- Fixed actions not showing in Woodie's Weregoose form]] .. "\n" ..
+    [[- Fixed actions not showing when a player becomes a ghost]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
@@ -43,7 +46,7 @@ local target_distance = {
 }
 
 local mobs = {
-    { description = "Default", data = "default", hover = "Default: hand-picked list based on prefabs that will suit most players" },
+    { description = "Default", data = "default", hover = "Default: a hand-picked list based on prefabs that will suit most players" },
     { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
 }
 
