@@ -230,8 +230,13 @@ function KeepFollowing:CanBePushed(entity)
         return false
     end
 
-    -- flyers don't collide with characters so pushing won't work anyway
+    -- different flyers don't collide with characters so pushing won't work anyway
     if entity.Physics:GetCollisionGroup() == COLLISION.FLYERS then
+        return false
+    end
+
+    -- Shadow Creatures also don't collide with characters
+    if entity.Physics:GetCollisionGroup() == COLLISION.SANITY then
         return false
     end
 
