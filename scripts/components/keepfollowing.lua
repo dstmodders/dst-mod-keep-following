@@ -222,7 +222,7 @@ function KeepFollowing:CanBeFollowed(entity)
         return false
     end
 
-    return entity.components and entity.components.locomotor
+    return entity:HasTag("locomotor")
 end
 
 function KeepFollowing:CanBePushed(entity)
