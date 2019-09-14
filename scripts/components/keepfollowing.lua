@@ -350,7 +350,7 @@ function KeepFollowing:IsFollowing()
 end
 
 function KeepFollowing:StartFollowing(leader)
-    local distance
+    local distance, dist
 
     if not self:IsFollowing() then
         if self.configpushlagcompensation and not self:IsMasterSim() then
@@ -392,7 +392,9 @@ function KeepFollowing:StartFollowing(leader)
             end
 
             if not self.isnear or self.configkeeptargetdistance then
-                self:WalkToPosition(self.inst:GetPositionAdjacentTo(self.leader, self.configtargetdistance - 0.25))
+                dist = self.configtargetdistance + self.leader.Physics:GetRadius()
+                self:WalkToPosition(self.inst:GetPositionAdjacentTo(self.leader, dist))
+
                 if self.tasktime == 0 then
                     self.tasktime = _DEFAULT_TASK_TIME
                 end
