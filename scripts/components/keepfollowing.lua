@@ -222,7 +222,7 @@ function KeepFollowing:CanBeFollowed(entity)
         return false
     end
 
-    return entity:HasTag("locomotor")
+    return entity:HasTag("locomotor") or entity:HasTag("balloon")
 end
 
 function KeepFollowing:CanBePushed(entity)
