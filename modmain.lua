@@ -296,14 +296,14 @@ local function PlayerControllerPostInit(_self, _player)
             KeepFollowingStop()
         end
 
-        if control == CONTROL_PRIMARY then
-            if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+        if control == CONTROL_PRIMARY and not down then
+            if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
 
             OurMouseAction(_player, self:GetLeftMouseAction())
-        elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY then
-            if not down or TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+        elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
+            if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
 
