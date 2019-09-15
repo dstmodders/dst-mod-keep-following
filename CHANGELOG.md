@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Support for Balloon in all mobs mode
+
+### Changed
+
+- Improved clicking behaviour
+
+### Removed
+
+- Pushing support for Shadow Creatures
+
+### Fixed
+
+- Actions not showing on dedicated in all mobs mode
+- Distance calculation between follower and leader
+
 ## [0.12.0][] - 2019-09-16
 
 ### Added
