@@ -1,3 +1,4 @@
+local _DEBUG_FN
 local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
@@ -104,7 +105,6 @@ local KeepFollowing = Class(function(self, inst)
 end)
 
 function KeepFollowing:Init()
-    self.debugfn = nil
     self.isclient = false
     self.isdst = false
     self.isfollowing = false
@@ -122,6 +122,20 @@ function KeepFollowing:Init()
     self.configmobs = "default"
     self.configpushlagcompensation = true
     self.configtargetdistance = 2.5
+end
+
+--
+-- Debugging-related
+--
+
+function KeepFollowing:SetDebugFn(fn)
+    _DEBUG_FN = fn
+end
+
+local function DebugString(...)
+    if _DEBUG_FN then
+        _DEBUG_FN(...)
+    end
 end
 
 --
@@ -162,8 +176,8 @@ end
 
 function KeepFollowing:IsMovementPredictionEnabled()
     local state = self.inst.components.locomotor ~= nil
-    self:DebugString("Checking movement prediction current state...")
-    self:DebugString("Current state:", state and "enabled" or "disabled")
+    DebugString("Checking movement prediction current state...")
+    DebugString("Current state:", state and "enabled" or "disabled")
     return state
 end
 
@@ -172,12 +186,12 @@ function KeepFollowing:MovementPrediction(enable)
         local x, _, z = self.inst.Transform:GetWorldPosition()
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
         self.inst:EnableMovementPrediction(true)
-        self:DebugString("Movement prediction: enabled")
+        DebugString("Movement prediction: enabled")
         return true
     elseif self.inst.components and self.inst.components.locomotor then
         self.inst.components.locomotor:Stop()
         self.inst:EnableMovementPrediction(false)
-        self:DebugString("Movement prediction: disabled")
+        DebugString("Movement prediction: disabled")
         return false
     end
 end
@@ -186,9 +200,9 @@ function KeepFollowing:MovementPredictionOnPush()
     local state = self:IsMovementPredictionEnabled()
 
     if self.movementpredictionstate == nil then
-        self:DebugString("Setting movement prediction previous state...")
+        DebugString("Setting movement prediction previous state...")
         self.movementpredictionstate = state
-        self:DebugString("Previous state:", state and "enabled" or "disabled")
+        DebugString("Previous state:", state and "enabled" or "disabled")
     end
 
     if self.movementpredictionstate then
@@ -283,7 +297,7 @@ end
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
-        self:DebugString("New leader:", self.leader:GetDisplayName())
+        DebugString("New leader:", self.leader:GetDisplayName())
     end
 end
 
@@ -319,18 +333,18 @@ function KeepFollowing:GetTentSleeper(entity)
         return nil
     end
 
-    self:DebugString("Attempting to get a", entity:GetDisplayName(), "sleeper...")
+    DebugString("Attempting to get a", entity:GetDisplayName(), "sleeper...")
 
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
     else
-        self:DebugString("Component sleepingbag is not available, looking for sleeping players nearby...")
+        DebugString("Component sleepingbag is not available, looking for sleeping players nearby...")
         local x, y, z = entity.Transform:GetWorldPosition()
         player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
     end
 
     if player and player:HasTag("sleeping") then
-        self:DebugString("Found sleeping", player:GetDisplayName())
+        DebugString("Found sleeping", player:GetDisplayName())
         return player
     end
 
@@ -362,7 +376,7 @@ function KeepFollowing:StartFollowing(leader)
         if not self:IsFollowing() then
             self.isfollowing = true
 
-            self:DebugString(string.format(
+            DebugString(string.format(
                 "Started following leader. Distance: %0.2f. Target: %0.2f",
                 distance,
                 self.configtargetdistance
@@ -376,7 +390,7 @@ function KeepFollowing:StartFollowing(leader)
             end
 
             if not self.leader or not self.leader.entity:IsValid() then
-                self:DebugString("Leader doesn't exist anymore")
+                DebugString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -404,7 +418,7 @@ end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        self:DebugString("Stopped following", self.leader:GetDisplayName())
+        DebugString("Stopped following", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
         self.isfollowing = false
         self.leader = nil
@@ -432,8 +446,7 @@ function KeepFollowing:StartPushing(leader)
     if self.leader and self.playercontroller then
         if not self:IsPushing() then
             self.ispushing = true
-
-            self:DebugString("Started pushing leader")
+            DebugString("Started pushing leader")
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
@@ -443,7 +456,7 @@ function KeepFollowing:StartPushing(leader)
             end
 
             if not self.leader or not self.leader.entity:IsValid() then
-                self:DebugString("Leader doesn't exist anymore")
+                DebugString("Leader doesn't exist anymore")
                 self:StopPushing()
                 return
             end
@@ -460,20 +473,12 @@ function KeepFollowing:StopPushing()
     end
 
     if self.leader then
-        self:DebugString("Stopped pushing", self.leader:GetDisplayName())
+        DebugString("Stopped pushing", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
         self.ispushing = false
         self.leader = nil
         self.tasktime = 0
     end
-end
-
---
--- Debugging-related
---
-
-function KeepFollowing:DebugString(...)
-    self.debugfn(...)
 end
 
 return KeepFollowing

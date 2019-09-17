@@ -148,12 +148,13 @@ local function OnPlayerActivated(player, world)
     local keepfollowing = player.components.keepfollowing
 
     if keepfollowing then
-        keepfollowing.debugfn = DebugFn
         keepfollowing.isclient = IsClient()
         keepfollowing.isdst = IsDST()
         keepfollowing.ismastersim = world.ismastersim
         keepfollowing.modname = modname
         keepfollowing.world = world
+
+        keepfollowing:SetDebugFn(DebugFn)
 
         --GetModConfigData
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
