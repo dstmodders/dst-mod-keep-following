@@ -125,6 +125,18 @@ function KeepFollowing:Init()
 end
 
 --
+-- Helpers
+--
+
+local function WalkToPosition(self, pos)
+    if self.playercontroller.locomotor then
+        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+    else
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+    end
+end
+
+--
 -- Debugging-related
 --
 
@@ -150,14 +162,6 @@ function KeepFollowing:InGame()
     return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
 end
 
-function KeepFollowing:WalkToPosition(pos)
-    if self.playercontroller.locomotor then
-        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-    else
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-    end
-end
-
 function KeepFollowing:Stop()
     if self:InGame() then
         if self:IsFollowing() then
@@ -173,6 +177,33 @@ end
 --
 -- Movement prediction
 --
+
+local function MovementPredictionOnPush(self)
+    local state = self:IsMovementPredictionEnabled()
+
+    if self.movementpredictionstate == nil then
+        DebugString("Setting movement prediction previous state...")
+        self.movementpredictionstate = state
+        DebugString("Previous state:", state and "enabled" or "disabled")
+    end
+
+    if self.movementpredictionstate then
+        self:MovementPrediction(false)
+    end
+end
+
+local function MovementPredictionOnFollow(self)
+    local state = self.movementpredictionstate
+    if state ~= nil then
+        self:MovementPrediction(state)
+        self.movementpredictionstate = nil
+    end
+end
+
+local function MovementPredictionOnStop(self)
+    self:MovementPrediction(self.movementpredictionstate)
+    self.movementpredictionstate = nil
+end
 
 function KeepFollowing:IsMovementPredictionEnabled()
     local state = self.inst.components.locomotor ~= nil
@@ -194,33 +225,6 @@ function KeepFollowing:MovementPrediction(enable)
         DebugString("Movement prediction: disabled")
         return false
     end
-end
-
-function KeepFollowing:MovementPredictionOnPush()
-    local state = self:IsMovementPredictionEnabled()
-
-    if self.movementpredictionstate == nil then
-        DebugString("Setting movement prediction previous state...")
-        self.movementpredictionstate = state
-        DebugString("Previous state:", state and "enabled" or "disabled")
-    end
-
-    if self.movementpredictionstate then
-        self:MovementPrediction(false)
-    end
-end
-
-function KeepFollowing:MovementPredictionOnFollow()
-    local state = self.movementpredictionstate
-    if state ~= nil then
-        self:MovementPrediction(state)
-        self.movementpredictionstate = nil
-    end
-end
-
-function KeepFollowing:MovementPredictionOnStop()
-    self:MovementPrediction(self.movementpredictionstate)
-    self.movementpredictionstate = nil
 end
 
 --
@@ -309,7 +313,7 @@ end
 -- Tent-related
 --
 
-function KeepFollowing:FindClosestInvisiblePlayerInRange(x, y, z, range)
+local function FindClosestInvisiblePlayerInRange(x, y, z, range)
     local closestPlayer
     local rangesq = range * range
 
@@ -340,7 +344,7 @@ function KeepFollowing:GetTentSleeper(entity)
     else
         DebugString("Component sleepingbag is not available, looking for sleeping players nearby...")
         local x, y, z = entity.Transform:GetWorldPosition()
-        player = self:FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
+        player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
     end
 
     if player and player:HasTag("sleeping") then
@@ -364,7 +368,7 @@ function KeepFollowing:StartFollowing(leader)
 
     if not self:IsFollowing() then
         if self.configpushlagcompensation and not self:IsMasterSim() then
-            self:MovementPredictionOnFollow()
+            MovementPredictionOnFollow(self)
         end
 
         self:SetLeader(leader)
@@ -404,7 +408,7 @@ function KeepFollowing:StartFollowing(leader)
 
             if not self.isnear or self.configkeeptargetdistance then
                 dist = self.configtargetdistance + self.leader.Physics:GetRadius()
-                self:WalkToPosition(self.inst:GetPositionAdjacentTo(self.leader, dist))
+                WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, dist))
 
                 if self.tasktime == 0 then
                     self.tasktime = _DEFAULT_TASK_TIME
@@ -437,7 +441,7 @@ end
 function KeepFollowing:StartPushing(leader)
     if not self:IsPushing() then
         if self.configpushlagcompensation and not self:IsMasterSim() then
-            self:MovementPredictionOnPush()
+            MovementPredictionOnPush(self)
         end
 
         self:SetLeader(leader)
@@ -461,7 +465,7 @@ function KeepFollowing:StartPushing(leader)
                 return
             end
 
-            self:WalkToPosition(self.leader:GetPosition())
+            WalkToPosition(self, self.leader:GetPosition())
             self:StartPushing(self.leader)
         end)
     end
@@ -469,7 +473,7 @@ end
 
 function KeepFollowing:StopPushing()
     if self.configpushlagcompensation and not self:IsMasterSim() then
-        self:MovementPredictionOnStop()
+        MovementPredictionOnStop(self)
     end
 
     if self.leader then
