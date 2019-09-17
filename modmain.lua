@@ -206,6 +206,7 @@ local function PlayerActionPickerPostInit(self, player)
     local function NewDoGetMouseActions(position, target)
         local lmb, rmb = OldDoGetMouseActions(position, target)
         local keepfollowing = player.components.keepfollowing
+        local buffered = self.inst:GetBufferedAction()
 
         if TheInput:IsKeyDown(_KEY_ACTION) then
             -- We could have used lmb.target but as PlayerActionPicker has leftclickoverride and
@@ -213,6 +214,17 @@ local function PlayerActionPickerPostInit(self, player)
             -- which overrides mouse actions.
             target = TheInput:GetWorldEntityUnderMouse()
             if not target then
+                return lmb, rmb
+            end
+
+            -- You are probably wondering why we need this check? Isn't it better to just show our
+            -- actions without the buffered action check? My answer is - no. There are so many mods
+            -- out there "in the wild" which also do different in-game actions and don't bother
+            -- checking for interruptions in their scheduler tasks (threads). For example,
+            -- ActionQueue Reborn will always try to force their action if entities have already
+            -- been selected. We can adapt our mod for such cases to improve compatibility but this
+            -- is the only bulletproof way to cover the most.
+            if buffered and buffered.action ~= ACTIONS.WALKTO then
                 return lmb, rmb
             end
 
