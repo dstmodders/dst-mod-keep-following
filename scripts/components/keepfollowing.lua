@@ -151,10 +151,6 @@ function KeepFollowing:Stop()
         end
 
         if self:IsPushing() then
-            if self.configpushlagcompensation and not self:IsMasterSim() then
-                self:MovementPredictionOnStop()
-            end
-
             self:StopPushing()
         end
     end
@@ -374,13 +370,14 @@ function KeepFollowing:StartFollowing(leader)
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
-            if not self:IsFollowing() or not self.leader then
+            if not self:IsFollowing() then
+                self:StopFollowing()
                 return
             end
 
-            if not self.leader.entity:IsValid() then
+            if not self.leader or not self.leader.entity:IsValid() then
                 self:DebugString("Leader doesn't exist anymore")
-                self:Stop()
+                self:StopFollowing()
                 return
             end
 
@@ -440,13 +437,14 @@ function KeepFollowing:StartPushing(leader)
         end
 
         self.inst:DoTaskInTime(self.tasktime, function()
-            if not self:IsPushing() or not self.leader then
+            if not self:IsPushing() then
+                self:StopPushing()
                 return
             end
 
-            if not self.leader.entity:IsValid() then
+            if not self.leader or not self.leader.entity:IsValid() then
                 self:DebugString("Leader doesn't exist anymore")
-                self:Stop()
+                self:StopPushing()
                 return
             end
 
@@ -457,6 +455,10 @@ function KeepFollowing:StartPushing(leader)
 end
 
 function KeepFollowing:StopPushing()
+    if self.configpushlagcompensation and not self:IsMasterSim() then
+        self:MovementPredictionOnStop()
+    end
+
     if self.leader then
         self:DebugString("Stopped pushing", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
