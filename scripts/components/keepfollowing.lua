@@ -128,6 +128,10 @@ end
 -- Helpers
 --
 
+local function IsPlayerInGame(player)
+    return player and player.HUD and not player.HUD:HasInputFocus()
+end
+
 local function WalkToPosition(self, pos)
     if self.playercontroller.locomotor then
         self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
@@ -154,12 +158,8 @@ end
 -- General
 --
 
-function KeepFollowing:InGame()
-    return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
-end
-
 function KeepFollowing:Stop()
-    if self:InGame() then
+    if IsPlayerInGame(self.inst) then
         if self:IsFollowing() then
             self:StopFollowing()
         end
