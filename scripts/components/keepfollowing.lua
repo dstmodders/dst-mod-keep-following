@@ -380,13 +380,11 @@ function KeepFollowing:StartFollowing(leader)
     self.threadfollowing = StartThread(function()
         local distance, dist
 
-        distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
-
         self.isfollowing = true
 
         DebugTheadString(string.format(
             "Started following leader. Distance: %0.2f. Target: %0.2f",
-            distance,
+            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition())),
             self.configtargetdistance
         ))
 
@@ -397,6 +395,7 @@ function KeepFollowing:StartFollowing(leader)
                 return
             end
 
+            distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
             if distance >= self.configtargetdistance then
                 self.isnear = false
             elseif not self.isnear and distance < self.configtargetdistance then
