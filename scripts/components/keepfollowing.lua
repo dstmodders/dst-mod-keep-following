@@ -154,10 +154,6 @@ end
 -- General
 --
 
-function KeepFollowing:IsMasterSim()
-    return self.ismastersim
-end
-
 function KeepFollowing:InGame()
     return self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()
 end
@@ -367,7 +363,7 @@ function KeepFollowing:StartFollowing(leader)
     local distance, dist
 
     if not self:IsFollowing() then
-        if self.configpushlagcompensation and not self:IsMasterSim() then
+        if self.configpushlagcompensation and not self.ismastersim then
             MovementPredictionOnFollow(self)
         end
 
@@ -440,7 +436,7 @@ end
 
 function KeepFollowing:StartPushing(leader)
     if not self:IsPushing() then
-        if self.configpushlagcompensation and not self:IsMasterSim() then
+        if self.configpushlagcompensation and not self.ismastersim then
             MovementPredictionOnPush(self)
         end
 
@@ -472,7 +468,7 @@ function KeepFollowing:StartPushing(leader)
 end
 
 function KeepFollowing:StopPushing()
-    if self.configpushlagcompensation and not self:IsMasterSim() then
+    if self.configpushlagcompensation and not self.ismastersim then
         MovementPredictionOnStop(self)
     end
 
