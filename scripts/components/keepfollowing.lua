@@ -1,5 +1,4 @@
 local _DEBUG_FN
-local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
 local _FOLLOWING_THREAD_ID = "following_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
@@ -116,7 +115,6 @@ function KeepFollowing:Init()
     self.leader = nil
     self.movementpredictionstate = nil
     self.playercontroller = nil
-    self.tasktime = 0
     self.threadfollowing = nil
     self.threadpushing = nil
     self.world = TheWorld
@@ -403,19 +401,14 @@ function KeepFollowing:StartFollowing(leader)
                 self.isnear = false
             elseif not self.isnear and distance < self.configtargetdistance then
                 self.isnear = true
-                self.tasktime = 0
             end
 
             if not self.isnear or self.configkeeptargetdistance then
                 dist = self.configtargetdistance + self.leader.Physics:GetRadius()
                 WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, dist))
-
-                if self.tasktime == 0 then
-                    self.tasktime = _DEFAULT_TASK_TIME
-                end
             end
 
-            Sleep(self.tasktime)
+            Sleep(FRAMES * 9) -- 0.3 sec
         end
 
         self:ClearFollowingThread()
@@ -436,7 +429,6 @@ function KeepFollowing:StopFollowing()
         DebugString("[" .. self.threadfollowing.id .. "]", "Stopped following", self.leader:GetDisplayName())
         self.isfollowing = false
         self.leader = nil
-        self.tasktime = 0
         self:ClearFollowingThread()
     end
 end
@@ -470,7 +462,7 @@ function KeepFollowing:StartPushing(leader)
 
             WalkToPosition(self, self.leader:GetPosition())
 
-            Sleep(self.tasktime)
+            Sleep(FRAMES)
         end
 
         self:ClearPushingThread()
@@ -496,7 +488,6 @@ function KeepFollowing:StopPushing()
         self.inst:CancelAllPendingTasks()
         self.ispushing = false
         self.leader = nil
-        self.tasktime = 0
         self:ClearPushingThread()
     end
 end
