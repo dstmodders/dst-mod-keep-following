@@ -1,6 +1,7 @@
 local _DEBUG_FN
-local _FOLLOWING_THREAD_ID = "following_thread"
 local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
+local _FOLLOWING_THREAD_ID = "following_thread"
+local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 -- We could have used group tags instead of mob-specific ones but this approach gives more control.
@@ -117,6 +118,7 @@ function KeepFollowing:Init()
     self.playercontroller = nil
     self.tasktime = 0
     self.threadfollowing = nil
+    self.threadpushing = nil
     self.world = TheWorld
 
     --replaced by GetModConfigData
@@ -448,35 +450,39 @@ function KeepFollowing:IsPushing()
 end
 
 function KeepFollowing:StartPushing(leader)
-    if not self:IsPushing() then
-        if self.configpushlagcompensation and not self.ismastersim then
-            MovementPredictionOnPush(self)
-        end
-
-        self:SetLeader(leader)
+    if self.configpushlagcompensation and not self.ismastersim then
+        MovementPredictionOnPush(self)
     end
 
-    if self.leader and self.playercontroller then
-        if not self:IsPushing() then
-            self.ispushing = true
-            DebugString("Started pushing leader")
-        end
+    self:SetLeader(leader)
 
-        self.inst:DoTaskInTime(self.tasktime, function()
-            if not self:IsPushing() then
-                self:StopPushing()
-                return
-            end
+    self.threadpushing = StartThread(function()
+        self.ispushing = true
 
+        DebugTheadString("Started pushing leader")
+
+        while self.inst and self.inst:IsValid() and self:IsPushing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugString("Leader doesn't exist anymore")
+                DebugTheadString("Leader doesn't exist anymore")
                 self:StopPushing()
                 return
             end
 
             WalkToPosition(self, self.leader:GetPosition())
-            self:StartPushing(self.leader)
-        end)
+
+            Sleep(self.tasktime)
+        end
+
+        self:ClearPushingThread()
+    end, _PUSHING_THREAD_ID)
+end
+
+function KeepFollowing:ClearPushingThread()
+    if self.threadpushing then
+        DebugString("[" .. self.threadpushing.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.threadpushing.id)
+        self.threadpushing:SetList(nil)
+        self.threadpushing = nil
     end
 end
 
@@ -486,11 +492,12 @@ function KeepFollowing:StopPushing()
     end
 
     if self.leader then
-        DebugString("Stopped pushing", self.leader:GetDisplayName())
+        DebugString("[" .. self.threadpushing.id .. "]", "Stopped pushing", self.leader:GetDisplayName())
         self.inst:CancelAllPendingTasks()
         self.ispushing = false
         self.leader = nil
         self.tasktime = 0
+        self:ClearPushingThread()
     end
 end
 
