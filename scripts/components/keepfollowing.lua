@@ -1,4 +1,5 @@
 local _DEBUG_FN
+local _FOLLOWING_THREAD_ID = "following_thread"
 local _DEFAULT_TASK_TIME = FRAMES * 9 --0.3
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
@@ -115,6 +116,7 @@ function KeepFollowing:Init()
     self.movementpredictionstate = nil
     self.playercontroller = nil
     self.tasktime = 0
+    self.threadfollowing = nil
     self.world = TheWorld
 
     --replaced by GetModConfigData
@@ -151,6 +153,15 @@ end
 local function DebugString(...)
     if _DEBUG_FN then
         _DEBUG_FN(...)
+    end
+end
+
+local function DebugTheadString(...)
+    if _DEBUG_FN then
+        local task = scheduler:GetCurrentTask()
+        if task then
+            _DEBUG_FN("[" .. task.id .. "]", ...)
+        end
     end
 end
 
@@ -360,37 +371,28 @@ function KeepFollowing:IsFollowing()
 end
 
 function KeepFollowing:StartFollowing(leader)
-    local distance, dist
-
-    if not self:IsFollowing() then
-        if self.configpushlagcompensation and not self.ismastersim then
-            MovementPredictionOnFollow(self)
-        end
-
-        self:SetLeader(leader)
+    if self.configpushlagcompensation and not self.ismastersim then
+        MovementPredictionOnFollow(self)
     end
 
-    if self.leader and self.playercontroller then
+    self:SetLeader(leader)
+
+    self.threadfollowing = StartThread(function()
+        local distance, dist
+
         distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
 
-        if not self:IsFollowing() then
-            self.isfollowing = true
+        self.isfollowing = true
 
-            DebugString(string.format(
-                "Started following leader. Distance: %0.2f. Target: %0.2f",
-                distance,
-                self.configtargetdistance
-            ))
-        end
+        DebugTheadString(string.format(
+            "Started following leader. Distance: %0.2f. Target: %0.2f",
+            distance,
+            self.configtargetdistance
+        ))
 
-        self.inst:DoTaskInTime(self.tasktime, function()
-            if not self:IsFollowing() then
-                self:StopFollowing()
-                return
-            end
-
+        while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugString("Leader doesn't exist anymore")
+                DebugTheadString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -411,18 +413,29 @@ function KeepFollowing:StartFollowing(leader)
                 end
             end
 
-            self:StartFollowing(self.leader)
-        end)
+            Sleep(self.tasktime)
+        end
+
+        self:ClearFollowingThread()
+    end, _FOLLOWING_THREAD_ID)
+end
+
+function KeepFollowing:ClearFollowingThread()
+    if self.threadfollowing then
+        DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.threadfollowing.id)
+        self.threadfollowing:SetList(nil)
+        self.threadfollowing = nil
     end
 end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        DebugString("Stopped following", self.leader:GetDisplayName())
-        self.inst:CancelAllPendingTasks()
+        DebugString("[" .. self.threadfollowing.id .. "]", "Stopped following", self.leader:GetDisplayName())
         self.isfollowing = false
         self.leader = nil
         self.tasktime = 0
+        self:ClearFollowingThread()
     end
 end
 
