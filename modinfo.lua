@@ -13,9 +13,9 @@ author = "Demonblink"
 api_version = 10
 forumthread = ""
 
---Advanced Controls is using the default 0 priority. We need to load our mod after theirs, so its
---"Attack actions only key" wouldn't interfere with us. The "1835465557" part is the workshop ID of
---this mod so other mods had enough "space for manoeuvre" in loading priority
+-- Advanced Controls is using the default 0 priority. We need to load our mod after theirs, so its
+-- "Attack actions only key" wouldn't interfere with us. The "1835465557" part is the workshop ID of
+-- this mod so other mods had enough "space for manoeuvre" in loading priority.
 priority = -0.011835465557
 
 icon = "modicon.tex"
@@ -74,7 +74,7 @@ configuration_options = {
     AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
     AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
-    AddConfig("Target Distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
+    AddConfig("Target distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
     AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
     AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),

@@ -157,6 +157,7 @@ local function OnPlayerActivated(player, world)
         keepfollowing:SetDebugFn(DebugFn)
 
         --GetModConfigData
+        keepfollowing.configfollowingmethod = GetModConfigData("following_method")
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
         keepfollowing.configmobs = GetModConfigData("mobs")
         keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
@@ -282,6 +283,23 @@ local function PlayerControllerPostInit(_self, _player)
         keepfollowing:Stop()
     end
 
+    -- We ignore ActionQueue(DST) mod here intentionally as we don't even need to bother. Our mod
+    -- won't work with theirs if the same action key is used. So there is no point to mess with
+    -- their functions anyway.
+    --
+    -- From an engineering perspective, the method which ActionQueue(DST) mod uses for overriding
+    -- PlayerController:OnControl() should never be used. Technically, we can fix this issue by
+    -- either using the same approach or using the global input handler when ActionQueue(DST) mod is
+    -- enabled. However, I don't see any valid reason to do that.
+    local function ClearActionQueueRebornEntities()
+        local actionqueuer = _player.components.actionqueuer
+        if not actionqueuer or not actionqueuer.ClearAllThreads then
+            return
+        end
+
+        actionqueuer:ClearAllThreads()
+    end
+
     local function OurMouseAction(player, act)
         if not act then
             KeepFollowingStop()
@@ -296,6 +314,7 @@ local function PlayerControllerPostInit(_self, _player)
         end
 
         if IsOurAction(action) then
+            ClearActionQueueRebornEntities()
             return action.fn(act)
         else
             KeepFollowingStop()
