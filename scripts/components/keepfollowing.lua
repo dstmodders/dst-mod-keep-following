@@ -247,8 +247,14 @@ function KeepFollowing:CanBeFollowed(entity)
 end
 
 function KeepFollowing:CanBePushed(entity)
-    if not entity or not entity.Physics then
+    if not self.inst or not entity or not entity.Physics then
         return false
+    end
+
+    -- ghosts should be able to push other players ignoring the mass difference as the point is not
+    -- to move the player but to provide light
+    if self.inst:HasTag("playerghost") and entity:HasTag("player") then
+        return true
     end
 
     -- different flyers don't collide with characters so pushing won't work anyway
