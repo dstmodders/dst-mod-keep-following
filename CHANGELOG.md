@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.14.0][] - 2019-09-20
+
+### Added
+
+- Support for pushing players as a ghost
+
+### Changed
+
+- Improved compatibility with some other mods
+- Improved debug output
+
+### Removed
+
+- Pending tasks in favour of custom threads
+
+### Fixed
+
+- Keeping the target distance behaviour
+
 ## [0.13.0][] - 2019-09-17
 
 ### Added
@@ -162,7 +181,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.10.0...v0.11.0
