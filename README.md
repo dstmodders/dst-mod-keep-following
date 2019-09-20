@@ -57,16 +57,18 @@ from this mod.
 Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
-| Configuration             | Options          | Default   | Description                                                                                   |
-|---------------------------|------------------|-----------|-----------------------------------------------------------------------------------------------|
-| **Action key**            | _[keys]_         | _LShift_  | Key used for both following and pushing                                                       |
-| **Push key**              | _[keys]_         | _LCtrl_   | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
-| **Push with RMB**         | _Yes/No_         | _No_      | Use RMB in combination with action key for pushing instead                                    |
-| **Push lag compensation** | _Yes/No_         | _Yes_     | Automatically disables lag compensation while pushing and restores the previous state after   |
-| **Target Distance**       | _1.5m/2.5m/3.5m_ | _2.5m_    | How close can you approach the leader? Ignored when pushing                                   |
-| **Keep target distance**  | _Yes/No_         | _No_      | Move away from a leader inside the target distance. Ignored when pushing                      |
-| **Mobs**                  | _Default/All_    | _Default_ | Which mobs can be followed and pushed?                                                        |
-| **Debug**                 | _Yes/No_         | _No_      | Enables/Disables the debug mode                                                               |
+| Configuration             | Options           | Default   | Description                                                                                   |
+|---------------------------|-------------------|-----------|-----------------------------------------------------------------------------------------------|
+| **Action key**            | _[keys]_          | _LShift_  | Key used for both following and pushing                                                       |
+| **Push key**              | _[keys]_          | _LCtrl_   | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
+| **Push with RMB**         | _Yes/No_          | _No_      | Use RMB in combination with action key for pushing instead                                    |
+| **Push mass checking**    | _Yes/No_          | _Yes_     | Enables/Disables the mass difference checking. Ignored for the ghosts pushing players         |
+| **Push lag compensation** | _Yes/No_          | _Yes_     | Automatically disables lag compensation while pushing and restores the previous state after   |
+| **Following method**      | _Default/Closest_ | _Default_ | Which following method should be used?                                                        |
+| **Target distance**       | _1.5m/2.5m/3.5m_  | _2.5m_    | How close can you approach the leader? Ignored when pushing                                   |
+| **Keep target distance**  | _Yes/No_          | _No_      | Move away from a leader inside the target distance. Ignored when pushing                      |
+| **Mobs**                  | _Default/All_     | _Default_ | Which mobs can be followed and pushed?                                                        |
+| **Debug**                 | _Yes/No_          | _No_      | Enables/Disables the debug mode                                                               |
 
 ## Roadmap
 
@@ -75,8 +77,6 @@ Below are the features/improvements yet to be implemented:
 - [ ] Auto-hide in a Bush Hat if equipped
 - [ ] Auto-hide in a Snurtle Shell Armor if in the inventory
 - [ ] Follow players through wormholes and possibly cave entrances
-- [ ] Improve pathfinder precision
-- [ ] Improve picking/following/pushing LMB conflicts with some other mods
 
 ## License
 
