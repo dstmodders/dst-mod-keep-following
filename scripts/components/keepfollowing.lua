@@ -150,10 +150,21 @@ local function GetDistSqBetweenPositions(p1, p2)
 end
 
 local function WalkToPosition(self, pos)
-    if self.playercontroller.locomotor then
-        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
+    local action = BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos)
+
+    if self.ismastersim then
+        self.playercontroller:DoAction(action)
     else
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+        if self.playercontroller.locomotor then
+            self.playercontroller:DoAction(action)
+        else
+            SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
+        end
+
+        local locomotor = self.playercontroller.locomotor
+        if locomotor then
+            locomotor:PreviewAction(action)
+        end
     end
 end
 
