@@ -109,8 +109,8 @@ function KeepFollowing:Init()
     self.isclient = false
     self.isdst = false
     self.isfollowing = false
+    self.isleadernear = false
     self.ismastersim = TheWorld.ismastersim
-    self.isnear = false
     self.ispushing = false
     self.leader = nil
     self.movementpredictionstate = nil
@@ -403,12 +403,12 @@ function KeepFollowing:StartFollowing(leader)
 
             distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
             if distance >= self.configtargetdistance then
-                self.isnear = false
-            elseif not self.isnear and distance < self.configtargetdistance then
-                self.isnear = true
+                self.isleadernear = false
+            elseif not self.isleadernear and distance < self.configtargetdistance then
+                self.isleadernear = true
             end
 
-            if not self.isnear or self.configkeeptargetdistance then
+            if not self.isleadernear or self.configkeeptargetdistance then
                 dist = self.configtargetdistance + self.leader.Physics:GetRadius()
                 WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, dist))
             end
