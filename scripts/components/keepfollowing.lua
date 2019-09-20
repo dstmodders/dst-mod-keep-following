@@ -1,5 +1,6 @@
 local _DEBUG_FN
 local _FOLLOWING_THREAD_ID = "following_thread"
+local _PATH_THREAD_ID = "path_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
@@ -113,13 +114,16 @@ function KeepFollowing:Init()
     self.ismastersim = TheWorld.ismastersim
     self.ispushing = false
     self.leader = nil
+    self.leaderpositions = {}
     self.movementpredictionstate = nil
     self.playercontroller = nil
     self.threadfollowing = nil
+    self.threadpath = nil
     self.threadpushing = nil
     self.world = TheWorld
 
     --replaced by GetModConfigData
+    self.configfollowingmethod = "default"
     self.configkeeptargetdistance = false
     self.configmobs = "default"
     self.configpushlagcompensation = true
@@ -132,6 +136,17 @@ end
 
 local function IsPlayerInGame(player)
     return player and player.HUD and not player.HUD:HasInputFocus()
+end
+
+local function GetDistSq(x1, y1, z1, x2, y2, z2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local dz = z2 - z1
+    return dx * dx + dy * dy + dz * dz
+end
+
+local function GetDistSqBetweenPositions(p1, p2)
+    return GetDistSq(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
 end
 
 local function WalkToPosition(self, pos)
@@ -314,7 +329,12 @@ end
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
-        DebugString("New leader:", self.leader:GetDisplayName())
+        DebugString(string.format(
+            "New leader: %s. Distance: %0.2f. Target: %0.2f",
+            self.leader:GetDisplayName(),
+            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition())),
+            self.configtargetdistance
+        ))
     end
 end
 
@@ -376,23 +396,12 @@ function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
 
-function KeepFollowing:StartFollowing(leader)
-    if self.configpushlagcompensation and not self.ismastersim then
-        MovementPredictionOnFollow(self)
-    end
+function KeepFollowing:StartPathThread()
+    self.threadpath = StartThread(function()
+        local pos, previouspos
+        local dist
 
-    self:SetLeader(leader)
-
-    self.threadfollowing = StartThread(function()
-        local distance, dist
-
-        self.isfollowing = true
-
-        DebugTheadString(string.format(
-            "Started following leader. Distance: %0.2f. Target: %0.2f",
-            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition())),
-            self.configtargetdistance
-        ))
+        DebugTheadString("Started gathering path coordinates...")
 
         while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
@@ -401,23 +410,114 @@ function KeepFollowing:StartFollowing(leader)
                 return
             end
 
-            distance = math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
-            if distance >= self.configtargetdistance then
-                self.isleadernear = false
-            elseif not self.isleadernear and distance < self.configtargetdistance then
-                self.isleadernear = true
+            pos = self.leader:GetPosition()
+
+            if not previouspos then
+                table.insert(self.leaderpositions, pos)
+                previouspos = pos
             end
 
-            if not self.isleadernear or self.configkeeptargetdistance then
-                dist = self.configtargetdistance + self.leader.Physics:GetRadius()
-                WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, dist))
+            dist = math.sqrt(GetDistSqBetweenPositions(pos, previouspos))
+            if dist > .5 and pos ~= previouspos then
+                table.insert(self.leaderpositions, pos)
+                previouspos = pos
             end
 
-            Sleep(FRAMES * 9) -- 0.3 sec
+            Sleep(FRAMES)
+        end
+
+        self:ClearPathThread()
+    end, _PATH_THREAD_ID)
+end
+
+function KeepFollowing:StartFollowingThread()
+    self.threadfollowing = StartThread(function()
+        local distinstsq, distinst
+        local distsqleader, distleader
+        local pos, previouspos, isleadernear
+
+        local radiusinst = self.inst.Physics:GetRadius()
+        local radiusleader = self.leader.Physics:GetRadius()
+        local target = self.configtargetdistance + radiusleader
+
+        self.isfollowing = true
+
+        DebugTheadString("Following method:", self.configfollowingmethod)
+        DebugTheadString(string.format(
+            "Started following %s...",
+            self.leader:GetDisplayName()
+        ))
+
+        if self.configfollowingmethod == "default" then
+            self:StartPathThread()
+        end
+
+        while self.inst and self.inst:IsValid() and self:IsFollowing() do
+            if not self.leader or not self.leader.entity:IsValid() then
+                DebugTheadString("Leader doesn't exist anymore")
+                self:StopFollowing()
+                return
+            end
+
+            isleadernear = self.inst:IsNear(self.leader, target)
+
+            if self.configfollowingmethod == "default" then
+                pos = self.leaderpositions[1]
+
+                if pos then
+                    distinstsq = self.inst:GetDistanceSqToPoint(pos)
+                    distinst = math.sqrt(distinstsq)
+                    distsqleader = self.leader:GetDistanceSqToPoint(pos)
+                    distleader = math.sqrt(distsqleader)
+
+                    if distinst > radiusinst then
+                        if not self.isleadernear and isleadernear or (isleadernear and self.configkeeptargetdistance) then
+                            WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, target))
+                            self.leaderpositions = {}
+                        elseif not isleadernear then
+                            WalkToPosition(self, pos)
+                        else
+                            self.leaderpositions = {}
+                        end
+                    else
+                        table.remove(self.leaderpositions, 1)
+                    end
+                end
+            elseif self.configfollowingmethod == "closest" then
+                pos = self.leader:GetPosition()
+                distsqleader = self.leader:GetDistanceSqToPoint(pos)
+
+                if (not previouspos or pos ~= previouspos) and (not isleadernear or self.configkeeptargetdistance) then
+                    WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, target))
+                    previouspos = pos
+                end
+            end
+
+            self.isleadernear = isleadernear
+
+            Sleep(FRAMES)
         end
 
         self:ClearFollowingThread()
     end, _FOLLOWING_THREAD_ID)
+end
+
+function KeepFollowing:StartFollowing(leader)
+    if self.configpushlagcompensation and not self.ismastersim then
+        MovementPredictionOnFollow(self)
+    end
+
+    self:SetLeader(leader)
+    self:StartFollowingThread()
+end
+
+function KeepFollowing:ClearPathThread()
+    if self.threadpath then
+        DebugString("[" .. self.threadpath.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.threadpath.id)
+        self.threadpath:SetList(nil)
+        self.threadpath = nil
+    end
 end
 
 function KeepFollowing:ClearFollowingThread()
@@ -434,6 +534,8 @@ function KeepFollowing:StopFollowing()
         DebugString("[" .. self.threadfollowing.id .. "]", "Stopped following", self.leader:GetDisplayName())
         self.isfollowing = false
         self.leader = nil
+        self.leaderpositions = {}
+        self:ClearPathThread()
         self:ClearFollowingThread()
     end
 end

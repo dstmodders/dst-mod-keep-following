@@ -49,6 +49,11 @@ local mobs = {
     { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
 }
 
+local following_methods = {
+    { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
+    { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
+}
+
 local string = ""
 local keys = {
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
@@ -74,6 +79,7 @@ configuration_options = {
     AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
     AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
+    AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
     AddConfig("Target distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
     AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
     AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
