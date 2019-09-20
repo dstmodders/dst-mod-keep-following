@@ -127,6 +127,7 @@ function KeepFollowing:Init()
     self.configkeeptargetdistance = false
     self.configmobs = "default"
     self.configpushlagcompensation = true
+    self.configpushmasschecking = true
     self.configtargetdistance = 2.5
 end
 
@@ -291,6 +292,10 @@ function KeepFollowing:CanBePushed(entity)
     -- Shadow Creatures also don't collide with characters
     if entity.Physics:GetCollisionGroup() == COLLISION.SANITY then
         return false
+    end
+
+    if not self.configpushmasschecking then
+        return true
     end
 
     -- Mass is the key factor for pushing. Players have a mass of 75 while most bosses have a mass

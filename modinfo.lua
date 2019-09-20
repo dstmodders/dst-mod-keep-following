@@ -38,6 +38,11 @@ local boolean = {
     { description = "No", data = false }
 }
 
+local boolean_push_mass_checking = {
+    { description = "Yes", data = true, hover = "Yes: only entities with an appropriate mass difference can be pushed" },
+    { description = "No", data = false, hover = "No: no mass difference limitations" },
+}
+
 local target_distance = {
     { description = "1.5m", data = 1.5 },
     { description = "2.5m", data = 2.5 },
@@ -78,6 +83,7 @@ configuration_options = {
     AddConfig("Action key", "key_action", keylist, "KEY_LSHIFT", "Key used for both following and pushing"),
     AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
     AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
+    AddConfig("Push mass checking", "push_mass_checking", boolean_push_mass_checking, true, "Enables/Disables the mass difference checking.\nIgnored for the ghosts pushing players"),
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
     AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
     AddConfig("Target distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),

@@ -161,6 +161,7 @@ local function OnPlayerActivated(player, world)
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
         keepfollowing.configmobs = GetModConfigData("mobs")
         keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
+        keepfollowing.configpushmasschecking = GetModConfigData("push_mass_checking")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
     end
 
