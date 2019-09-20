@@ -293,11 +293,17 @@ local function PlayerControllerPostInit(_self, _player)
     -- enabled. However, I don't see any valid reason to do that.
     local function ClearActionQueueRebornEntities()
         local actionqueuer = _player.components.actionqueuer
-        if not actionqueuer or not actionqueuer.ClearAllThreads then
+        if not actionqueuer
+            or not actionqueuer.ClearActionThread
+            or not actionqueuer.ClearSelectionThread
+            or not actionqueuer.ClearSelectedEntities
+        then
             return
         end
 
-        actionqueuer:ClearAllThreads()
+        actionqueuer:ClearActionThread()
+        actionqueuer:ClearSelectionThread()
+        actionqueuer:ClearSelectedEntities()
     end
 
     local function OurMouseAction(player, act)
