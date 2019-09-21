@@ -433,8 +433,9 @@ function KeepFollowing:StartPathThread()
                 previouspos = pos
             end
 
+            -- 1 is the most optimal value so far
             dist = math.sqrt(GetDistSqBetweenPositions(pos, previouspos))
-            if dist > .5 and pos ~= previouspos then
+            if dist > 1 and pos ~= previouspos then
                 table.insert(self.leaderpositions, pos)
                 previouspos = pos
             end
@@ -486,7 +487,10 @@ function KeepFollowing:StartFollowingThread()
                     distsqleader = self.leader:GetDistanceSqToPoint(pos)
                     distleader = math.sqrt(distsqleader)
 
-                    if distinst > radiusinst then
+                    -- 1.5 in diameter. Smaller value gives more precision, especially near the
+                    -- corners. However, when lag compensation is off the movement becomes "awkward"
+                    -- so I don't recommend using something less than 1 diameter.
+                    if distinst > radiusinst * 3 then
                         if not self.isleadernear and isleadernear or (isleadernear and self.configkeeptargetdistance) then
                             WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, target))
                             self.leaderpositions = {}
