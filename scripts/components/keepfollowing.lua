@@ -4,6 +4,20 @@ local _PATH_THREAD_ID = "path_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
+-- A list of actions that will cause the following thread to pause. The first value represents the
+-- action itself and the second, optional value, is the thread sleep time (default: 1.25).
+local _PAUSE_ACTIONS = {
+    { ACTIONS.ADDFUEL, .5 },
+    { ACTIONS.ADDWETFUEL, .5 },
+    { ACTIONS.BUILD },
+    { ACTIONS.DROP, .5 },
+    { ACTIONS.EAT, 1 },
+    { ACTIONS.HEAL },
+    { ACTIONS.LOOKAT, .25 },
+    { ACTIONS.TEACH },
+    { ACTIONS.USEITEM },
+}
+
 -- We could have used group tags instead of mob-specific ones but this approach gives more control.
 -- Originally the list included only player-friendly ones but as the mod has matured the list was
 -- expanding based on the requests from players as there are some cases when even following/pushing
@@ -112,6 +126,7 @@ function KeepFollowing:Init()
     self.isfollowing = false
     self.isleadernear = false
     self.ismastersim = TheWorld.ismastersim
+    self.ispaused = false
     self.ispushing = false
     self.leader = nil
     self.leaderpositions = {}
@@ -148,6 +163,21 @@ end
 
 local function GetDistSqBetweenPositions(p1, p2)
     return GetDistSq(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
+end
+
+local function GetPauseAction(action)
+    for _, v in ipairs(_PAUSE_ACTIONS) do
+        if v[1] == action then
+            if v[2] then
+                return v[1], v[2]
+            end
+
+            -- 1.25 is the most optimal so far so it will be used as a default time value for sleep
+            return v[1], 1.25
+        end
+    end
+
+    return nil
 end
 
 local function WalkToPosition(self, pos)
@@ -447,6 +477,8 @@ function KeepFollowing:StartFollowingThread()
         local distinstsq, distinst
         local distsqleader, distleader
         local pos, previouspos, isleadernear
+        local buffered, previousbuffered
+        local pauseaction, pauseactiontime
 
         local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
@@ -471,9 +503,34 @@ function KeepFollowing:StartFollowingThread()
                 return
             end
 
+            buffered = self.inst:GetBufferedAction()
+
+            if buffered and buffered.action ~= ACTIONS.WALKTO then
+                if not previousbuffered or buffered ~= previousbuffered then
+                    DebugTheadString("Interrupted by action:", buffered.action.id)
+                    pauseaction, pauseactiontime = GetPauseAction(buffered.action)
+
+                    if pauseaction then
+                        self.ispaused = true
+                        DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+                        Sleep(FRAMES / FRAMES * pauseactiontime)
+                    end
+
+                    previousbuffered = buffered
+                end
+            end
+
+            if self.ispaused
+                and not self.playercontroller:IsBusy()
+                and not self.inst.replica.builder:IsBusy()
+            then
+                self.ispaused = false
+                DebugTheadString("Unpausing...")
+            end
+
             isleadernear = self.inst:IsNear(self.leader, target)
 
-            if self.configfollowingmethod == "default" then
+            if not self.ispaused and self.configfollowingmethod == "default" then
                 pos = self.leaderpositions[1]
 
                 if pos then
@@ -498,7 +555,7 @@ function KeepFollowing:StartFollowingThread()
                         table.remove(self.leaderpositions, 1)
                     end
                 end
-            elseif self.configfollowingmethod == "closest" then
+            elseif not self.ispaused and self.configfollowingmethod == "closest" then
                 pos = self.leader:GetPosition()
                 distsqleader = self.leader:GetDistanceSqToPoint(pos)
 
