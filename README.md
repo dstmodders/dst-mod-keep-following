@@ -64,7 +64,7 @@ needs:
 | **Push with RMB**         | _Yes/No_          | _No_      | Use RMB in combination with action key for pushing instead                                    |
 | **Push mass checking**    | _Yes/No_          | _Yes_     | Enables/Disables the mass difference checking. Ignored for the ghosts pushing players         |
 | **Push lag compensation** | _Yes/No_          | _Yes_     | Automatically disables lag compensation while pushing and restores the previous state after   |
-| **Following method**      | _Default/Closest_ | _Default_ | Which following method should be used?                                                        |
+| **Following method**      | _Default/Closest_ | _Default_ | Which following method should be used? Ignored when pushing                                   |
 | **Target distance**       | _1.5m/2.5m/3.5m_  | _2.5m_    | How close can you approach the leader? Ignored when pushing                                   |
 | **Keep target distance**  | _Yes/No_          | _No_      | Move away from a leader inside the target distance. Ignored when pushing                      |
 | **Mobs**                  | _Default/All_     | _Default_ | Which mobs can be followed and pushed?                                                        |
