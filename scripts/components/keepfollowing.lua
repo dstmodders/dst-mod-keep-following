@@ -161,11 +161,6 @@ local function WalkToPosition(self, pos)
         else
             SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
         end
-
-        local locomotor = self.playercontroller.locomotor
-        if locomotor then
-            locomotor:PreviewAction(action)
-        end
     end
 end
 
