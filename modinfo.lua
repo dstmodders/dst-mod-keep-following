@@ -1,13 +1,12 @@
 name = "Keep Following"
-version = "0.15.0"
+version = "0.16.0"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.15.0:]] .. "\n" ..
-    [[- Added support for the following method configuration]] .. "\n" ..
-    [[- Added support for the push mass checking configuration]] .. "\n" ..
-    [[- Fixed selection issue with ActionQueue Reborn]] .. "\n" ..
-    [[- Improved pathfinding precision]]
+    [[v0.16.0:]] .. "\n" ..
+    [[- Added support for following interruptions]] .. "\n" ..
+    [[- Fixed client/server position mismatch during interruptions]] .. "\n" ..
+    [[- Fixed some movement issues when lag compensation is off]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
