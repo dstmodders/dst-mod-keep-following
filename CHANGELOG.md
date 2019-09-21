@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Support for following interruptions
+
+### Fixed
+
+- Client/Server position mismatch during interruptions
+- Some movement issues when lag compensation is off
+
 ## [0.15.0][] - 2019-09-21
 
 ### Added
