@@ -432,6 +432,44 @@ end
 -- Following
 --
 
+local function GetDefaultMethodNextPosition(self, target, isleadernear)
+    local pos = self.leaderpositions[1]
+
+    if pos then
+        local distinstsq = self.inst:GetDistanceSqToPoint(pos)
+        local distinst = math.sqrt(distinstsq)
+
+        -- 1.5 in diameter. Smaller value gives more precision, especially near the corners.
+        -- However, when lag compensation is off the movement becomes "awkward" so I don't recommend
+        -- using something less than 1 diameter.
+        if distinst > self.inst.Physics:GetRadius() * 3 then
+            if not self.isleadernear
+                and isleadernear
+                or (isleadernear and self.configkeeptargetdistance)
+            then
+                self.leaderpositions = {}
+                return self.inst:GetPositionAdjacentTo(self.leader, target)
+            elseif not isleadernear then
+                return pos
+            else
+                self.leaderpositions = {}
+            end
+        else
+            table.remove(self.leaderpositions, 1)
+        end
+    end
+
+    return nil
+end
+
+local function GetClosestMethodNextPosition(self, target, isleadernear)
+    if not isleadernear or self.configkeeptargetdistance then
+        return self.inst:GetPositionAdjacentTo(self.leader, target)
+    end
+
+    return nil
+end
+
 function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
@@ -473,13 +511,10 @@ end
 
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
-        local distinstsq, distinst
-        local distsqleader, distleader
-        local pos, previouspos, isleadernear
+        local pos, isleadernear
         local buffered, previousbuffered
         local pauseaction, pauseactiontime
 
-        local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
         local target = self.configtargetdistance + radiusleader
 
@@ -539,37 +574,16 @@ function KeepFollowing:StartFollowingThread()
             isleadernear = self.inst:IsNear(self.leader, target)
 
             if not self.ispaused and self.configfollowingmethod == "default" then
-                pos = self.leaderpositions[1]
-
+                -- default: player follows a leader step-by-step
+                pos = GetDefaultMethodNextPosition(self, target, isleadernear)
                 if pos then
-                    distinstsq = self.inst:GetDistanceSqToPoint(pos)
-                    distinst = math.sqrt(distinstsq)
-                    distsqleader = self.leader:GetDistanceSqToPoint(pos)
-                    distleader = math.sqrt(distsqleader)
-
-                    -- 1.5 in diameter. Smaller value gives more precision, especially near the
-                    -- corners. However, when lag compensation is off the movement becomes "awkward"
-                    -- so I don't recommend using something less than 1 diameter.
-                    if distinst > radiusinst * 3 then
-                        if not self.isleadernear and isleadernear or (isleadernear and self.configkeeptargetdistance) then
-                            WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, target))
-                            self.leaderpositions = {}
-                        elseif not isleadernear then
-                            WalkToPosition(self, pos)
-                        else
-                            self.leaderpositions = {}
-                        end
-                    else
-                        table.remove(self.leaderpositions, 1)
-                    end
+                    WalkToPosition(self, pos)
                 end
             elseif not self.ispaused and self.configfollowingmethod == "closest" then
-                pos = self.leader:GetPosition()
-                distsqleader = self.leader:GetDistanceSqToPoint(pos)
-
-                if (not previouspos or pos ~= previouspos) and (not isleadernear or self.configkeeptargetdistance) then
-                    WalkToPosition(self, self.inst:GetPositionAdjacentTo(self.leader, target))
-                    previouspos = pos
+                -- closest: player goes to the closest target point from a leader
+                pos = GetClosestMethodNextPosition(self, target, isleadernear)
+                if pos then
+                    WalkToPosition(self, pos)
                 end
             end
 
