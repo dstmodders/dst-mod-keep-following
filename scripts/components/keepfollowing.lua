@@ -515,8 +515,9 @@ function KeepFollowing:StartFollowingThread()
         local buffered, previousbuffered
         local pauseaction, pauseactiontime
 
+        local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
-        local target = self.configtargetdistance + radiusleader
+        local target = self.configtargetdistance + radiusinst + radiusleader
 
         self.isfollowing = true
 
