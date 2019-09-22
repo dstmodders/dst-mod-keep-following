@@ -238,7 +238,9 @@ end
 --
 
 local function MovementPredictionOnPush(self)
+    DebugString("Checking movement prediction current state...")
     local state = self:IsMovementPredictionEnabled()
+    DebugString("Current state:", state and "enabled" or "disabled")
 
     if self.movementpredictionstate == nil then
         DebugString("Setting movement prediction previous state...")
@@ -265,10 +267,7 @@ local function MovementPredictionOnStop(self)
 end
 
 function KeepFollowing:IsMovementPredictionEnabled()
-    local state = self.inst.components.locomotor ~= nil
-    DebugString("Checking movement prediction current state...")
-    DebugString("Current state:", state and "enabled" or "disabled")
-    return state
+    return self.inst.components.locomotor ~= nil
 end
 
 function KeepFollowing:MovementPrediction(enable)
@@ -517,6 +516,15 @@ function KeepFollowing:StartFollowingThread()
                     end
 
                     previousbuffered = buffered
+                end
+            elseif not self:IsMovementPredictionEnabled() then
+                -- When movement prediction is disabled the buffered action will always be nil. In
+                -- this case, we use the default sleep time and just rely on IsBusy() functions.
+                if self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy() then
+                    self.ispaused = true
+                    pauseactiontime = 1.25 -- default
+                    DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+                    Sleep(FRAMES / FRAMES * pauseactiontime)
                 end
             end
 
