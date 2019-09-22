@@ -511,7 +511,7 @@ end
 
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
-        local pos, isleadernear
+        local pos, previouspos, isleadernear
         local buffered, previousbuffered
         local pauseaction, pauseactiontime
 
@@ -577,14 +577,16 @@ function KeepFollowing:StartFollowingThread()
             if not self.ispaused and self.configfollowingmethod == "default" then
                 -- default: player follows a leader step-by-step
                 pos = GetDefaultMethodNextPosition(self, target, isleadernear)
-                if pos then
+                if pos and (not previouspos or pos ~= previouspos) then
                     WalkToPosition(self, pos)
+                    previouspos = pos
                 end
             elseif not self.ispaused and self.configfollowingmethod == "closest" then
                 -- closest: player goes to the closest target point from a leader
                 pos = GetClosestMethodNextPosition(self, target, isleadernear)
-                if pos then
+                if pos and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1) then
                     WalkToPosition(self, pos)
+                    previouspos = pos
                 end
             end
 
