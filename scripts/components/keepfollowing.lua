@@ -121,21 +121,30 @@ local KeepFollowing = Class(function(self, inst)
 end)
 
 function KeepFollowing:Init()
+    -- general
     self.isclient = false
     self.isdst = false
-    self.isfollowing = false
-    self.isleadernear = false
     self.ismastersim = TheWorld.ismastersim
-    self.ispaused = false
-    self.ispushing = false
     self.leader = nil
-    self.leaderpositions = {}
     self.movementpredictionstate = nil
     self.playercontroller = nil
+    self.starttime = nil
+    self.world = TheWorld
+
+    -- following
+    self.isfollowing = false
+    self.isleadernear = false
+    self.ispaused = false
+    self.leaderpositions = {}
     self.threadfollowing = nil
     self.threadpath = nil
+
+    -- pushing
+    self.ispushing = false
     self.threadpushing = nil
-    self.world = TheWorld
+
+    -- debugging
+    self.debugrequests = 0
 
     --replaced by GetModConfigData
     self.configfollowingmethod = "default"
@@ -520,6 +529,7 @@ function KeepFollowing:StartFollowingThread()
         local target = self.configtargetdistance + radiusinst + radiusleader
 
         self.isfollowing = true
+        self.starttime = os.clock()
 
         DebugTheadString("Following method:", self.configfollowingmethod)
         DebugTheadString(string.format(
@@ -580,6 +590,10 @@ function KeepFollowing:StartFollowingThread()
                 if pos and (not previouspos or pos ~= previouspos) then
                     WalkToPosition(self, pos)
                     previouspos = pos
+
+                    if _DEBUG_FN then
+                        self.debugrequests = self.debugrequests + 1
+                    end
                 end
             elseif not self.ispaused and self.configfollowingmethod == "closest" then
                 -- closest: player goes to the closest target point from a leader
@@ -587,6 +601,10 @@ function KeepFollowing:StartFollowingThread()
                 if pos and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1) then
                     WalkToPosition(self, pos)
                     previouspos = pos
+
+                    if _DEBUG_FN then
+                        self.debugrequests = self.debugrequests + 1
+                    end
                 end
             end
 
@@ -628,10 +646,19 @@ end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        DebugString("[" .. self.threadfollowing.id .. "]", "Stopped following", self.leader:GetDisplayName())
+        DebugString(string.format(
+            "[%s] Stopped following %s. Requests: %d. Time: %f",
+            self.threadfollowing.id,
+            self.leader:GetDisplayName(),
+            self.debugrequests,
+            os.clock() - self.starttime
+        ))
+
+        self.debugrequests = 0
         self.isfollowing = false
         self.leader = nil
         self.leaderpositions = {}
+        self.starttime = nil
         self:ClearPathThread()
         self:ClearFollowingThread()
     end
@@ -654,6 +681,7 @@ function KeepFollowing:StartPushing(leader)
 
     self.threadpushing = StartThread(function()
         self.ispushing = true
+        self.starttime = os.clock()
 
         DebugTheadString("Started pushing leader")
 
@@ -665,6 +693,10 @@ function KeepFollowing:StartPushing(leader)
             end
 
             WalkToPosition(self, self.leader:GetPosition())
+
+            if _DEBUG_FN then
+                self.debugrequests = self.debugrequests + 1
+            end
 
             Sleep(FRAMES)
         end
@@ -688,10 +720,18 @@ function KeepFollowing:StopPushing()
     end
 
     if self.leader then
-        DebugString("[" .. self.threadpushing.id .. "]", "Stopped pushing", self.leader:GetDisplayName())
-        self.inst:CancelAllPendingTasks()
+        DebugString(string.format(
+            "[%s] Stopped pushing %s. Requests: %d. Time: %f",
+            self.threadpushing.id,
+            self.leader:GetDisplayName(),
+            self.debugrequests,
+            os.clock() - self.starttime
+        ))
+
+        self.debugrequests = 0
         self.ispushing = false
         self.leader = nil
+        self.starttime = nil
         self:ClearPushingThread()
     end
 end
