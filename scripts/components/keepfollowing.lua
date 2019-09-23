@@ -202,17 +202,12 @@ local function GetPauseAction(action)
     return nil
 end
 
+-- TODO: In some cases WalkToPosition() doesn't trigger moving (investigate PlayerController:DoAction())
 local function WalkToPosition(self, pos)
-    local action = BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos)
-
-    if self.ismastersim then
-        self.playercontroller:DoAction(action)
+    if self.ismastersim or self.playercontroller.locomotor then
+        self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
     else
-        if self.playercontroller.locomotor then
-            self.playercontroller:DoAction(action)
-        else
-            SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-        end
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
     end
 end
 
@@ -495,10 +490,11 @@ local function GetDefaultMethodNextPosition(self, target)
         else
             table.remove(self.leaderpositions, 1)
             pos = GetDefaultMethodNextPosition(self, target)
+            return pos
         end
     end
 
-    return pos
+    return nil
 end
 
 local function GetClosestMethodNextPosition(self, target, isleadernear)
@@ -542,15 +538,24 @@ function KeepFollowing:StartPathThread()
 
             pos = self.leader:GetPosition()
 
+            if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+                pos = GetClosestPosition(self.inst, self.leader)
+            end
+
             if not previouspos then
                 table.insert(self.leaderpositions, pos)
                 previouspos = pos
             end
 
-            -- 1 is the most optimal value so far
-            if GetDistBetweenPositions(pos, previouspos) > 1 and pos ~= previouspos then
-                table.insert(self.leaderpositions, pos)
-                previouspos = pos
+            if IsPassable(pos) == IsPassable(previouspos) then
+                -- 1 is the most optimal value so far
+                if GetDistBetweenPositions(pos, previouspos) > 1
+                    and pos ~= previouspos
+                    and self.leaderpositions[#self.leaderpositions] ~= pos
+                then
+                    table.insert(self.leaderpositions, pos)
+                    previouspos = pos
+                end
             end
 
             Sleep(FRAMES)
@@ -565,7 +570,9 @@ function KeepFollowing:StartFollowingThread()
         local pos, previouspos, isleadernear
         local buffered, previousbuffered
         local pauseaction, pauseactiontime
+        local retry
 
+        local retryframes = 0
         local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
         local target = self.configtargetdistance + radiusinst + radiusleader
@@ -628,14 +635,38 @@ function KeepFollowing:StartFollowingThread()
 
             if not self.ispaused and self.configfollowingmethod == "default" then
                 -- default: player follows a leader step-by-step
-                pos = GetDefaultMethodNextPosition(self, target, isleadernear)
+                pos = GetDefaultMethodNextPosition(self, target)
                 if pos and (not previouspos or pos ~= previouspos) then
                     WalkToPosition(self, pos)
                     previouspos = pos
+                    retry = false
+                    retryframes = 0
 
                     if _DEBUG_FN then
                         self.debugrequests = self.debugrequests + 1
                     end
+                elseif not retry and pos and pos == previouspos then
+                    -- In some cases, the WalkToPosition() doesn't trigger moving and I don't know
+                    -- why yet. This is the reason we try resending the walking request. In my
+                    -- opinion, this is still better than sending a request each time we get a
+                    -- position by GetDefaultMethodNextPosition().
+                    retryframes = retryframes + 1
+
+                    -- 0.5 sec
+                    if retryframes * FRAMES > .5 then
+                        WalkToPosition(self, pos)
+                        previouspos = pos
+                        retry = true
+
+                        if _DEBUG_FN then
+                            self.debugrequests = self.debugrequests + 1
+                        end
+                    end
+                elseif retry and #self.leaderpositions > 1 and pos and pos == previouspos then
+                    -- After the retry, if the position is still the same then most likely the
+                    -- position is invalid for some reason. We don't need to care much if it was a
+                    -- valid one as the next valid position should pretty much restore the path.
+                    table.remove(self.leaderpositions, 1)
                 end
             elseif not self.ispaused and self.configfollowingmethod == "closest" then
                 -- closest: player goes to the closest target point from a leader
