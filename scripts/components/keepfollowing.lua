@@ -163,6 +163,15 @@ local function IsPlayerInGame(player)
     return player and player.HUD and not player.HUD:HasInputFocus()
 end
 
+local function IsPassable(pos)
+    return TheWorld.Map:IsPassableAtPoint(pos:Get())
+end
+
+local function GetClosestPosition(entity1, entity2)
+    local distance = entity1.Physics:GetRadius() + entity2.Physics:GetRadius()
+    return entity1:GetPositionAdjacentTo(entity2, distance)
+end
+
 local function GetDistSq(x1, y1, z1, x2, y2, z2)
     local dx = x2 - x1
     local dy = y2 - y1
@@ -234,6 +243,14 @@ end
 -- General
 --
 
+function KeepFollowing:IsOnPlatform()
+    if not self.world or not self.inst then
+        return
+    end
+
+    return self.world.Map:GetPlatformAtPoint(self.inst:GetPosition():Get()) and true or false
+end
+
 function KeepFollowing:Stop()
     if IsPlayerInGame(self.inst) then
         if self:IsFollowing() then
@@ -301,6 +318,14 @@ end
 --
 -- Leader-related
 --
+
+function KeepFollowing:IsLeaderOnPlatform()
+    if not self.world or not self.inst then
+        return
+    end
+
+    return self.world.Map:GetPlatformAtPoint(self.leader:GetPosition():Get()) and true or false
+end
 
 function KeepFollowing:CanBeFollowed(entity)
     if not entity or (entity.entity and not entity.entity:IsValid()) then
@@ -478,7 +503,21 @@ end
 
 local function GetClosestMethodNextPosition(self, target, isleadernear)
     if not isleadernear or self.configkeeptargetdistance then
-        return self.inst:GetPositionAdjacentTo(self.leader, target)
+        local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
+
+        if IsPassable(pos) then
+            return pos
+        end
+
+        -- When the leader is on a platform (boat) and our next position is not passable (while
+        -- hopping, for example) we set the next position to be as close to the leader as possible
+        -- without pushing him. The same goes when we are on the platform (boat) and the leader if
+        -- jumping off.
+        if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+            pos = GetClosestPosition(self.inst, self.leader)
+        end
+
+        return pos
     end
 
     return nil
@@ -491,7 +530,6 @@ end
 function KeepFollowing:StartPathThread()
     self.threadpath = StartThread(function()
         local pos, previouspos
-        local dist
 
         DebugTheadString("Started gathering path coordinates...")
 
