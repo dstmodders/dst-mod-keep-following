@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.17.0][] - 2019-09-23
+
+### Changed
+
+- Improved debug output
+- Improved leader approaching behaviour in the default mode
+- Improved the target distance calculation
+- Optimized requests while following
+
+### Fixed
+
+- Following interruptions when lag compensation is off
+- Jumping on/off a boat issues while following
+
 ## [0.16.0][] - 2019-09-21
 
 ### Added
@@ -207,7 +221,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.16.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.13.0...v0.14.0
