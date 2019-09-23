@@ -174,6 +174,10 @@ local function GetDistSqBetweenPositions(p1, p2)
     return GetDistSq(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
 end
 
+local function GetDistBetweenPositions(p1, p2)
+    return math.sqrt(GetDistSqBetweenPositions(p1, p2))
+end
+
 local function GetPauseAction(action)
     for _, v in ipairs(_PAUSE_ACTIONS) do
         if v[1] == action then
@@ -441,34 +445,35 @@ end
 -- Following
 --
 
-local function GetDefaultMethodNextPosition(self, target, isleadernear)
+local function GetDefaultMethodNextPosition(self, target)
     local pos = self.leaderpositions[1]
 
     if pos then
         local distinstsq = self.inst:GetDistanceSqToPoint(pos)
         local distinst = math.sqrt(distinstsq)
 
-        -- 1.5 in diameter. Smaller value gives more precision, especially near the corners.
-        -- However, when lag compensation is off the movement becomes "awkward" so I don't recommend
-        -- using something less than 1 diameter.
-        if distinst > self.inst.Physics:GetRadius() * 3 then
-            if not self.isleadernear
-                and isleadernear
-                or (isleadernear and self.configkeeptargetdistance)
-            then
-                self.leaderpositions = {}
-                return self.inst:GetPositionAdjacentTo(self.leader, target)
-            elseif not isleadernear then
-                return pos
-            else
-                self.leaderpositions = {}
-            end
+        -- This represents the distance where the gathered leader positions will be ignored and
+        -- removed as we don't want to step on each coordinate and we still need to remove the past
+        -- ones. At the moment the value is 1.5 in physics diameter. Smaller value gives more
+        -- precision, especially near the corners. However, when lag compensation is off the
+        -- movement becomes less smooth so I don't recommend using something less than 1 diameter.
+        local step = self.inst.Physics:GetRadius() * 3
+        local isleadernear = self.inst:IsNear(self.leader, target + step)
+
+        if not self.isleadernear and isleadernear or (isleadernear and self.configkeeptargetdistance) then
+            self.leaderpositions = {}
+            return self.inst:GetPositionAdjacentTo(self.leader, target)
+        end
+
+        if not isleadernear and distinst > step then
+            return pos
         else
             table.remove(self.leaderpositions, 1)
+            pos = GetDefaultMethodNextPosition(self, target)
         end
     end
 
-    return nil
+    return pos
 end
 
 local function GetClosestMethodNextPosition(self, target, isleadernear)
@@ -505,8 +510,7 @@ function KeepFollowing:StartPathThread()
             end
 
             -- 1 is the most optimal value so far
-            dist = math.sqrt(GetDistSqBetweenPositions(pos, previouspos))
-            if dist > 1 and pos ~= previouspos then
+            if GetDistBetweenPositions(pos, previouspos) > 1 and pos ~= previouspos then
                 table.insert(self.leaderpositions, pos)
                 previouspos = pos
             end
