@@ -69,8 +69,8 @@ end
 local function IsOurAction(action)
     return action == ACTIONS.FOLLOW
         or action == ACTIONS.PUSH
-        or action == ACTIONS.TENTFOLLOW
-        or action == ACTIONS.TENTPUSH
+        or action == ACTIONS.TENT_FOLLOW
+        or action == ACTIONS.TENT_PUSH
 end
 
 --
@@ -135,8 +135,8 @@ end
 
 AddAction("FOLLOW", "Follow", ActionFollow)
 AddAction("PUSH", "Push", ActionPush)
-AddAction("TENTFOLLOW", "Follow player in", ActionTentFollow)
-AddAction("TENTPUSH", _PUSH_WITH_RMB and "Push player" or "Push player in", ActionTentPush)
+AddAction("TENT_FOLLOW", "Follow player in", ActionTentFollow)
+AddAction("TENT_PUSH", _PUSH_WITH_RMB and "Push player" or "Push player in", ActionTentPush)
 
 --
 -- Player-related
@@ -234,11 +234,11 @@ local function PlayerActionPickerPostInit(self, player)
 
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, target, ACTIONS.TENTFOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.TENT_FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.TENTPUSH)
+                    lmb = BufferedAction(player, target, ACTIONS.TENT_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.TENTFOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.TENT_FOLLOW)
                 end
             end
 
@@ -254,7 +254,7 @@ local function PlayerActionPickerPostInit(self, player)
 
             if _PUSH_WITH_RMB then
                 if target:HasTag("tent") and target:HasTag("hassleeper") then
-                    rmb = BufferedAction(player, target, ACTIONS.TENTPUSH)
+                    rmb = BufferedAction(player, target, ACTIONS.TENT_PUSH)
                 end
 
                 if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
