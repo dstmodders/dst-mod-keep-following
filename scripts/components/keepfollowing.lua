@@ -4,8 +4,8 @@ local _PATH_THREAD_ID = "path_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
--- A list of actions that will cause the following thread to pause. The first value represents the
--- action itself and the second, optional value, is the thread sleep time (default: 1.25).
+-- A list of actions that will cause the following thread to pause. The first value represents an
+-- action itself and the second (optional) is a sleep time (default: 1.25).
 local _PAUSE_ACTIONS = {
     { ACTIONS.ADDFUEL, .5 },
     { ACTIONS.ADDWETFUEL, .5 },
@@ -18,10 +18,10 @@ local _PAUSE_ACTIONS = {
     { ACTIONS.USEITEM },
 }
 
--- We could have used group tags instead of mob-specific ones but this approach gives more control.
--- Originally the list included only player-friendly ones but as the mod has matured the list was
--- expanding based on the requests from players as there are some cases when even following/pushing
--- bosses, ghosts and worms is useful.
+-- We could have used group tags instead of the mob-specific ones. However, this approach gives more
+-- control. Originally the list included only player-friendly mobs but as the mod has matured the
+-- list kept growing based on user requests. There are some cases when even following/pushing
+-- bosses becomes useful.
 --
 -- When "Mobs" configuration option is set to "All" this hand-picked list will be ignored.
 local _CAN_BE_LEADER_TAGS = {
@@ -146,7 +146,7 @@ function KeepFollowing:Init()
     -- debugging
     self.debugrequests = 0
 
-    --replaced by GetModConfigData
+    -- replaced by GetModConfigData
     self.configfollowingmethod = "default"
     self.configkeeptargetdistance = false
     self.configmobs = "default"
@@ -194,8 +194,7 @@ local function GetPauseAction(action)
                 return v[1], v[2]
             end
 
-            -- 1.25 is the most optimal so far so it will be used as a default time value for sleep
-            return v[1], 1.25
+            return v[1], 1.25 -- 1.25 is the most optimal so far as a default value
         end
     end
 
@@ -335,13 +334,13 @@ function KeepFollowing:CanBePushed(entity)
         return false
     end
 
-    -- ghosts should be able to push other players ignoring the mass difference as the point is not
-    -- to move the player but to provide light
+    -- Ghosts should be able to push other players and ignore the mass difference checking. The
+    -- point is to provide light.
     if self.inst:HasTag("playerghost") and entity:HasTag("player") then
         return true
     end
 
-    -- different flyers don't collide with characters so pushing won't work anyway
+    -- different flyers don't collide with characters
     if entity.Physics:GetCollisionGroup() == COLLISION.FLYERS then
         return false
     end
@@ -355,14 +354,14 @@ function KeepFollowing:CanBePushed(entity)
         return true
     end
 
-    -- Mass is the key factor for pushing. Players have a mass of 75 while most bosses have a mass
-    -- 1000. Moleworms have a mass of 99999 and Gigantic Beehive has a mass of 999999 which makes
-    -- them act as "unpushable". If Klei's physics is correct then even those entities can be pushed
-    -- but it will take a very very long time.
+    -- Mass is the key factor for pushing. For example, players have a mass of 75 while most bosses
+    -- have a mass of 1000. Some entities just act as "unpushable" like Moleworm (99999) and
+    -- Gigantic Beehive (999999). However, if Klei's physics is correct then even those entities can
+    -- be pushed but it will take an insane amount of time...
     --
-    -- The only entities with high mass that still can be useful to be pushed are bosses like
-    -- Bearger or Toadstool. They both have mass 1000 and that will be our ceil value to disable
-    -- pushing.
+    -- So far the only entities with a high mass that still can be useful to be pushed are bosses
+    -- like Bearger or Toadstool. They both have a mass of 1000 which makes a perfect ceil value for
+    -- us to disable pushing.
     local mass = self.inst.Physics:GetMass()
     local entitymass = entity.Physics:GetMass()
     local massdiff = math.abs(entitymass - mass)
@@ -372,10 +371,9 @@ function KeepFollowing:CanBePushed(entity)
         return false
     end
 
-    -- When the player becomes a ghost his mass becomes 1. In this case, we just set the ceil value
-    -- difference to 10 as there is no point to push something with a mass higher than that. But
-    -- there are Frogs, Saladmanders and Critters with mass 1 so why ruin all the fun and disable
-    -- pushing for a ghost.
+    -- When the player becomes a ghost his mass becomes 1. In that case, we just set the ceil
+    -- difference to 10 (there is no point to push something with a mass higher than that) to allow
+    -- pushing Frogs, Saladmanders and Critters as they all have a mass of 1.
     if mass == 1 and massdiff > 10 then
         return false
     end
@@ -472,11 +470,11 @@ local function GetDefaultMethodNextPosition(self, target)
         local distinstsq = self.inst:GetDistanceSqToPoint(pos)
         local distinst = math.sqrt(distinstsq)
 
-        -- This represents the distance where the gathered leader positions will be ignored and
-        -- removed as we don't want to step on each coordinate and we still need to remove the past
-        -- ones. At the moment the value is 1.5 in physics diameter. Smaller value gives more
-        -- precision, especially near the corners. However, when lag compensation is off the
-        -- movement becomes less smooth so I don't recommend using something less than 1 diameter.
+        -- This represents the distance where the gathered points (leaderpositions) will be
+        -- ignored/removed. There is no real point to step on each coordinate and we still need to
+        -- remove the past ones. Smaller value gives more precision, especially near the corners.
+        -- However, when lag compensation is off the movement becomes less smooth. I don't recommend
+        -- using anything < 1 diameter.
         local step = self.inst.Physics:GetRadius() * 3
         local isleadernear = self.inst:IsNear(self.leader, target + step)
 
@@ -505,10 +503,6 @@ local function GetClosestMethodNextPosition(self, target, isleadernear)
             return pos
         end
 
-        -- When the leader is on a platform (boat) and our next position is not passable (while
-        -- hopping, for example) we set the next position to be as close to the leader as possible
-        -- without pushing him. The same goes when we are on the platform (boat) and the leader if
-        -- jumping off.
         if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
             pos = GetClosestPosition(self.inst, self.leader)
         end
@@ -613,8 +607,8 @@ function KeepFollowing:StartFollowingThread()
                     previousbuffered = buffered
                 end
             elseif not self:IsMovementPredictionEnabled() then
-                -- When movement prediction is disabled the buffered action will always be nil. In
-                -- this case, we use the default sleep time and just rely on IsBusy() functions.
+                -- When movement prediction is disabled the buffered action will be nil. In that
+                -- case, we use the default sleep time and just rely on IsBusy() functions.
                 if self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy() then
                     self.ispaused = true
                     pauseactiontime = 1.25 -- default
@@ -646,10 +640,9 @@ function KeepFollowing:StartFollowingThread()
                         self.debugrequests = self.debugrequests + 1
                     end
                 elseif not retry and pos and pos == previouspos then
-                    -- In some cases, the WalkToPosition() doesn't trigger moving and I don't know
-                    -- why yet. This is the reason we try resending the walking request. In my
-                    -- opinion, this is still better than sending a request each time we get a
-                    -- position by GetDefaultMethodNextPosition().
+                    -- In some cases, the WalkToPosition() doesn't trigger movement and I don't know
+                    -- why yet. So we try sending the walking request once again (still better than
+                    -- sending a request on each frame).
                     retryframes = retryframes + 1
 
                     -- 0.5 sec
@@ -663,9 +656,8 @@ function KeepFollowing:StartFollowingThread()
                         end
                     end
                 elseif retry and #self.leaderpositions > 1 and pos and pos == previouspos then
-                    -- After the retry, if the position is still the same then most likely the
-                    -- position is invalid for some reason. We don't need to care much if it was a
-                    -- valid one as the next valid position should pretty much restore the path.
+                    -- after the retry, if the position didn't change then most likely we are
+                    -- dealing with an invalid one
                     table.remove(self.leaderpositions, 1)
                 end
             elseif not self.ispaused and self.configfollowingmethod == "closest" then
