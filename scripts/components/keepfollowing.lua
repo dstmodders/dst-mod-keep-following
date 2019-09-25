@@ -156,6 +156,29 @@ function KeepFollowing:Init()
 end
 
 --
+-- Debugging-related
+--
+
+function KeepFollowing:SetDebugFn(fn)
+    _DEBUG_FN = fn
+end
+
+local function DebugString(...)
+    if _DEBUG_FN then
+        _DEBUG_FN(...)
+    end
+end
+
+local function DebugTheadString(...)
+    if _DEBUG_FN then
+        local task = scheduler:GetCurrentTask()
+        if task then
+            _DEBUG_FN("[" .. task.id .. "]", ...)
+        end
+    end
+end
+
+--
 -- Helpers
 --
 
@@ -201,6 +224,10 @@ local function GetPauseAction(action)
     return nil
 end
 
+--
+-- General
+--
+
 -- TODO: In some cases WalkToPosition() doesn't trigger moving (investigate PlayerController:DoAction())
 local function WalkToPosition(self, pos)
     if self.ismastersim or self.playercontroller.locomotor then
@@ -209,33 +236,6 @@ local function WalkToPosition(self, pos)
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
     end
 end
-
---
--- Debugging-related
---
-
-function KeepFollowing:SetDebugFn(fn)
-    _DEBUG_FN = fn
-end
-
-local function DebugString(...)
-    if _DEBUG_FN then
-        _DEBUG_FN(...)
-    end
-end
-
-local function DebugTheadString(...)
-    if _DEBUG_FN then
-        local task = scheduler:GetCurrentTask()
-        if task then
-            _DEBUG_FN("[" .. task.id .. "]", ...)
-        end
-    end
-end
-
---
--- General
---
 
 function KeepFollowing:IsOnPlatform()
     if not self.world or not self.inst then
@@ -517,48 +517,6 @@ function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
 
-function KeepFollowing:StartPathThread()
-    self.threadpath = StartThread(function()
-        local pos, previouspos
-
-        DebugTheadString("Started gathering path coordinates...")
-
-        while self.inst and self.inst:IsValid() and self:IsFollowing() do
-            if not self.leader or not self.leader.entity:IsValid() then
-                DebugTheadString("Leader doesn't exist anymore")
-                self:StopFollowing()
-                return
-            end
-
-            pos = self.leader:GetPosition()
-
-            if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
-                pos = GetClosestPosition(self.inst, self.leader)
-            end
-
-            if not previouspos then
-                table.insert(self.leaderpositions, pos)
-                previouspos = pos
-            end
-
-            if IsPassable(pos) == IsPassable(previouspos) then
-                -- 1 is the most optimal value so far
-                if GetDistBetweenPositions(pos, previouspos) > 1
-                    and pos ~= previouspos
-                    and self.leaderpositions[#self.leaderpositions] ~= pos
-                then
-                    table.insert(self.leaderpositions, pos)
-                    previouspos = pos
-                end
-            end
-
-            Sleep(FRAMES)
-        end
-
-        self:ClearPathThread()
-    end, _PATH_THREAD_ID)
-end
-
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
         local pos, previouspos, isleadernear
@@ -682,13 +640,55 @@ function KeepFollowing:StartFollowingThread()
     end, _FOLLOWING_THREAD_ID)
 end
 
-function KeepFollowing:StartFollowing(leader)
-    if self.configpushlagcompensation and not self.ismastersim then
-        MovementPredictionOnFollow(self)
+function KeepFollowing:ClearFollowingThread()
+    if self.threadfollowing then
+        DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.threadfollowing.id)
+        self.threadfollowing:SetList(nil)
+        self.threadfollowing = nil
     end
+end
 
-    self:SetLeader(leader)
-    self:StartFollowingThread()
+function KeepFollowing:StartPathThread()
+    self.threadpath = StartThread(function()
+        local pos, previouspos
+
+        DebugTheadString("Started gathering path coordinates...")
+
+        while self.inst and self.inst:IsValid() and self:IsFollowing() do
+            if not self.leader or not self.leader.entity:IsValid() then
+                DebugTheadString("Leader doesn't exist anymore")
+                self:StopFollowing()
+                return
+            end
+
+            pos = self.leader:GetPosition()
+
+            if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+                pos = GetClosestPosition(self.inst, self.leader)
+            end
+
+            if not previouspos then
+                table.insert(self.leaderpositions, pos)
+                previouspos = pos
+            end
+
+            if IsPassable(pos) == IsPassable(previouspos) then
+                -- 1 is the most optimal value so far
+                if GetDistBetweenPositions(pos, previouspos) > 1
+                    and pos ~= previouspos
+                    and self.leaderpositions[#self.leaderpositions] ~= pos
+                then
+                    table.insert(self.leaderpositions, pos)
+                    previouspos = pos
+                end
+            end
+
+            Sleep(FRAMES)
+        end
+
+        self:ClearPathThread()
+    end, _PATH_THREAD_ID)
 end
 
 function KeepFollowing:ClearPathThread()
@@ -700,13 +700,13 @@ function KeepFollowing:ClearPathThread()
     end
 end
 
-function KeepFollowing:ClearFollowingThread()
-    if self.threadfollowing then
-        DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.threadfollowing.id)
-        self.threadfollowing:SetList(nil)
-        self.threadfollowing = nil
+function KeepFollowing:StartFollowing(leader)
+    if self.configpushlagcompensation and not self.ismastersim then
+        MovementPredictionOnFollow(self)
     end
+
+    self:SetLeader(leader)
+    self:StartFollowingThread()
 end
 
 function KeepFollowing:StopFollowing()
@@ -737,13 +737,7 @@ function KeepFollowing:IsPushing()
     return self.leader and self.ispushing
 end
 
-function KeepFollowing:StartPushing(leader)
-    if self.configpushlagcompensation and not self.ismastersim then
-        MovementPredictionOnPush(self)
-    end
-
-    self:SetLeader(leader)
-
+function KeepFollowing:StartPushingThread()
     self.threadpushing = StartThread(function()
         self.ispushing = true
         self.starttime = os.clock()
@@ -777,6 +771,15 @@ function KeepFollowing:ClearPushingThread()
         self.threadpushing:SetList(nil)
         self.threadpushing = nil
     end
+end
+
+function KeepFollowing:StartPushing(leader)
+    if self.configpushlagcompensation and not self.ismastersim then
+        MovementPredictionOnPush(self)
+    end
+
+    self:SetLeader(leader)
+    self:StartPushingThread()
 end
 
 function KeepFollowing:StopPushing()
