@@ -212,21 +212,22 @@ local function PlayerActionPickerPostInit(self, player)
         local buffered = self.inst:GetBufferedAction()
 
         if TheInput:IsKeyDown(_KEY_ACTION) then
-            -- We could have used lmb.target but as PlayerActionPicker has leftclickoverride and
-            -- rightclickoverride we can't trust that. A good example is Woodie's Weregoose form
-            -- which overrides mouse actions.
+            -- We could have used lmb.target. However, the PlayerActionPicker has leftclickoverride
+            -- and rightclickoverride so we can't trust that. A good example is Woodie's Weregoose
+            -- form which overrides mouse actions.
             target = TheInput:GetWorldEntityUnderMouse()
             if not target then
                 return lmb, rmb
             end
 
             -- You are probably wondering why we need this check? Isn't it better to just show our
-            -- actions without the buffered action check? My answer is - no. There are so many mods
-            -- out there "in the wild" which also do different in-game actions and don't bother
-            -- checking for interruptions in their scheduler tasks (threads). For example,
-            -- ActionQueue Reborn will always try to force their action if entities have already
-            -- been selected. We can adapt our mod for such cases to improve compatibility but this
-            -- is the only bulletproof way to cover the most.
+            -- actions without the buffered action check?
+            --
+            -- There are so many mods out there "in the wild" which also do different in-game
+            -- actions and don't bother checking for interruptions in their scheduler tasks
+            -- (threads). For example, ActionQueue Reborn will always try to force their action if
+            -- entities have already been selected. We can adapt our mod for such cases to improve
+            -- compatibility but this is the only bulletproof way to cover the most.
             if buffered and buffered.action ~= ACTIONS.WALKTO then
                 return lmb, rmb
             end
@@ -284,9 +285,8 @@ local function PlayerControllerPostInit(_self, _player)
         keepfollowing:Stop()
     end
 
-    -- We ignore ActionQueue(DST) mod here intentionally as we don't even need to bother. Our mod
-    -- won't work with theirs if the same action key is used. So there is no point to mess with
-    -- their functions anyway.
+    -- We ignore ActionQueue(DST) mod here intentionally. Our mod won't work with theirs if the same
+    -- action key is used. So there is no point to mess with their functions anyway.
     --
     -- From an engineering perspective, the method which ActionQueue(DST) mod uses for overriding
     -- PlayerController:OnControl() should never be used. Technically, we can fix this issue by
