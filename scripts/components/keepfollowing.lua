@@ -228,6 +228,47 @@ end
 -- General
 --
 
+local function ThreadInterruptOnPauseAction(self, previousbuffered)
+    local pauseaction, pauseactiontime
+
+    local buffered = self.inst:GetBufferedAction()
+
+    if buffered and buffered.action ~= ACTIONS.WALKTO then
+        if not previousbuffered or buffered ~= previousbuffered then
+            DebugTheadString("Interrupted by action:", buffered.action.id)
+            pauseaction, pauseactiontime = GetPauseAction(buffered.action)
+
+            if pauseaction then
+                self.ispaused = true
+                DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+                Sleep(FRAMES / FRAMES * pauseactiontime)
+            end
+
+            previousbuffered = buffered
+        end
+    elseif not self:IsMovementPredictionEnabled() then
+        -- When movement prediction is disabled the buffered action will be nil. In that case, we
+        -- use the default sleep time and just rely on IsBusy() functions.
+        if self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy() then
+            self.ispaused = true
+            pauseactiontime = 1.25 -- default
+            DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+            Sleep(FRAMES / FRAMES * pauseactiontime)
+        end
+    end
+
+    if self.ispaused
+        and not self.playercontroller:IsBusy()
+        and not self.inst.replica.builder:IsBusy()
+    then
+        self.ispaused = false
+        DebugTheadString("Unpausing...")
+        return previousbuffered, true
+    end
+
+    return previousbuffered, false
+end
+
 -- TODO: In some cases WalkToPosition() doesn't trigger moving (investigate PlayerController:DoAction())
 local function WalkToPosition(self, pos)
     if self.ismastersim or self.playercontroller.locomotor then
@@ -524,8 +565,7 @@ end
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
         local pos, previouspos, isleadernear
-        local buffered, previousbuffered
-        local pauseaction, pauseactiontime
+        local previousbuffered
         local retry
 
         local retryframes = 0
@@ -553,39 +593,7 @@ function KeepFollowing:StartFollowingThread()
                 return
             end
 
-            buffered = self.inst:GetBufferedAction()
-
-            if buffered and buffered.action ~= ACTIONS.WALKTO then
-                if not previousbuffered or buffered ~= previousbuffered then
-                    DebugTheadString("Interrupted by action:", buffered.action.id)
-                    pauseaction, pauseactiontime = GetPauseAction(buffered.action)
-
-                    if pauseaction then
-                        self.ispaused = true
-                        DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
-                        Sleep(FRAMES / FRAMES * pauseactiontime)
-                    end
-
-                    previousbuffered = buffered
-                end
-            elseif not self:IsMovementPredictionEnabled() then
-                -- When movement prediction is disabled the buffered action will be nil. In that
-                -- case, we use the default sleep time and just rely on IsBusy() functions.
-                if self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy() then
-                    self.ispaused = true
-                    pauseactiontime = 1.25 -- default
-                    DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
-                    Sleep(FRAMES / FRAMES * pauseactiontime)
-                end
-            end
-
-            if self.ispaused
-                and not self.playercontroller:IsBusy()
-                and not self.inst.replica.builder:IsBusy()
-            then
-                self.ispaused = false
-                DebugTheadString("Unpausing...")
-            end
+            previousbuffered = ThreadInterruptOnPauseAction(self, previousbuffered)
 
             isleadernear = self.inst:IsNear(self.leader, target)
 
