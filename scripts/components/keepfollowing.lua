@@ -235,6 +235,10 @@ local function WalkToPosition(self, pos)
     else
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
     end
+
+    if _DEBUG_FN then
+        self.debugrequests = self.debugrequests + 1
+    end
 end
 
 function KeepFollowing:IsOnPlatform()
@@ -593,10 +597,6 @@ function KeepFollowing:StartFollowingThread()
                     previouspos = pos
                     retry = false
                     retryframes = 0
-
-                    if _DEBUG_FN then
-                        self.debugrequests = self.debugrequests + 1
-                    end
                 elseif not retry and pos and pos == previouspos then
                     -- In some cases, the WalkToPosition() doesn't trigger movement and I don't know
                     -- why yet. So we try sending the walking request once again (still better than
@@ -608,10 +608,6 @@ function KeepFollowing:StartFollowingThread()
                         WalkToPosition(self, pos)
                         previouspos = pos
                         retry = true
-
-                        if _DEBUG_FN then
-                            self.debugrequests = self.debugrequests + 1
-                        end
                     end
                 elseif retry and #self.leaderpositions > 1 and pos and pos == previouspos then
                     -- after the retry, if the position didn't change then most likely we are
@@ -624,10 +620,6 @@ function KeepFollowing:StartFollowingThread()
                 if pos and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1) then
                     WalkToPosition(self, pos)
                     previouspos = pos
-
-                    if _DEBUG_FN then
-                        self.debugrequests = self.debugrequests + 1
-                    end
                 end
             end
 
@@ -752,10 +744,6 @@ function KeepFollowing:StartPushingThread()
             end
 
             WalkToPosition(self, self.leader:GetPosition())
-
-            if _DEBUG_FN then
-                self.debugrequests = self.debugrequests + 1
-            end
 
             Sleep(FRAMES)
         end
