@@ -9,11 +9,14 @@ local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 local _PAUSE_ACTIONS = {
     { ACTIONS.ADDFUEL, .5 },
     { ACTIONS.ADDWETFUEL, .5 },
+    { ACTIONS.BLINK },
     { ACTIONS.BUILD },
     { ACTIONS.DROP, .5 },
     { ACTIONS.EAT, 1 },
+    { ACTIONS.EQUIP, .25 },
     { ACTIONS.HEAL },
     { ACTIONS.LOOKAT, .25 },
+    { ACTIONS.READ, 2 },
     { ACTIONS.TEACH },
     { ACTIONS.USEITEM },
 }
