@@ -228,7 +228,10 @@ local function PlayerActionPickerPostInit(self, player)
             -- (threads). For example, ActionQueue Reborn will always try to force their action if
             -- entities have already been selected. We can adapt our mod for such cases to improve
             -- compatibility but this is the only bulletproof way to cover the most.
-            if buffered and buffered.action ~= ACTIONS.WALKTO then
+            if buffered
+                and not IsOurAction(buffered.action)
+                and buffered.action ~= ACTIONS.WALKTO
+            then
                 return lmb, rmb
             end
 
