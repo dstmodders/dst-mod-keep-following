@@ -236,20 +236,19 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
     if buffered and buffered.action ~= ACTIONS.WALKTO then
         if not previousbuffered or buffered ~= previousbuffered then
             DebugTheadString("Interrupted by action:", buffered.action.id)
+            previousbuffered = buffered
             pauseaction, pauseactiontime = GetPauseAction(buffered.action)
-
             if pauseaction then
                 self.ispaused = true
                 DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
                 Sleep(FRAMES / FRAMES * pauseactiontime)
             end
-
-            previousbuffered = buffered
         end
     elseif not self:IsMovementPredictionEnabled() then
-        -- When movement prediction is disabled the buffered action will be nil. In that case, we
-        -- use the default sleep time and just rely on IsBusy() functions.
-        if self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy() then
+        if not self.inst:HasTag("ignorewalkableplatforms")
+            and (self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy())
+            and not self.inst.replica.inventory:GetActiveItem()
+        then
             self.ispaused = true
             pauseactiontime = 1.25 -- default
             DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
@@ -257,12 +256,9 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
         end
     end
 
-    if self.ispaused
-        and not self.playercontroller:IsBusy()
-        and not self.inst.replica.builder:IsBusy()
-    then
-        self.ispaused = false
+    if self.ispaused then
         DebugTheadString("Unpausing...")
+        self.ispaused = false
         return previousbuffered, true
     end
 
@@ -565,7 +561,7 @@ end
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
         local pos, previouspos, isleadernear
-        local previousbuffered
+        local previousbuffered, interrupted
         local retry
 
         local retryframes = 0
@@ -593,7 +589,10 @@ function KeepFollowing:StartFollowingThread()
                 return
             end
 
-            previousbuffered = ThreadInterruptOnPauseAction(self, previousbuffered)
+            previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+            if pos and interrupted then
+                WalkToPosition(self, pos)
+            end
 
             isleadernear = self.inst:IsNear(self.leader, target)
 
