@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.18.0][] - 2019-09-27
+
+### Added
+
+- Support for `BLINK`, `EQUIP` and `READ` interruptions
+- Support for pushing interruptions
+
+### Changed
+
+- Improved following behaviour
+
+### Fixed
+
+- Issue forcing original actions in some cases
+- Pausing behaviour related to following interruptions
+
 ## [0.17.0][] - 2019-09-23
 
 ### Changed
@@ -221,7 +237,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.17.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.14.0...v0.15.0
