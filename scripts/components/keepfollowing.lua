@@ -265,7 +265,6 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
     return previousbuffered, false
 end
 
--- TODO: In some cases WalkToPosition() doesn't trigger moving (investigate PlayerController:DoAction())
 local function WalkToPosition(self, pos)
     if self.ismastersim or self.playercontroller.locomotor then
         self.playercontroller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
@@ -560,11 +559,11 @@ end
 
 function KeepFollowing:StartFollowingThread()
     self.threadfollowing = StartThread(function()
+        local buffered, previousbuffered, interrupted
         local pos, previouspos, isleadernear
-        local previousbuffered, interrupted
-        local retry
+        local stuck
 
-        local retryframes = 0
+        local stuckframes = 0
         local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
         local target = self.configtargetdistance + radiusinst + radiusleader
@@ -589,6 +588,7 @@ function KeepFollowing:StartFollowingThread()
                 return
             end
 
+            buffered = self.inst:GetBufferedAction()
             isleadernear = self.inst:IsNear(self.leader, target)
 
             if self.configfollowingmethod == "default" then
@@ -596,31 +596,26 @@ function KeepFollowing:StartFollowingThread()
                 pos = GetDefaultMethodNextPosition(self, target)
                 if pos then
                     previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
-                    if interrupted then
+                    if interrupted
+                        or not buffered and self:IsMovementPredictionEnabled()
+                    then
                         WalkToPosition(self, pos)
+                        previouspos = pos
                     end
 
                     if not self.ispaused then
                         if not previouspos or pos ~= previouspos then
                             WalkToPosition(self, pos)
                             previouspos = pos
-                            retry = false
-                            retryframes = 0
-                        elseif not retry and pos == previouspos then
-                            -- In some cases, the WalkToPosition() doesn't trigger movement and I
-                            -- don't know why yet. So we try sending the walking request once again
-                            -- (still better than sending a request on each frame).
-                            retryframes = retryframes + 1
-
-                            -- 0.5 sec
-                            if retryframes * FRAMES > .5 then
-                                WalkToPosition(self, pos)
+                            stuck = false
+                            stuckframes = 0
+                        elseif not stuck and pos == previouspos then
+                            stuckframes = stuckframes + 1
+                            if stuckframes * FRAMES > .5 then
                                 previouspos = pos
-                                retry = true
+                                stuck = true
                             end
-                        elseif retry and #self.leaderpositions > 1 and pos == previouspos then
-                            -- after the retry, if the position didn't change then most likely we
-                            -- are dealing with an invalid one
+                        elseif stuck and pos == previouspos and #self.leaderpositions > 1 then
                             table.remove(self.leaderpositions, 1)
                         end
                     end
