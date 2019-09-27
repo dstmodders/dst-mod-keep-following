@@ -600,7 +600,7 @@ function KeepFollowing:StartFollowingThread()
                 if pos then
                     previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
                     if interrupted
-                        or not buffered and self:IsMovementPredictionEnabled()
+                        or (not buffered and self:IsMovementPredictionEnabled())
                     then
                         WalkToPosition(self, pos)
                         previouspos = pos
@@ -749,6 +749,9 @@ end
 
 function KeepFollowing:StartPushingThread()
     self.threadpushing = StartThread(function()
+        local buffered, previousbuffered, interrupted
+        local pos
+
         self.ispushing = true
         self.starttime = os.clock()
 
@@ -761,7 +764,17 @@ function KeepFollowing:StartPushingThread()
                 return
             end
 
-            WalkToPosition(self, self.leader:GetPosition())
+            buffered = self.inst:GetBufferedAction()
+            pos = self.leader:GetPosition()
+
+            previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+            if interrupted
+                or (not buffered and self:IsMovementPredictionEnabled())
+            then
+                WalkToPosition(self, pos)
+            end
+
+            WalkToPosition(self, pos)
 
             Sleep(FRAMES)
         end
