@@ -589,44 +589,57 @@ function KeepFollowing:StartFollowingThread()
                 return
             end
 
-            previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
-            if pos and interrupted then
-                WalkToPosition(self, pos)
-            end
-
             isleadernear = self.inst:IsNear(self.leader, target)
 
-            if not self.ispaused and self.configfollowingmethod == "default" then
+            if self.configfollowingmethod == "default" then
                 -- default: player follows a leader step-by-step
                 pos = GetDefaultMethodNextPosition(self, target)
-                if pos and (not previouspos or pos ~= previouspos) then
-                    WalkToPosition(self, pos)
-                    previouspos = pos
-                    retry = false
-                    retryframes = 0
-                elseif not retry and pos and pos == previouspos then
-                    -- In some cases, the WalkToPosition() doesn't trigger movement and I don't know
-                    -- why yet. So we try sending the walking request once again (still better than
-                    -- sending a request on each frame).
-                    retryframes = retryframes + 1
-
-                    -- 0.5 sec
-                    if retryframes * FRAMES > .5 then
+                if pos then
+                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+                    if interrupted then
                         WalkToPosition(self, pos)
-                        previouspos = pos
-                        retry = true
                     end
-                elseif retry and #self.leaderpositions > 1 and pos and pos == previouspos then
-                    -- after the retry, if the position didn't change then most likely we are
-                    -- dealing with an invalid one
-                    table.remove(self.leaderpositions, 1)
+
+                    if not self.ispaused then
+                        if not previouspos or pos ~= previouspos then
+                            WalkToPosition(self, pos)
+                            previouspos = pos
+                            retry = false
+                            retryframes = 0
+                        elseif not retry and pos == previouspos then
+                            -- In some cases, the WalkToPosition() doesn't trigger movement and I
+                            -- don't know why yet. So we try sending the walking request once again
+                            -- (still better than sending a request on each frame).
+                            retryframes = retryframes + 1
+
+                            -- 0.5 sec
+                            if retryframes * FRAMES > .5 then
+                                WalkToPosition(self, pos)
+                                previouspos = pos
+                                retry = true
+                            end
+                        elseif retry and #self.leaderpositions > 1 and pos == previouspos then
+                            -- after the retry, if the position didn't change then most likely we
+                            -- are dealing with an invalid one
+                            table.remove(self.leaderpositions, 1)
+                        end
+                    end
                 end
-            elseif not self.ispaused and self.configfollowingmethod == "closest" then
+            elseif self.configfollowingmethod == "closest" then
                 -- closest: player goes to the closest target point from a leader
                 pos = GetClosestMethodNextPosition(self, target, isleadernear)
-                if pos and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1) then
-                    WalkToPosition(self, pos)
-                    previouspos = pos
+                if pos then
+                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+                    if interrupted then
+                        WalkToPosition(self, pos)
+                    end
+
+                    if not self.ispaused
+                        and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1)
+                    then
+                        WalkToPosition(self, pos)
+                        previouspos = pos
+                    end
                 end
             end
 
