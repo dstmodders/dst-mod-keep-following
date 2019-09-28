@@ -393,6 +393,11 @@ function KeepFollowing:CanBePushed(entity)
         return false
     end
 
+    -- so does birds
+    if entity:HasTag("bird") then
+        return false
+    end
+
     if not self.configpushmasschecking then
         return true
     end
