@@ -206,23 +206,24 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
     DebugString("AddPlayerPostInit initialized")
 end
 
-local function PlayerActionPickerPostInit(self, player)
+local function PlayerActionPickerPostInit(_self, player)
     if player ~= _G.ThePlayer then
         return
     end
 
-    local OldDoGetMouseActions = self.DoGetMouseActions
+    local OldDoGetMouseActions = _self.DoGetMouseActions
 
-    local function NewDoGetMouseActions(position, target)
-        local lmb, rmb = OldDoGetMouseActions(position, target)
-        local keepfollowing = player.components.keepfollowing
-        local buffered = self.inst:GetBufferedAction()
+    local function NewDoGetMouseActions(self, position, _target)
+        local lmb, rmb = OldDoGetMouseActions(self, position, _target)
 
         if TheInput:IsKeyDown(_KEY_ACTION) then
+            local keepfollowing = player.components.keepfollowing
+            local buffered = self.inst:GetBufferedAction()
+
             -- We could have used lmb.target. However, the PlayerActionPicker has leftclickoverride
             -- and rightclickoverride so we can't trust that. A good example is Woodie's Weregoose
             -- form which overrides mouse actions.
-            target = TheInput:GetWorldEntityUnderMouse()
+            local target = TheInput:GetWorldEntityUnderMouse()
             if not target then
                 return lmb, rmb
             end
@@ -276,7 +277,7 @@ local function PlayerActionPickerPostInit(self, player)
         return lmb, rmb
     end
 
-    self.DoGetMouseActions = NewDoGetMouseActions
+    _self.DoGetMouseActions = NewDoGetMouseActions
 
     DebugString("PlayerActionPickerPostInit initialized")
 end
