@@ -444,10 +444,9 @@ function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
         DebugString(string.format(
-            "New leader: %s. Distance: %0.2f. Target: %0.2f",
+            "New leader: %s. Distance: %0.2f",
             self.leader:GetDisplayName(),
-            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition())),
-            self.configtargetdistance
+            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
         ))
     end
 end
@@ -574,11 +573,7 @@ function KeepFollowing:StartFollowingThread()
         self.isfollowing = true
         self.starttime = os.clock()
 
-        DebugTheadString("Following method:", self.configfollowingmethod)
-        DebugTheadString(string.format(
-            "Started following %s...",
-            self.leader:GetDisplayName()
-        ))
+        DebugTheadString("Thread started")
 
         if self.configfollowingmethod == "default" then
             self:StartPathThread()
@@ -599,9 +594,7 @@ function KeepFollowing:StartFollowingThread()
                 pos = GetDefaultMethodNextPosition(self, target)
                 if pos then
                     previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
-                    if interrupted
-                        or (not buffered and self:IsMovementPredictionEnabled())
-                    then
+                    if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
                         WalkToPosition(self, pos)
                         previouspos = pos
                     end
@@ -716,14 +709,14 @@ function KeepFollowing:StartFollowing(leader)
     end
 
     self:SetLeader(leader)
+    DebugString(string.format("Started following %s...", self.leader:GetDisplayName()))
     self:StartFollowingThread()
 end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
         DebugString(string.format(
-            "[%s] Stopped following %s. Requests: %d. Time: %f",
-            self.threadfollowing.id,
+            "Stopped following %s. Requests: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
             self.debugrequests,
             os.clock() - self.starttime
@@ -755,7 +748,7 @@ function KeepFollowing:StartPushingThread()
         self.ispushing = true
         self.starttime = os.clock()
 
-        DebugTheadString("Started pushing leader")
+        DebugTheadString("Thread started")
 
         while self.inst and self.inst:IsValid() and self:IsPushing() do
             if not self.leader or not self.leader.entity:IsValid() then
@@ -798,6 +791,7 @@ function KeepFollowing:StartPushing(leader)
     end
 
     self:SetLeader(leader)
+    DebugString("Started pushing leader...")
     self:StartPushingThread()
 end
 
@@ -808,8 +802,7 @@ function KeepFollowing:StopPushing()
 
     if self.leader then
         DebugString(string.format(
-            "[%s] Stopped pushing %s. Requests: %d. Time: %f",
-            self.threadpushing.id,
+            "Stopped pushing %s. Requests: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
             self.debugrequests,
             os.clock() - self.starttime

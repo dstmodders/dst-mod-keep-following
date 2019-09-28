@@ -163,6 +163,13 @@ local function OnPlayerActivated(player, world)
         keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
         keepfollowing.configpushmasschecking = GetModConfigData("push_mass_checking")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
+
+        DebugString("[config] Following method:", keepfollowing.configfollowingmethod)
+        DebugString("[config] Keep target distance:", keepfollowing.configkeeptargetdistance)
+        DebugString("[config] Mobs:", keepfollowing.configmobs)
+        DebugString("[config] Push lag compensation:", keepfollowing.configpushlagcompensation)
+        DebugString("[config] Push mass checking:", keepfollowing.configpushmasschecking)
+        DebugString("[config] Target distance:", keepfollowing.configtargetdistance)
     end
 
     DebugString("Player", player:GetDisplayName(), "activated")
