@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.19.0][] - 2019-10-04
+
+### Changed
+
+- Improved compatibility with some other mods
+- Improved debug output
+- Mod icon
+
+### Removed
+
+- Pushing support for birds
+
+### Fixed
+
+- `PlayerActionPicker:DoGetMouseActions()` override
+
 ## [0.18.0][] - 2019-09-27
 
 ### Added
@@ -237,7 +253,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.18.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.15.0...v0.16.0
