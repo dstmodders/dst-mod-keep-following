@@ -1,14 +1,14 @@
 name = "Keep Following"
-version = "0.18.0"
+version = "0.19.0"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.18.0:]] .. "\n" ..
-    [[- Added support for BLINK, EQUIP and READ interruptions]] .. "\n" ..
-    [[- Added support for pushing interruptions]] .. "\n" ..
-    [[- Fixed issue forcing original actions in some cases]] .. "\n" ..
-    [[- Fixed pausing behaviour related to following interruptions]] .. "\n" ..
-    [[- Improved following behaviour]]
+    [[v0.19.0:]] .. "\n" ..
+    [[- Changed mod icon]] .. "\n" ..
+    [[- Fixed PlayerActionPicker:DoGetMouseActions() override]] .. "\n" ..
+    [[- Improved compatibility with some other mods]] .. "\n" ..
+    [[- Improved debug output]] .. "\n" ..
+    [[- Removed pushing support for birds]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
