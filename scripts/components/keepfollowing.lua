@@ -172,7 +172,7 @@ local function DebugString(...)
     end
 end
 
-local function DebugTheadString(...)
+local function DebugThreadString(...)
     if _DEBUG_FN then
         local task = scheduler:GetCurrentTask()
         if task then
@@ -238,12 +238,12 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
 
     if buffered and buffered.action ~= ACTIONS.WALKTO then
         if not previousbuffered or buffered ~= previousbuffered then
-            DebugTheadString("Interrupted by action:", buffered.action.id)
+            DebugThreadString("Interrupted by action:", buffered.action.id)
             previousbuffered = buffered
             pauseaction, pauseactiontime = GetPauseAction(buffered.action)
             if pauseaction then
                 self.ispaused = true
-                DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+                DebugThreadString(string.format("Pausing (%2.2f)...", pauseactiontime))
                 Sleep(FRAMES / FRAMES * pauseactiontime)
             end
         end
@@ -254,13 +254,13 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
         then
             self.ispaused = true
             pauseactiontime = 1.25 -- default
-            DebugTheadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+            DebugThreadString(string.format("Pausing (%2.2f)...", pauseactiontime))
             Sleep(FRAMES / FRAMES * pauseactiontime)
         end
     end
 
     if self.ispaused then
-        DebugTheadString("Unpausing...")
+        DebugThreadString("Unpausing...")
         self.ispaused = false
         return previousbuffered, true
     end
@@ -578,7 +578,7 @@ function KeepFollowing:StartFollowingThread()
         self.isfollowing = true
         self.starttime = os.clock()
 
-        DebugTheadString("Thread started")
+        DebugThreadString("Thread started")
 
         if self.configfollowingmethod == "default" then
             self:StartPathThread()
@@ -586,7 +586,7 @@ function KeepFollowing:StartFollowingThread()
 
         while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugTheadString("Leader doesn't exist anymore")
+                DebugThreadString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -661,11 +661,11 @@ function KeepFollowing:StartPathThread()
     self.threadpath = StartThread(function()
         local pos, previouspos
 
-        DebugTheadString("Started gathering path coordinates...")
+        DebugThreadString("Started gathering path coordinates...")
 
         while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugTheadString("Leader doesn't exist anymore")
+                DebugThreadString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -753,11 +753,11 @@ function KeepFollowing:StartPushingThread()
         self.ispushing = true
         self.starttime = os.clock()
 
-        DebugTheadString("Thread started")
+        DebugThreadString("Thread started")
 
         while self.inst and self.inst:IsValid() and self:IsPushing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugTheadString("Leader doesn't exist anymore")
+                DebugThreadString("Leader doesn't exist anymore")
                 self:StopPushing()
                 return
             end
