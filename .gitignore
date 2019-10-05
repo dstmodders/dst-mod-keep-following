@@ -2,5 +2,6 @@
 .idea/
 
 ### Project specific ###
+description.txt
 modsettings.lua
 workshop/
