@@ -7,7 +7,7 @@ Mod for the game [Don't Starve Together][] which is available through the
 supported entities.
 
 | Default Keys             | Actions                                        |
-|--------------------------|------------------------------------------------|
+| ------------------------ | ---------------------------------------------- |
 | `Shift` + `LMB`          | to keep following                              |
 | `Shift` + `Ctrl` + `LMB` | to keep pushing and ignore the target distance |
 
@@ -28,21 +28,21 @@ change from time to time as the game updates and/or player requests depending on
 usefulness:
 
 - **Hostile Creatures**: Batilisk, Birchnutter, Cave Spider, Clockwork
-Bishop/Rook/Knight (Damaged), Dangling Depth Dweller, Depths Worm, Ewecus, Frog,
-Ghost, Guardian Pig, Hound (Blue/Red), Lavae, MacTusk/Wee MacTusk, Merm,
-Slurper, Spider Warrior, Spider, Spitter, Tallbird, Varg, Werepig.
+  Bishop/Rook/Knight (Damaged), Dangling Depth Dweller, Depths Worm, Ewecus, Frog,
+  Ghost, Guardian Pig, Hound (Blue/Red), Lavae, MacTusk/Wee MacTusk, Merm,
+  Slurper, Spider Warrior, Spider, Spitter, Tallbird, Varg, Werepig.
 
 - **Boss Monsters**: Bearger, Beequeen, Deerclops, Dragonfly, Klaus, Treeguard
-(Normal/Lumpy), Ancient Guardian, Moose/Goose, Reanimated Skeleton
-(Caves/Forest/Ancient Fuelweaver), Spider Queen, Toadstool (Misery).
+  (Normal/Lumpy), Ancient Guardian, Moose/Goose, Reanimated Skeleton
+  (Caves/Forest/Ancient Fuelweaver), Spider Queen, Toadstool (Misery).
 
 - **Neutral Animals**: Beefalo, Catcoon, Saladmander, Koalefant, Krampus, Volt
-Goat, Splumonkey (Shadow), Mosling, Pengull, Pig, Rock Lobster, Slurtle,
-Snurtle, Smallish Tallbird.
+  Goat, Splumonkey (Shadow), Mosling, Pengull, Pig, Rock Lobster, Slurtle,
+  Snurtle, Smallish Tallbird.
 
 - **Passive Animals**: Baby Beefalo, Gobbler, Carrat, Chester, Deer, Gem Deer
-(Blue/Red), Glommer, Grass Gekko, Hutch, Extra-Adorable Lavae,
-Bunnyman (Beardlord), Mole, Smallbird.
+  (Blue/Red), Glommer, Grass Gekko, Hutch, Extra-Adorable Lavae,
+  Bunnyman (Beardlord), Mole, Smallbird.``
 
 - **Other**: Abigail, Balloon, Companion, Critter, Player.
 
@@ -58,7 +58,7 @@ Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
 | Configuration             | Options           | Default   | Description                                                                                   |
-|---------------------------|-------------------|-----------|-----------------------------------------------------------------------------------------------|
+| ------------------------- | ----------------- | --------- | --------------------------------------------------------------------------------------------- |
 | **Action key**            | _[keys]_          | _LShift_  | Key used for both following and pushing                                                       |
 | **Push key**              | _[keys]_          | _LCtrl_   | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
 | **Push with RMB**         | _Yes/No_          | _No_      | Use RMB in combination with action key for pushing instead                                    |
