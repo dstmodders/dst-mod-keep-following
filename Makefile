@@ -1,6 +1,6 @@
 help:
-	@echo "Please use \`make <target>' where <target> is one of:\n"
-	@echo "   workshop   to prepare directory for upload to Steam Workshop."
+	@echo "Please use \`make <target>\` where <target> is one of:\n"
+	@echo "   workshop   to prepare the Steam Workshop directory"
 
 workshop:
 	@rm -Rf ./workshop/
