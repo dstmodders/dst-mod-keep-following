@@ -1,5 +1,5 @@
 help:
-	@echo "Please use \`make <target>\` where <target> is one of:\n"
+	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
 	@echo "   workshop   to prepare the Steam Workshop directory"
 
 workshop:
