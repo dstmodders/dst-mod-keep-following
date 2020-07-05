@@ -33,17 +33,57 @@ if not folder_name:find("workshop-") then
     name = name .. " (dev)"
 end
 
+--
+-- Helpers
+--
+
+local function AddConfig(label, name, options, default, hover)
+    return { label = label, name = name, options = options, default = default, hover = hover or "" }
+end
+
+local function CreateKeyList()
+    local keylist = {}
+    local string = ""
+    local keys = {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+        "LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift",
+        "Tab", "Capslock", "Space", "Minus", "Equals", "Backspace",
+        "Insert", "Home", "Delete", "End", "Pageup", "Pagedown", "Print", "Scrollock", "Pause",
+        "Period", "Slash", "Semicolon", "Leftbracket", "Rightbracket", "Backslash",
+        "Up", "Down", "Left", "Right",
+    }
+
+    keylist[1] = { description = "Disabled", data = false }
+    for i = 1, #keys do
+        keylist[i + 1] = { description = keys[i], data = "KEY_" .. string.upper(keys[i]) }
+    end
+
+    return keylist
+end
+
+--
+-- Configuration
+--
+
+local key_list = CreateKeyList()
+
 local boolean = {
     { description = "Yes", data = true },
     { description = "No", data = false }
 }
 
-local boolean_push_mass_checking = {
+local push_mass_checking = {
     { description = "Yes", data = true, hover = "Yes: only entities with an appropriate mass difference can be pushed" },
     { description = "No", data = false, hover = "No: no mass difference limitations" },
 }
 
-local target_distance = {
+local following_methods = {
+    { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
+    { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
+}
+
+local target_distances = {
     { description = "1.5m", data = 1.5 },
     { description = "2.5m", data = 2.5 },
     { description = "3.5m", data = 3.5 }
@@ -54,39 +94,14 @@ local mobs = {
     { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
 }
 
-local following_methods = {
-    { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
-    { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
-}
-
-local string = ""
-local keys = {
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
-    "LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift",
-    "Tab", "Capslock", "Space", "Minus", "Equals", "Backspace",
-    "Insert", "Home", "Delete", "End", "Pageup", "Pagedown", "Print", "Scrollock", "Pause",
-    "Period", "Slash", "Semicolon", "Leftbracket", "Rightbracket", "Backslash",
-    "Up", "Down", "Left", "Right"
-}
-
-local keylist = {}
-for i = 1, #keys do
-    keylist[i] = { description = keys[i], data = "KEY_" .. string.upper(keys[i]) }
-end
-
-local function AddConfig(label, name, options, default, hover)
-    return { label = label, name = name, options = options, default = default, hover = hover or "" }
-end
-
 configuration_options = {
-    AddConfig("Action key", "key_action", keylist, "KEY_LSHIFT", "Key used for both following and pushing"),
-    AddConfig("Push key", "key_push", keylist, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
+    AddConfig("Action key", "key_action", key_list, "KEY_LSHIFT", "Key used for both following and pushing"),
+    AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
     AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
-    AddConfig("Push mass checking", "push_mass_checking", boolean_push_mass_checking, true, "Enables/Disables the mass difference checking.\nIgnored for the ghosts pushing players"),
+    AddConfig("Push mass checking", "push_mass_checking", push_mass_checking, true, "Enables/Disables the mass difference checking.\nIgnored for the ghosts pushing players"),
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
     AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
-    AddConfig("Target distance", "target_distance", target_distance, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
+    AddConfig("Target distance", "target_distance", target_distances, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
     AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
     AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
     AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
