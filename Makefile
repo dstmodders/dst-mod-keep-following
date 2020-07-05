@@ -2,6 +2,7 @@ help:
 	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
 	@echo "   install     to install the mod"
 	@echo "   ldoc        to generate an LDoc documentation"
+	@echo "   lint        to run code linting"
 	@echo "   uninstall   to uninstall the mod"
 	@echo "   workshop    to prepare the Steam Workshop directory"
 
@@ -29,6 +30,14 @@ uninstall:
 ldoc:
 	@find ./doc/* -type f -not -name Dockerfile -not -name docker-stack.yml -not -wholename ./doc/ldoc/ldoc.css -delete
 	@ldoc .
+
+lint:
+	@EXIT=0; \
+		printf "Luacheck:\n\n"; luacheck . --exclude-files="here/" || EXIT=$$?; \
+		printf "\nPrettier (Markdown):\n\n"; prettier --check ./**/*.md || EXIT=$$?; \
+		printf "\nPrettier (XML):\n\n"; prettier --check ./**/*.xml || EXIT=$$?; \
+		printf "\nPrettier (YAML):\n\n"; prettier --check ./**/*.yml || EXIT=$$?; \
+		exit $${EXIT}
 
 workshop:
 	@rm -Rf ./workshop/
