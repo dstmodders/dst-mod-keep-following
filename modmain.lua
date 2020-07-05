@@ -33,6 +33,7 @@ local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 -- Debugging-related
 --
 
+-- luacheck: no unused args
 local DebugFn = _DEBUG and function(...)
     local msg = string.format("[%s]", modname)
     for i = 1, arg.n do
@@ -184,14 +185,14 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
     DebugString("Game ID -", TheSim:GetGameID())
 
     if IsDST() then
-        env.AddPrefabPostInit("world", function(world)
-            world:ListenForEvent("playeractivated", function(world, player)
+        env.AddPrefabPostInit("world", function(_world)
+            _world:ListenForEvent("playeractivated", function(world, player)
                 if player == _G.ThePlayer then
                     onActivatedFn(player, world)
                 end
             end)
 
-            world:ListenForEvent("playerdeactivated", function(_, player)
+            _world:ListenForEvent("playerdeactivated", function(_, player)
                 if player == _G.ThePlayer then
                     onDeactivatedFn(player)
                 end

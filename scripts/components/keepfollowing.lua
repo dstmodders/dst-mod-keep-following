@@ -162,6 +162,7 @@ end
 -- Debugging-related
 --
 
+-- luacheck: no unused args
 function KeepFollowing:SetDebugFn(fn)
     _DEBUG_FN = fn
 end
@@ -493,9 +494,11 @@ function KeepFollowing:GetTentSleeper(entity)
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
     else
-        DebugString("Component sleepingbag is not available, looking for sleeping players nearby...")
         local x, y, z = entity.Transform:GetWorldPosition()
         player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
+        DebugString(
+            "Component sleepingbag is not available, looking for sleeping players nearby..."
+        )
     end
 
     if player and player:HasTag("sleeping") then
@@ -525,7 +528,10 @@ local function GetDefaultMethodNextPosition(self, target)
         local step = self.inst.Physics:GetRadius() * 3
         local isleadernear = self.inst:IsNear(self.leader, target + step)
 
-        if not self.isleadernear and isleadernear or (isleadernear and self.configkeeptargetdistance) then
+        if not self.isleadernear
+            and isleadernear
+            or (isleadernear and self.configkeeptargetdistance)
+        then
             self.leaderpositions = {}
             return self.inst:GetPositionAdjacentTo(self.leader, target)
         end
@@ -598,7 +604,11 @@ function KeepFollowing:StartFollowingThread()
                 -- default: player follows a leader step-by-step
                 pos = GetDefaultMethodNextPosition(self, target)
                 if pos then
-                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(
+                        self,
+                        previousbuffered
+                    )
+
                     if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
                         WalkToPosition(self, pos)
                         previouspos = pos
@@ -625,7 +635,11 @@ function KeepFollowing:StartFollowingThread()
                 -- closest: player goes to the closest target point from a leader
                 pos = GetClosestMethodNextPosition(self, target, isleadernear)
                 if pos then
-                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
+                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(
+                        self,
+                        previousbuffered
+                    )
+
                     if interrupted then
                         WalkToPosition(self, pos)
                     end
