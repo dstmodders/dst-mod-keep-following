@@ -77,9 +77,9 @@ local boolean = {
     { description = "No", data = false }
 }
 
-local push_mass_checking = {
-    { description = "Yes", data = true, hover = "Yes: only entities with an appropriate mass difference can be pushed" },
-    { description = "No", data = false, hover = "No: no mass difference limitations" },
+local mobs = {
+    { description = "Default", data = "default", hover = "Default: a hand-picked list based on prefabs that will suit most players" },
+    { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
 }
 
 local following_methods = {
@@ -93,15 +93,25 @@ local target_distances = {
     { description = "3.5m", data = 3.5 }
 }
 
-local mobs = {
-    { description = "Default", data = "default", hover = "Default: a hand-picked list based on prefabs that will suit most players" },
-    { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
+local keep_target_distance = {
+    { description = "Yes", data = true, hover = "Yes: move away from a leader within the target distance" },
+    { description = "No", data = false, hover = "No: stay still within the target distance" },
+}
+
+local push_with_rmb = {
+    { description = "Yes", data = true, hover = "Yes: the \"push key\" becomes disabled in favour of the RMB" },
+    { description = "No", data = false, hover = "No: the \"push key\" is used for pushing" },
+}
+
+local push_mass_checking = {
+    { description = "Yes", data = true, hover = "Yes: limits pushing to entities with an appropriate mass difference" },
+    { description = "No", data = false, hover = "No: no limitations for the mass difference" },
 }
 
 configuration_options = {
     AddSection("Keybinds"),
     AddConfig("Action key", "key_action", key_list, "KEY_LSHIFT", "Key used for both following and pushing"),
-    AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used for pushing in combination with action key.\nDisabled when \"Push with RMB\" is enabled"),
+    AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used in combination with an action key for pushing"),
 
     AddSection("General"),
     AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
@@ -109,13 +119,13 @@ configuration_options = {
     AddSection("Following"),
     AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
     AddConfig("Target distance", "target_distance", target_distances, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
-    AddConfig("Keep target distance", "keep_target_distance", boolean, false, "Move away from a leader inside the target distance.\nIgnored when pushing"),
+    AddConfig("Keep target distance", "keep_target_distance", keep_target_distance, false, "Should the follower keep the distance from the leader?\nIgnored when pushing"),
 
     AddSection("Pushing"),
-    AddConfig("Push with RMB", "push_with_rmb", boolean, false, "Use  (RMB) in combination with action key for pushing instead"),
-    AddConfig("Push mass checking", "push_mass_checking", push_mass_checking, true, "Enables/Disables the mass difference checking.\nIgnored for the ghosts pushing players"),
-    AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Automatically disables lag compensation while pushing and restores the previous state after"),
+    AddConfig("Push with RMB", "push_with_rmb", push_with_rmb, false, "Should the  (RMB) in combination with an action key be used for pushing?"),
+    AddConfig("Push mass checking", "push_mass_checking", push_mass_checking, true, "Should the mass difference checking be enabled?\nIgnored for pushing players as a ghost"),
+    AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Should the lag compensation be automatically disabled while pushing?"),
 
     AddSection("Other"),
-    AddConfig("Debug", "debug", boolean, false, "Enables/Disables the debug mode"),
+    AddConfig("Debug", "debug", boolean, false, "Should the debug mode be enabled?"),
 }
