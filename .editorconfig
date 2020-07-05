@@ -16,3 +16,7 @@ max_line_length = 100
 # Makefile
 [Makefile]
 indent_style = tab
+
+# XML
+[*.xml]
+indent_size = 4
