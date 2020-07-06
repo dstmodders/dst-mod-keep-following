@@ -372,3 +372,32 @@ end
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
 AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
+
+--
+-- KnownModIndex
+--
+
+if GetModConfigData("hide_changelog") then
+    local KnownModIndex = _G.KnownModIndex
+    local OldGetModInfo = KnownModIndex.GetModInfo
+    local TrimString = _G.TrimString
+
+    KnownModIndex.GetModInfo = function(_self, _modname)
+        if _modname == modname
+            and _self.savedata
+            and _self.savedata.known_mods
+            and _self.savedata.known_mods[modname]
+        then
+            local modinfo = _self.savedata.known_mods[modname].modinfo
+            if modinfo and modinfo.description then
+                local changelog = string.find(modinfo.description, "v" .. modinfo.version)
+                if type(changelog) == "number" then
+                    modinfo.description = TrimString(modinfo.description:sub(1, changelog - 1))
+                end
+            end
+        end
+        return OldGetModInfo(_self, _modname)
+    end
+
+    _G.KnownModIndex = KnownModIndex
+end

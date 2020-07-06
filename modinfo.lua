@@ -127,5 +127,6 @@ configuration_options = {
     AddConfig("Push lag compensation", "push_lag_compensation", boolean, true, "Should the lag compensation be automatically disabled while pushing?"),
 
     AddSection("Other"),
+    AddConfig("Hide changelog", "hide_changelog", boolean, true, "Should the changelog in the mod description be hidden?\nMods should be reloaded to take effect"),
     AddConfig("Debug", "debug", boolean, false, "Should the debug mode be enabled?"),
 }
