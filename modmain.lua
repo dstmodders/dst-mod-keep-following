@@ -16,41 +16,13 @@ local TheInput = _G.TheInput
 local TheSim = _G.TheSim
 
 --
--- GetModConfigData-related
+-- Helpers
 --
 
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
     return key and (type(key) == "number" and key or _G[key]) or -1
 end
-
-local _DEBUG = GetModConfigData("debug")
-local _KEY_ACTION = GetKeyFromConfig("key_action")
-local _KEY_PUSH = GetKeyFromConfig("key_push")
-local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
-
---
--- Debugging-related
---
-
--- luacheck: no unused args
-local DebugFn = _DEBUG and function(...)
-    local msg = string.format("[%s]", modname)
-    for i = 1, arg.n do
-        msg = msg .. " " .. tostring(arg[i])
-    end
-    print(msg)
-end or function()
-    --nil
-end
-
-local function DebugString(...)
-    DebugFn(...)
-end
-
---
--- Helpers
---
 
 local function IsDST()
     return TheSim:GetGameID() == "DST"
@@ -73,6 +45,33 @@ local function IsOurAction(action)
         or action == ACTIONS.TENT_FOLLOW
         or action == ACTIONS.TENT_PUSH
 end
+
+--
+-- Debugging
+--
+
+-- luacheck: no unused args
+local DebugFn = GetModConfigData("debug") and function(...)
+    local msg = string.format("[%s]", modname)
+    for i = 1, arg.n do
+        msg = msg .. " " .. tostring(arg[i])
+    end
+    print(msg)
+end or function()
+    --nil
+end
+
+local function DebugString(...)
+    DebugFn(...)
+end
+
+--
+-- Configurations
+--
+
+local _KEY_ACTION = GetKeyFromConfig("key_action")
+local _KEY_PUSH = GetKeyFromConfig("key_push")
+local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 
 --
 -- Actions
@@ -140,7 +139,7 @@ AddAction("TENT_FOLLOW", "Follow player in", ActionTentFollow)
 AddAction("TENT_PUSH", _PUSH_WITH_RMB and "Push player" or "Push player in", ActionTentPush)
 
 --
--- Player-related
+-- Player
 --
 
 local function OnPlayerActivated(player, world)
