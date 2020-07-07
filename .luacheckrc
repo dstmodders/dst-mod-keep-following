@@ -97,6 +97,7 @@ files["scripts/**/*.lua"] = {
         "AllPlayers",
         "BufferedAction",
         "KnownModIndex",
+        "_G",
 
         -- constants
         "ACTIONS",
