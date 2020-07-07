@@ -1,8 +1,14 @@
 --
--- Globals
+-- Requires
 --
 
 local _G = GLOBAL
+local require = _G.require
+
+--
+-- Globals
+--
+
 local ACTIONS = _G.ACTIONS
 local BufferedAction = _G.BufferedAction
 local CONTROL_ACTION = _G.CONTROL_ACTION
@@ -14,6 +20,28 @@ local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
+
+--
+-- Debugging
+--
+
+local Debug
+
+if GetModConfigData("debug") then
+    Debug = require "keepfollowing/debug"
+    Debug:DoInit(modname)
+    Debug:SetIsEnabled(GetModConfigData("debug") and true or false)
+    Debug:DebugModConfigs()
+    _G.KeepFollowingDebug = Debug
+end
+
+local function DebugString(...)
+    return Debug and Debug:DebugString(...)
+end
+
+local function DebugInit(...)
+    return Debug and Debug:DebugInit(...)
+end
 
 --
 -- Helpers
@@ -44,25 +72,6 @@ local function IsOurAction(action)
         or action == ACTIONS.PUSH
         or action == ACTIONS.TENT_FOLLOW
         or action == ACTIONS.TENT_PUSH
-end
-
---
--- Debugging
---
-
--- luacheck: no unused args
-local DebugFn = GetModConfigData("debug") and function(...)
-    local msg = string.format("[%s]", modname)
-    for i = 1, arg.n do
-        msg = msg .. " " .. tostring(arg[i])
-    end
-    print(msg)
-end or function()
-    --nil
-end
-
-local function DebugString(...)
-    DebugFn(...)
 end
 
 --
@@ -154,8 +163,6 @@ local function OnPlayerActivated(player, world)
         keepfollowing.modname = modname
         keepfollowing.world = world
 
-        keepfollowing:SetDebugFn(DebugFn)
-
         --GetModConfigData
         keepfollowing.configfollowingmethod = GetModConfigData("following_method")
         keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
@@ -163,13 +170,6 @@ local function OnPlayerActivated(player, world)
         keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
         keepfollowing.configpushmasschecking = GetModConfigData("push_mass_checking")
         keepfollowing.configtargetdistance = GetModConfigData("target_distance")
-
-        DebugString("[config] Following method:", keepfollowing.configfollowingmethod)
-        DebugString("[config] Keep target distance:", keepfollowing.configkeeptargetdistance)
-        DebugString("[config] Mobs:", keepfollowing.configmobs)
-        DebugString("[config] Push lag compensation:", keepfollowing.configpushlagcompensation)
-        DebugString("[config] Push mass checking:", keepfollowing.configpushmasschecking)
-        DebugString("[config] Target distance:", keepfollowing.configtargetdistance)
     end
 
     DebugString("Player", player:GetDisplayName(), "activated")
@@ -203,7 +203,7 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
         end)
     end
 
-    DebugString("AddPlayerPostInit initialized")
+    DebugInit("AddPlayerPostInit")
 end
 
 local function PlayerActionPickerPostInit(_self, player)
@@ -279,7 +279,7 @@ local function PlayerActionPickerPostInit(_self, player)
 
     _self.DoGetMouseActions = NewDoGetMouseActions
 
-    DebugString("PlayerActionPickerPostInit initialized")
+    DebugInit("PlayerActionPickerPostInit")
 end
 
 local function PlayerControllerPostInit(_self, _player)
@@ -365,7 +365,7 @@ local function PlayerControllerPostInit(_self, _player)
 
     _self.OnControl = NewOnControl
 
-    DebugString("PlayerControllerPostInit initialized")
+    DebugInit("PlayerControllerPostInit")
 end
 
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)

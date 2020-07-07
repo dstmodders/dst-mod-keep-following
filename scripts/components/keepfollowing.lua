@@ -8,7 +8,8 @@
 -- @copyright 2019
 -- @license MIT
 ----
-local _DEBUG_FN
+local Utils = require "keepfollowing/utils"
+
 local _FOLLOWING_THREAD_ID = "following_thread"
 local _PATH_THREAD_ID = "path_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
@@ -131,30 +132,6 @@ local KeepFollowing = Class(function(self, inst)
 end)
 
 --
--- Debugging-related
---
-
--- luacheck: no unused args
-function KeepFollowing:SetDebugFn(fn)
-    _DEBUG_FN = fn
-end
-
-local function DebugString(...)
-    if _DEBUG_FN then
-        _DEBUG_FN(...)
-    end
-end
-
-local function DebugThreadString(...)
-    if _DEBUG_FN then
-        local task = scheduler:GetCurrentTask()
-        if task then
-            _DEBUG_FN("[" .. task.id .. "]", ...)
-        end
-    end
-end
-
---
 -- Helpers
 --
 
@@ -211,12 +188,12 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
 
     if buffered and buffered.action ~= ACTIONS.WALKTO then
         if not previousbuffered or buffered ~= previousbuffered then
-            DebugThreadString("Interrupted by action:", buffered.action.id)
+            self:DebugString("Interrupted by action:", buffered.action.id)
             previousbuffered = buffered
             pauseaction, pauseactiontime = GetPauseAction(buffered.action)
             if pauseaction then
                 self.ispaused = true
-                DebugThreadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+                self:DebugString(string.format("Pausing (%2.2f)...", pauseactiontime))
                 Sleep(FRAMES / FRAMES * pauseactiontime)
             end
         end
@@ -227,13 +204,13 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
         then
             self.ispaused = true
             pauseactiontime = 1.25 -- default
-            DebugThreadString(string.format("Pausing (%2.2f)...", pauseactiontime))
+            self:DebugString(string.format("Pausing (%2.2f)...", pauseactiontime))
             Sleep(FRAMES / FRAMES * pauseactiontime)
         end
     end
 
     if self.ispaused then
-        DebugThreadString("Unpausing...")
+        self:DebugString("Unpausing...")
         self.ispaused = false
         return previousbuffered, true
     end
@@ -248,7 +225,7 @@ local function WalkToPosition(self, pos)
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
     end
 
-    if _DEBUG_FN then
+    if _G.KeepFollowingDebug then
         self.debugrequests = self.debugrequests + 1
     end
 end
@@ -278,14 +255,14 @@ end
 --
 
 local function MovementPredictionOnPush(self)
-    DebugString("Checking movement prediction current state...")
+    self:DebugString("Checking movement prediction current state...")
     local state = self:IsMovementPredictionEnabled()
-    DebugString("Current state:", state and "enabled" or "disabled")
+    self:DebugString("Current state:", state and "enabled" or "disabled")
 
     if self.movementpredictionstate == nil then
-        DebugString("Setting movement prediction previous state...")
+        self:DebugString("Setting movement prediction previous state...")
         self.movementpredictionstate = state
-        DebugString("Previous state:", state and "enabled" or "disabled")
+        self:DebugString("Previous state:", state and "enabled" or "disabled")
     end
 
     if self.movementpredictionstate then
@@ -315,12 +292,12 @@ function KeepFollowing:MovementPrediction(enable)
         local x, _, z = self.inst.Transform:GetWorldPosition()
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
         self.inst:EnableMovementPrediction(true)
-        DebugString("Movement prediction: enabled")
+        self:DebugString("Movement prediction: enabled")
         return true
     elseif self.inst.components and self.inst.components.locomotor then
         self.inst.components.locomotor:Stop()
         self.inst:EnableMovementPrediction(false)
-        DebugString("Movement prediction: disabled")
+        self:DebugString("Movement prediction: disabled")
         return false
     end
 end
@@ -337,7 +314,7 @@ function KeepFollowing:IsLeaderOnPlatform()
     return self.world.Map:GetPlatformAtPoint(self.leader:GetPosition():Get()) and true or false
 end
 
-function KeepFollowing:CanBeFollowed(entity)
+function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
     if not entity or (entity.entity and not entity.entity:IsValid()) then
         return false
     end
@@ -421,7 +398,7 @@ end
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
-        DebugString(string.format(
+        self:DebugString(string.format(
             "New leader: %s. Distance: %0.2f",
             self.leader:GetDisplayName(),
             math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
@@ -461,20 +438,20 @@ function KeepFollowing:GetTentSleeper(entity)
         return nil
     end
 
-    DebugString("Attempting to get a", entity:GetDisplayName(), "sleeper...")
+    self:DebugString("Attempting to get a", entity:GetDisplayName(), "sleeper...")
 
     if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
         player = entity.components.sleepingbag.sleeper
     else
         local x, y, z = entity.Transform:GetWorldPosition()
         player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
-        DebugString(
+        self:DebugString(
             "Component sleepingbag is not available, looking for sleeping players nearby..."
         )
     end
 
     if player and player:HasTag("sleeping") then
-        DebugString("Found sleeping", player:GetDisplayName())
+        self:DebugString("Found sleeping", player:GetDisplayName())
         return player
     end
 
@@ -556,7 +533,7 @@ function KeepFollowing:StartFollowingThread()
         self.isfollowing = true
         self.starttime = os.clock()
 
-        DebugThreadString("Thread started")
+        self:DebugString("Thread started")
 
         if self.configfollowingmethod == "default" then
             self:StartPathThread()
@@ -564,7 +541,7 @@ function KeepFollowing:StartFollowingThread()
 
         while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugThreadString("Leader doesn't exist anymore")
+                self:DebugString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -636,7 +613,7 @@ end
 
 function KeepFollowing:ClearFollowingThread()
     if self.threadfollowing then
-        DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
+        self:DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
         KillThreadsWithID(self.threadfollowing.id)
         self.threadfollowing:SetList(nil)
         self.threadfollowing = nil
@@ -647,11 +624,11 @@ function KeepFollowing:StartPathThread()
     self.threadpath = StartThread(function()
         local pos, previouspos
 
-        DebugThreadString("Started gathering path coordinates...")
+        self:DebugString("Started gathering path coordinates...")
 
         while self.inst and self.inst:IsValid() and self:IsFollowing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugThreadString("Leader doesn't exist anymore")
+                self:DebugString("Leader doesn't exist anymore")
                 self:StopFollowing()
                 return
             end
@@ -687,7 +664,7 @@ end
 
 function KeepFollowing:ClearPathThread()
     if self.threadpath then
-        DebugString("[" .. self.threadpath.id .. "]", "Thread cleared")
+        self:DebugString("[" .. self.threadpath.id .. "]", "Thread cleared")
         KillThreadsWithID(self.threadpath.id)
         self.threadpath:SetList(nil)
         self.threadpath = nil
@@ -700,13 +677,13 @@ function KeepFollowing:StartFollowing(leader)
     end
 
     self:SetLeader(leader)
-    DebugString(string.format("Started following %s...", self.leader:GetDisplayName()))
+    self:DebugString(string.format("Started following %s...", self.leader:GetDisplayName()))
     self:StartFollowingThread()
 end
 
 function KeepFollowing:StopFollowing()
     if self.leader then
-        DebugString(string.format(
+        self:DebugString(string.format(
             "Stopped following %s. Requests: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
             self.debugrequests,
@@ -739,11 +716,11 @@ function KeepFollowing:StartPushingThread()
         self.ispushing = true
         self.starttime = os.clock()
 
-        DebugThreadString("Thread started")
+        self:DebugString("Thread started")
 
         while self.inst and self.inst:IsValid() and self:IsPushing() do
             if not self.leader or not self.leader.entity:IsValid() then
-                DebugThreadString("Leader doesn't exist anymore")
+                self:DebugString("Leader doesn't exist anymore")
                 self:StopPushing()
                 return
             end
@@ -769,7 +746,7 @@ end
 
 function KeepFollowing:ClearPushingThread()
     if self.threadpushing then
-        DebugString("[" .. self.threadpushing.id .. "]", "Thread cleared")
+        self:DebugString("[" .. self.threadpushing.id .. "]", "Thread cleared")
         KillThreadsWithID(self.threadpushing.id)
         self.threadpushing:SetList(nil)
         self.threadpushing = nil
@@ -782,7 +759,7 @@ function KeepFollowing:StartPushing(leader)
     end
 
     self:SetLeader(leader)
-    DebugString("Started pushing leader...")
+    self:DebugString("Started pushing leader...")
     self:StartPushingThread()
 end
 
@@ -792,7 +769,7 @@ function KeepFollowing:StopPushing()
     end
 
     if self.leader then
-        DebugString(string.format(
+        self:DebugString(string.format(
             "Stopped pushing %s. Requests: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
             self.debugrequests,
@@ -807,7 +784,14 @@ function KeepFollowing:StopPushing()
     end
 end
 
+--- Initializes.
+--
+-- Sets empty and default fields and adds debug functions.
+--
+-- @tparam table inst Player instance.
 function KeepFollowing:DoInit(inst)
+    Utils.AddDebugMethods(self)
+
     -- general
     self.inst = inst
     self.isclient = false
