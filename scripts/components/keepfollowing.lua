@@ -1,3 +1,13 @@
+----
+-- Component `keepfollowing`.
+--
+-- Includes following and pushing features/functionality.
+--
+-- @classmod KeepFollowing
+-- @author Victor Popkov
+-- @copyright 2019
+-- @license MIT
+----
 local _DEBUG_FN
 local _FOLLOWING_THREAD_ID = "following_thread"
 local _PATH_THREAD_ID = "path_thread"
@@ -117,46 +127,8 @@ local _CAN_BE_LEADER_TAGS = {
 }
 
 local KeepFollowing = Class(function(self, inst)
-    self.inst = inst
-
-    self:Init()
-    inst:StartUpdatingComponent(self)
+    self:DoInit(inst)
 end)
-
-function KeepFollowing:Init()
-    -- general
-    self.isclient = false
-    self.isdst = false
-    self.ismastersim = TheWorld.ismastersim
-    self.leader = nil
-    self.movementpredictionstate = nil
-    self.playercontroller = nil
-    self.starttime = nil
-    self.world = TheWorld
-
-    -- following
-    self.isfollowing = false
-    self.isleadernear = false
-    self.ispaused = false
-    self.leaderpositions = {}
-    self.threadfollowing = nil
-    self.threadpath = nil
-
-    -- pushing
-    self.ispushing = false
-    self.threadpushing = nil
-
-    -- debugging
-    self.debugrequests = 0
-
-    -- replaced by GetModConfigData
-    self.configfollowingmethod = "default"
-    self.configkeeptargetdistance = false
-    self.configmobs = "default"
-    self.configpushlagcompensation = true
-    self.configpushmasschecking = true
-    self.configtargetdistance = 2.5
-end
 
 --
 -- Debugging-related
@@ -833,6 +805,45 @@ function KeepFollowing:StopPushing()
         self.starttime = nil
         self:ClearPushingThread()
     end
+end
+
+function KeepFollowing:DoInit(inst)
+    -- general
+    self.inst = inst
+    self.isclient = false
+    self.isdst = false
+    self.ismastersim = TheWorld.ismastersim
+    self.leader = nil
+    self.movementpredictionstate = nil
+    self.playercontroller = nil
+    self.starttime = nil
+    self.world = TheWorld
+
+    -- following
+    self.isfollowing = false
+    self.isleadernear = false
+    self.ispaused = false
+    self.leaderpositions = {}
+    self.threadfollowing = nil
+    self.threadpath = nil
+
+    -- pushing
+    self.ispushing = false
+    self.threadpushing = nil
+
+    -- debugging
+    self.debugrequests = 0
+
+    -- replaced by GetModConfigData
+    self.configfollowingmethod = "default"
+    self.configkeeptargetdistance = false
+    self.configmobs = "default"
+    self.configpushlagcompensation = true
+    self.configpushmasschecking = true
+    self.configtargetdistance = 2.5
+
+    -- update
+    inst:StartUpdatingComponent(self)
 end
 
 return KeepFollowing
