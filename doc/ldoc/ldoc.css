@@ -833,6 +833,7 @@ pre {
 pre code {
   background: none;
   border-radius: 0;
+  padding: 0;
 }
 
 #container {
