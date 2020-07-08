@@ -77,11 +77,6 @@ local boolean = {
     { description = "No", data = false }
 }
 
-local mobs = {
-    { description = "Default", data = "default", hover = "Default: a hand-picked list based on prefabs that will suit most players" },
-    { description = "All", data = "all", hover = "All: pretty much anything that moves can be followed and pushed" },
-}
-
 local following_methods = {
     { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
     { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
@@ -112,9 +107,6 @@ configuration_options = {
     AddSection("Keybinds"),
     AddConfig("Action key", "key_action", key_list, "KEY_LSHIFT", "Key used for both following and pushing"),
     AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used in combination with an action key for pushing"),
-
-    AddSection("General"),
-    AddConfig("Mobs", "mobs", mobs, "default", "Which mobs can be followed and pushed?"),
 
     AddSection("Following"),
     AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),

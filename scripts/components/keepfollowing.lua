@@ -32,101 +32,6 @@ local _PAUSE_ACTIONS = {
     { ACTIONS.USEITEM },
 }
 
--- We could have used group tags instead of the mob-specific ones. However, this approach gives more
--- control. Originally the list included only player-friendly mobs but as the mod has matured the
--- list kept growing based on user requests. There are some cases when even following/pushing
--- bosses becomes useful.
---
--- When "Mobs" configuration option is set to "All" this hand-picked list will be ignored.
-local _CAN_BE_LEADER_TAGS = {
-    -- hostile creatures
-    "bat", -- Batilisk
-    "birchnutdrake", -- Birchnutter
-    "bishop",
-    "bishop_nightmare",
-    "firehound",
-    "frog",
-    "ghost",
-    "hound",
-    "icehound",
-    "knight",
-    "knight_nightmare",
-    "lavae",
-    "little_walrus", -- Wee MacTusk
-    "merm",
-    "moonpig", -- Werepig
-    "pigguard", -- Guardian Pig
-    "rook",
-    "rook_nightmare",
-    "slurper",
-    "spat", -- Ewecus
-    "spider",
-    "spider_dropper", -- Dangling Depth Dweller
-    "spider_hider", -- Cave Spider
-    "spider_spitter", -- Spitter
-    "spider_warrior",
-    "tallbird",
-    "walrus", -- MacTusk
-    "warg", -- Varg
-    "worm", -- Depths Worm
-
-    -- boss monsters
-    "bearger",
-    "beequeen",
-    "deerclops",
-    "dragonfly",
-    "klaus",
-    "leif", -- Normal Treeguard
-    "leif_sparse", -- Lumpy Treeguard
-    "minotaur", -- Ancient Guardian
-    "moose", -- Moose/Goose
-    "spiderqueen",
-    "stalker", -- Reanimated Skeleton (Caves)
-    "stalker_atrium", -- Reanimated Skeleton (Ancient Fuelweaver)
-    "stalker_forest", -- Reanimated Skeleton (Forest)
-    "toadstool",
-    "toadstool_dark", -- Misery Toadstool
-
-    -- neutral animals
-    "beefalo",
-    "catcoon",
-    "fruitdragon", -- Saladmander
-    "koalefant",
-    "krampus",
-    "lightninggoat", -- Volt Goat
-    "monkey", -- Splumonkey/Shadow Splumonkey
-    "mossling", -- Mosling
-    "penguin", -- Pengull
-    "pig",
-    "rocky", -- Rock Lobster
-    "slurtle",
-    "snurtle",
-    "teenbird", -- Smallish Tallbird
-
-    -- passive animals
-    "babybeefalo",
-    "berrythief", -- Gobbler
-    "carrat",
-    "chester",
-    "deer",
-    "deer_blue", -- Gem Deer (Blue)
-    "deer_red", -- Gem Deer (Red)
-    "glommer",
-    "grassgekko",
-    "hutch",
-    "lavae_pet", -- Extra-Adorable Lavae
-    "manrabbit", -- Bunnyman/Beardlord
-    "mole",
-    "smallbird",
-
-    -- other
-    "abigail",
-    "balloon",
-    "companion",
-    "critter",
-    "player",
-}
-
 local KeepFollowing = Class(function(self, inst)
     self:DoInit(inst)
 end)
@@ -384,15 +289,7 @@ function KeepFollowing:CanBeLeader(entity)
         return false
     end
 
-    if self.configmobs == "all" then
-        return self:CanBeFollowed(entity)
-    end
-
-    for _, tag in pairs(_CAN_BE_LEADER_TAGS) do
-        if entity:HasTag(tag) then
-            return true
-        end
-    end
+    return self:CanBeFollowed(entity)
 end
 
 function KeepFollowing:SetLeader(entity)
@@ -821,7 +718,6 @@ function KeepFollowing:DoInit(inst)
     -- replaced by GetModConfigData
     self.configfollowingmethod = "default"
     self.configkeeptargetdistance = false
-    self.configmobs = "default"
     self.configpushlagcompensation = true
     self.configpushmasschecking = true
     self.configtargetdistance = 2.5
