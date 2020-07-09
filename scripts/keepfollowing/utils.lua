@@ -11,6 +11,14 @@
 local Utils = {}
 
 --
+-- Helpers
+--
+
+local function DebugString(...)
+    return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugString(...)
+end
+
+--
 -- Debugging
 --
 
@@ -137,6 +145,54 @@ end
 -- @treturn boolean
 function Utils.ChainValidate(src, ...)
     return Utils.ChainGet(src, ...) and true or false
+end
+
+--
+-- Thread
+--
+
+--- Starts a new thread.
+--
+-- Just a convenience wrapper for the `StartThread`.
+--
+-- @tparam string id Thread ID
+-- @tparam function fn Thread function
+-- @tparam function whl While function
+-- @tparam[opt] function init Initialization function
+-- @tparam[opt] function term Termination function
+-- @treturn table
+function Utils.ThreadStart(id, fn, whl, init, term)
+    return StartThread(function()
+        DebugString("Thread started")
+        if init then
+            init()
+        end
+        while whl() do
+            fn()
+        end
+        if term then
+            term()
+        end
+        Utils.ThreadClear()
+    end, id)
+end
+
+--- Clears a thread.
+-- @tparam table thread Thread
+function Utils.ThreadClear(thread)
+    local task = scheduler:GetCurrentTask()
+    if thread or task then
+        if thread and not task then
+            DebugString("[" .. thread.id .. "]", "Thread cleared")
+        else
+            DebugString("Thread cleared")
+        end
+
+        thread = thread ~= nil and thread or task
+        KillThreadsWithID(thread.id)
+        thread:SetList(nil)
+        thread = nil -- luacheck: only
+    end
 end
 
 return Utils
