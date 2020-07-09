@@ -1,11 +1,17 @@
 require "busted.runner"()
 
 describe("KeepFollowing", function()
+    -- setup
+    local match
+
     -- before_each initialization
     local inst
     local KeepFollowing, keepfollowing
 
     setup(function()
+        -- match
+        match = require "luassert.match"
+
         -- debug
         DebugSpyTerm()
         DebugSpyInit(spy)
@@ -23,12 +29,19 @@ describe("KeepFollowing", function()
     before_each(function()
         -- globals
         _G.ACTIONS = {}
-        _G.TheWorld = {}
+        _G.TheWorld = mock({
+            Map = {
+                GetPlatformAtPoint = ReturnValueFn({}),
+            },
+        })
 
         -- initialization
-        inst = {
-            StartUpdatingComponent = spy.new(Empty),
-        }
+        inst = mock({
+            GetPosition = ReturnValueFn({
+                Get = ReturnValuesFn(1, 0, -1),
+            }),
+            StartUpdatingComponent = Empty,
+        })
 
         KeepFollowing = require "components/keepfollowing"
         keepfollowing = KeepFollowing(inst)
@@ -96,6 +109,49 @@ describe("KeepFollowing", function()
 
             it("should have the default fields", function()
                 AssertDefaults(KeepFollowing)
+            end)
+        end)
+    end)
+
+    describe("general", function()
+        describe("IsOnPlatform", function()
+            describe("when the self.world is set", function()
+                local GetPlatformAtPoint
+
+                before_each(function()
+                    GetPlatformAtPoint = keepfollowing.world.Map.GetPlatformAtPoint
+                end)
+
+                it("should call the self.world.Map.GetPlatformAtPoint()", function()
+                    assert.spy(GetPlatformAtPoint).was_called(0)
+                    keepfollowing:IsOnPlatform()
+                    assert.spy(GetPlatformAtPoint).was_called(1)
+                    assert.spy(GetPlatformAtPoint).was_called_with(
+                        match.is_ref(keepfollowing.world.Map),
+                        1,
+                        0,
+                        -1
+                    )
+                end)
+            end)
+
+            describe("when the self.inst is set", function()
+                local GetPosition
+
+                before_each(function()
+                    GetPosition = keepfollowing.inst.GetPosition
+                end)
+
+                it("should call the self.inst.GetPosition()", function()
+                    assert.spy(GetPosition).was_called(0)
+                    keepfollowing:IsOnPlatform()
+                    assert.spy(GetPosition).was_called(1)
+                    assert.spy(GetPosition).was_called_with(match.is_ref(keepfollowing.inst))
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:IsOnPlatform())
+                end)
             end)
         end)
     end)
