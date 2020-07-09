@@ -163,13 +163,18 @@ local function OnPlayerActivated(player, world)
         keepfollowing.modname = modname
         keepfollowing.world = world
 
-        --GetModConfigData
-        keepfollowing.configfollowingmethod = GetModConfigData("following_method")
-        keepfollowing.configkeeptargetdistance = GetModConfigData("keep_target_distance")
-        keepfollowing.configmobs = GetModConfigData("mobs")
-        keepfollowing.configpushlagcompensation = GetModConfigData("push_lag_compensation")
-        keepfollowing.configpushmasschecking = GetModConfigData("push_mass_checking")
-        keepfollowing.configtargetdistance = GetModConfigData("target_distance")
+        -- GetModConfigData
+        local configs = {
+            "following_method",
+            "keep_target_distance",
+            "push_lag_compensation",
+            "push_mass_checking",
+            "target_distance",
+        }
+
+        for _, config in ipairs(configs) do
+            keepfollowing.config[config] = GetModConfigData(config)
+        end
     end
 
     DebugString("Player", player:GetDisplayName(), "activated")

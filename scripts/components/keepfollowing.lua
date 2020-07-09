@@ -259,7 +259,7 @@ function KeepFollowing:CanBePushed(entity)
         return false
     end
 
-    if not self.configpushmasschecking then
+    if not self.config.push_mass_checking then
         return true
     end
 
@@ -382,7 +382,7 @@ local function GetDefaultMethodNextPosition(self, target)
 
         if not self.isleadernear
             and isleadernear
-            or (isleadernear and self.configkeeptargetdistance)
+            or (isleadernear and self.config.keep_target_distance)
         then
             self.leaderpositions = {}
             return self.inst:GetPositionAdjacentTo(self.leader, target)
@@ -401,7 +401,7 @@ local function GetDefaultMethodNextPosition(self, target)
 end
 
 local function GetClosestMethodNextPosition(self, target, isleadernear)
-    if not isleadernear or self.configkeeptargetdistance then
+    if not isleadernear or self.config.keep_target_distance then
         local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
 
         if IsPassable(pos) then
@@ -431,14 +431,14 @@ function KeepFollowing:StartFollowingThread()
         local stuckframes = 0
         local radiusinst = self.inst.Physics:GetRadius()
         local radiusleader = self.leader.Physics:GetRadius()
-        local target = self.configtargetdistance + radiusinst + radiusleader
+        local target = self.config.target_distance + radiusinst + radiusleader
 
         self.isfollowing = true
         self.starttime = os.clock()
 
         self:DebugString("Thread started")
 
-        if self.configfollowingmethod == "default" then
+        if self.config.following_method == "default" then
             self:StartPathThread()
         end
 
@@ -452,7 +452,7 @@ function KeepFollowing:StartFollowingThread()
             buffered = self.inst:GetBufferedAction()
             isleadernear = self.inst:IsNear(self.leader, target)
 
-            if self.configfollowingmethod == "default" then
+            if self.config.following_method == "default" then
                 -- default: player follows a leader step-by-step
                 pos = GetDefaultMethodNextPosition(self, target)
                 if pos then
@@ -483,7 +483,7 @@ function KeepFollowing:StartFollowingThread()
                         end
                     end
                 end
-            elseif self.configfollowingmethod == "closest" then
+            elseif self.config.following_method == "closest" then
                 -- closest: player goes to the closest target point from a leader
                 pos = GetClosestMethodNextPosition(self, target, isleadernear)
                 if pos then
@@ -575,7 +575,7 @@ function KeepFollowing:ClearPathThread()
 end
 
 function KeepFollowing:StartFollowing(leader)
-    if self.configpushlagcompensation and not self.ismastersim then
+    if self.config.push_lag_compensation and not self.ismastersim then
         MovementPredictionOnFollow(self)
     end
 
@@ -657,7 +657,7 @@ function KeepFollowing:ClearPushingThread()
 end
 
 function KeepFollowing:StartPushing(leader)
-    if self.configpushlagcompensation and not self.ismastersim then
+    if self.config.push_lag_compensation and not self.ismastersim then
         MovementPredictionOnPush(self)
     end
 
@@ -667,7 +667,7 @@ function KeepFollowing:StartPushing(leader)
 end
 
 function KeepFollowing:StopPushing()
-    if self.configpushlagcompensation and not self.ismastersim then
+    if self.config.push_lag_compensation and not self.ismastersim then
         MovementPredictionOnStop(self)
     end
 
@@ -689,7 +689,7 @@ end
 
 --- Initializes.
 --
--- Sets empty and default fields and adds debug functions.
+-- Sets empty and default fields and adds debug methods.
 --
 -- @tparam table inst Player instance.
 function KeepFollowing:DoInit(inst)
@@ -721,12 +721,14 @@ function KeepFollowing:DoInit(inst)
     -- debugging
     self.debugrequests = 0
 
-    -- replaced by GetModConfigData
-    self.configfollowingmethod = "default"
-    self.configkeeptargetdistance = false
-    self.configpushlagcompensation = true
-    self.configpushmasschecking = true
-    self.configtargetdistance = 2.5
+    -- config
+    self.config = {
+        following_method = "default",
+        keep_target_distance = false,
+        push_lag_compensation = true,
+        push_mass_checking = true,
+        target_distance = 2.5,
+    }
 
     -- update
     inst:StartUpdatingComponent(self)
