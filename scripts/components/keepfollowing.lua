@@ -40,6 +40,16 @@ end)
 -- Helpers
 --
 
+local function IsOnPlatform(world, inst)
+    if Utils.ChainValidate(world, "Map", "GetPlatformAtPoint")
+        and Utils.ChainValidate(inst, "GetPosition")
+    then
+        return world.Map:GetPlatformAtPoint(Utils.ChainGet(inst:GetPosition(), "Get", true))
+            and true
+            or false
+    end
+end
+
 local function IsPlayerInGame(player)
     return player and player.HUD and not player.HUD:HasInputFocus()
 end
@@ -135,12 +145,10 @@ local function WalkToPosition(self, pos)
     end
 end
 
+--- Checks if the player is on the platform.
+-- @treturn boolean
 function KeepFollowing:IsOnPlatform()
-    if not self.world or not self.inst then
-        return
-    end
-
-    return self.world.Map:GetPlatformAtPoint(self.inst:GetPosition():Get()) and true or false
+    return IsOnPlatform(self.world, self.inst)
 end
 
 function KeepFollowing:Stop()
@@ -208,15 +216,13 @@ function KeepFollowing:MovementPrediction(enable)
 end
 
 --
--- Leader-related
+-- Leader
 --
 
+--- Checks if a leader is on the platform.
+-- @treturn boolean
 function KeepFollowing:IsLeaderOnPlatform()
-    if not self.world or not self.inst then
-        return
-    end
-
-    return self.world.Map:GetPlatformAtPoint(self.leader:GetPosition():Get()) and true or false
+    return IsOnPlatform(self.world, self.leader)
 end
 
 function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
@@ -308,7 +314,7 @@ function KeepFollowing:GetLeader()
 end
 
 --
--- Tent-related
+-- Tent
 --
 
 local function FindClosestInvisiblePlayerInRange(x, y, z, range)
