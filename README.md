@@ -16,42 +16,6 @@ To stop following use `WASD` movement keys, `SPACEBAR` action key or click `LMB`
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
 
-## Supported entities
-
-There are two modes you can choose: **Default** and **All**. This can be set in
-the **Mobs** configuration.
-
-### Default
-
-A hand-picked list based on prefabs that will suit most players. The list will
-change from time to time as the game updates and/or player requests depending on
-usefulness:
-
-- **Hostile Creatures**: Batilisk, Birchnutter, Cave Spider, Clockwork
-  Bishop/Rook/Knight (Damaged), Dangling Depth Dweller, Depths Worm, Ewecus, Frog,
-  Ghost, Guardian Pig, Hound (Blue/Red), Lavae, MacTusk/Wee MacTusk, Merm,
-  Slurper, Spider Warrior, Spider, Spitter, Tallbird, Varg, Werepig.
-
-- **Boss Monsters**: Bearger, Beequeen, Deerclops, Dragonfly, Klaus, Treeguard
-  (Normal/Lumpy), Ancient Guardian, Moose/Goose, Reanimated Skeleton
-  (Caves/Forest/Ancient Fuelweaver), Spider Queen, Toadstool (Misery).
-
-- **Neutral Animals**: Beefalo, Catcoon, Saladmander, Koalefant, Krampus, Volt
-  Goat, Splumonkey (Shadow), Mosling, Pengull, Pig, Rock Lobster, Slurtle,
-  Snurtle, Smallish Tallbird.
-
-- **Passive Animals**: Baby Beefalo, Gobbler, Carrat, Chester, Deer, Gem Deer
-  (Blue/Red), Glommer, Grass Gekko, Hutch, Extra-Adorable Lavae,
-  Bunnyman (Beardlord), Mole, Smallbird.``
-
-- **Other**: Abigail, Balloon, Companion, Critter, Player.
-
-### All
-
-Pretty much anything that moves can be followed and pushed. This option is for
-those who don't want to depend on mobs support updates and want to get maximum
-from this mod.
-
 ## Configuration
 
 Don't like the default behaviour? Choose your own configuration to match your
