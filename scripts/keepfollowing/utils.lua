@@ -98,22 +98,21 @@ function Utils.ChainGet(src, ...)
         end
 
         if execute and previous then
-            local result
             if type(src) == "function" then
-                result = src(previous)
+                return src(previous)
             elseif type(src) == "userdata" or type(src) == "table" then
                 if type(src.value) == "function" then
                     -- netvar
-                    result = src:value()
+                    return src:value()
                 elseif getmetatable(src.value) and getmetatable(src.value).__call then
                     -- netvar (for testing)
-                    result = src.value(src)
+                    return src.value(src)
                 elseif getmetatable(src) and getmetatable(src).__call then
                     -- table acting as a function
-                    result = src(previous)
+                    return src(previous)
                 end
             end
-            return result
+            return
         end
 
         return src
