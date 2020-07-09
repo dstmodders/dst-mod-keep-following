@@ -5,7 +5,7 @@ describe("KeepFollowing", function()
     local match
 
     -- before_each initialization
-    local inst
+    local inst, leader
     local KeepFollowing, keepfollowing
 
     setup(function()
@@ -41,6 +41,12 @@ describe("KeepFollowing", function()
                 Get = ReturnValuesFn(1, 0, -1),
             }),
             StartUpdatingComponent = Empty,
+        })
+
+        leader = mock({
+            GetPosition = ReturnValueFn({
+                Get = ReturnValuesFn(1, 0, -1),
+            }),
         })
 
         KeepFollowing = require "components/keepfollowing"
@@ -115,11 +121,35 @@ describe("KeepFollowing", function()
 
     describe("general", function()
         describe("IsOnPlatform", function()
-            describe("when the self.world is set", function()
-                local GetPlatformAtPoint
+            describe("when some self.world chain fields are missing", function()
+                it("should return nil", function()
+                    AssertChainNil(function()
+                        assert.is_nil(keepfollowing:IsOnPlatform())
+                    end, keepfollowing, "world", "Map", "GetPlatformAtPoint")
+                end)
+            end)
+
+            describe("when some self.inst chain fields are missing", function()
+                it("should return nil", function()
+                    AssertChainNil(function()
+                        assert.is_nil(keepfollowing:IsOnPlatform())
+                    end, keepfollowing, "inst", "GetPosition", "Get")
+                end)
+            end)
+
+            describe("when both self.world and self.leader are set", function()
+                local GetPlatformAtPoint, GetPosition
 
                 before_each(function()
                     GetPlatformAtPoint = keepfollowing.world.Map.GetPlatformAtPoint
+                    GetPosition = keepfollowing.inst.GetPosition
+                end)
+
+                it("should call the self.inst.GetPosition()", function()
+                    assert.spy(GetPosition).was_called(0)
+                    keepfollowing:IsOnPlatform()
+                    assert.spy(GetPosition).was_called(1)
+                    assert.spy(GetPosition).was_called_with(match.is_ref(keepfollowing.inst))
                 end)
 
                 it("should call the self.world.Map.GetPlatformAtPoint()", function()
@@ -133,24 +163,62 @@ describe("KeepFollowing", function()
                         -1
                     )
                 end)
-            end)
-
-            describe("when the self.inst is set", function()
-                local GetPosition
-
-                before_each(function()
-                    GetPosition = keepfollowing.inst.GetPosition
-                end)
-
-                it("should call the self.inst.GetPosition()", function()
-                    assert.spy(GetPosition).was_called(0)
-                    keepfollowing:IsOnPlatform()
-                    assert.spy(GetPosition).was_called(1)
-                    assert.spy(GetPosition).was_called_with(match.is_ref(keepfollowing.inst))
-                end)
 
                 it("should return true", function()
                     assert.is_true(keepfollowing:IsOnPlatform())
+                end)
+            end)
+        end)
+    end)
+
+    describe("leader", function()
+        describe("IsLeaderOnPlatform", function()
+            describe("when some self.world chain fields are missing", function()
+                it("should return nil", function()
+                    AssertChainNil(function()
+                        assert.is_nil(keepfollowing:IsLeaderOnPlatform())
+                    end, keepfollowing, "world", "Map", "GetPlatformAtPoint")
+                end)
+            end)
+
+            describe("when some self.leader chain fields are missing", function()
+                it("should return nil", function()
+                    AssertChainNil(function()
+                        assert.is_nil(keepfollowing:IsLeaderOnPlatform())
+                    end, keepfollowing, "leader", "GetPosition", "Get")
+                end)
+            end)
+
+            describe("when both self.world and self.leader are set", function()
+                local GetPlatformAtPoint, GetPosition
+
+                before_each(function()
+                    GetPlatformAtPoint = keepfollowing.world.Map.GetPlatformAtPoint
+                    keepfollowing.leader = leader
+                    GetPosition = keepfollowing.leader.GetPosition
+                end)
+
+                it("should call the self.leader.GetPosition()", function()
+                    assert.spy(GetPosition).was_called(0)
+                    keepfollowing:IsLeaderOnPlatform()
+                    assert.spy(GetPosition).was_called(1)
+                    assert.spy(GetPosition).was_called_with(match.is_ref(keepfollowing.leader))
+                end)
+
+                it("should call the self.world.Map.GetPlatformAtPoint()", function()
+                    assert.spy(GetPlatformAtPoint).was_called(0)
+                    keepfollowing:IsLeaderOnPlatform()
+                    assert.spy(GetPlatformAtPoint).was_called(1)
+                    assert.spy(GetPlatformAtPoint).was_called_with(
+                        match.is_ref(keepfollowing.world.Map),
+                        1,
+                        0,
+                        -1
+                    )
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:IsLeaderOnPlatform())
                 end)
             end)
         end)
