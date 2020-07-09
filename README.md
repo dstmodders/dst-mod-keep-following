@@ -21,18 +21,18 @@ another player to keep following or pushing him.
 Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
-| Configuration             | Options           | Default   | Description                                                                                   |
-| ------------------------- | ----------------- | --------- | --------------------------------------------------------------------------------------------- |
-| **Action key**            | _[keys]_          | _LShift_  | Key used for both following and pushing                                                       |
-| **Push key**              | _[keys]_          | _LCtrl_   | Key used for pushing in combination with action key. Disabled when "Push with RMB" is enabled |
-| **Push with RMB**         | _Yes/No_          | _No_      | Use RMB in combination with action key for pushing instead                                    |
-| **Push mass checking**    | _Yes/No_          | _Yes_     | Enables/Disables the mass difference checking. Ignored for the ghosts pushing players         |
-| **Push lag compensation** | _Yes/No_          | _Yes_     | Automatically disables lag compensation while pushing and restores the previous state after   |
-| **Following method**      | _Default/Closest_ | _Default_ | Which following method should be used? Ignored when pushing                                   |
-| **Target distance**       | _1.5m/2.5m/3.5m_  | _2.5m_    | How close can you approach the leader? Ignored when pushing                                   |
-| **Keep target distance**  | _Yes/No_          | _No_      | Move away from a leader inside the target distance. Ignored when pushing                      |
-| **Mobs**                  | _Default/All_     | _Default_ | Which mobs can be followed and pushed?                                                        |
-| **Debug**                 | _Yes/No_          | _No_      | Enables/Disables the debug mode                                                               |
+| Configuration             | Default   | Description                                                           |
+| ------------------------- | --------- | --------------------------------------------------------------------- |
+| **Action key**            | _LShift_  | Key used for both following and pushing                               |
+| **Push key**              | _LCtrl_   | Key used in combination with an action key for pushing                |
+| **Following method**      | _Default_ | Which following method should be used?                                |
+| **Target distance**       | _2.5m_    | How close can you approach the leader?                                |
+| **Keep target distance**  | _No_      | Should the follower keep the distance from the leader?                |
+| **Push with RMB**         | _No_      | Should the RMB in combination with an action key be used for pushing? |
+| **Push mass checking**    | _Yes_     | Should the mass difference checking be enabled?                       |
+| **Push lag compensation** | _Yes_     | Should the lag compensation be automatically disabled while pushing?  |
+| **Hide changelog**        | _Yes_     | Should the changelog in the mod description be hidden?                |
+| **Debug**                 | _No_      | Should the debug mode be enabled?                                     |
 
 ## Roadmap
 
