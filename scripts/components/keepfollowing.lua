@@ -418,160 +418,156 @@ local function GetClosestMethodNextPosition(self, target, isleadernear)
     return nil
 end
 
+--- Gets the following state.
+-- @treturn boolean
 function KeepFollowing:IsFollowing()
     return self.leader and self.isfollowing
 end
 
+--- Starts the following thread.
+--
+-- Starts the thread to follow the leader based on the chosen method in the configurations. When the
+-- "default" following method is used it starts the following path thread as well by calling the
+-- `StartFollowingPathThread` to gather path coordinates of a leader.
 function KeepFollowing:StartFollowingThread()
-    self.followingthread = StartThread(function()
-        local buffered, previousbuffered, interrupted
-        local pos, previouspos, isleadernear
-        local stuck
+    local buffered, buffered_prev, interrupted, pos, pos_prev, is_leader_near, stuck
 
-        local stuckframes = 0
-        local radiusinst = self.inst.Physics:GetRadius()
-        local radiusleader = self.leader.Physics:GetRadius()
-        local target = self.config.target_distance + radiusinst + radiusleader
+    local stuck_frames = 0
+    local radius_inst = self.inst.Physics:GetRadius()
+    local radius_leader = self.leader.Physics:GetRadius()
+    local target = self.config.target_distance + radius_inst + radius_leader
 
+    self.followingthread = Utils.ThreadStart(_FOLLOWING_THREAD_ID, function()
+        if not self.leader or not self.leader.entity:IsValid() then
+            self:DebugString("Leader doesn't exist anymore")
+            self:StopFollowing()
+            return
+        end
+
+        buffered = self.inst:GetBufferedAction()
+        is_leader_near = self.inst:IsNear(self.leader, target)
+
+        if self.config.following_method == "default" then
+            -- default: player follows a leader step-by-step
+            pos = GetDefaultMethodNextPosition(self, target)
+            if pos then
+                buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
+
+                if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
+                    WalkToPosition(self, pos)
+                    pos_prev = pos
+                end
+
+                if not self.ispaused then
+                    if not pos_prev or pos ~= pos_prev then
+                        WalkToPosition(self, pos)
+                        pos_prev = pos
+                        stuck = false
+                        stuck_frames = 0
+                    elseif not stuck and pos == pos_prev then
+                        stuck_frames = stuck_frames + 1
+                        if stuck_frames * FRAMES > .5 then
+                            pos_prev = pos
+                            stuck = true
+                        end
+                    elseif stuck and pos == pos_prev and #self.leaderpositions > 1 then
+                        table.remove(self.leaderpositions, 1)
+                    end
+                end
+            end
+        elseif self.config.following_method == "closest" then
+            -- closest: player goes to the closest target point from a leader
+            pos = GetClosestMethodNextPosition(self, target, is_leader_near)
+            if pos then
+                buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
+
+                if interrupted then
+                    WalkToPosition(self, pos)
+                end
+
+                if not self.ispaused
+                    and (not pos_prev or GetDistSqBetweenPositions(pos, pos_prev) > .1)
+                then
+                    WalkToPosition(self, pos)
+                    pos_prev = pos
+                end
+            end
+        end
+
+        self.isleadernear = is_leader_near
+
+        Sleep(FRAMES)
+    end, function()
+        return self.inst and self.inst:IsValid() and self:IsFollowing()
+    end, function()
         self.isfollowing = true
         self.starttime = os.clock()
 
-        self:DebugString("Thread started")
-
         if self.config.following_method == "default" then
-            self:StartPathThread()
+            self:StartFollowingPathThread()
         end
-
-        while self.inst and self.inst:IsValid() and self:IsFollowing() do
-            if not self.leader or not self.leader.entity:IsValid() then
-                self:DebugString("Leader doesn't exist anymore")
-                self:StopFollowing()
-                return
-            end
-
-            buffered = self.inst:GetBufferedAction()
-            isleadernear = self.inst:IsNear(self.leader, target)
-
-            if self.config.following_method == "default" then
-                -- default: player follows a leader step-by-step
-                pos = GetDefaultMethodNextPosition(self, target)
-                if pos then
-                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(
-                        self,
-                        previousbuffered
-                    )
-
-                    if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
-                        WalkToPosition(self, pos)
-                        previouspos = pos
-                    end
-
-                    if not self.ispaused then
-                        if not previouspos or pos ~= previouspos then
-                            WalkToPosition(self, pos)
-                            previouspos = pos
-                            stuck = false
-                            stuckframes = 0
-                        elseif not stuck and pos == previouspos then
-                            stuckframes = stuckframes + 1
-                            if stuckframes * FRAMES > .5 then
-                                previouspos = pos
-                                stuck = true
-                            end
-                        elseif stuck and pos == previouspos and #self.leaderpositions > 1 then
-                            table.remove(self.leaderpositions, 1)
-                        end
-                    end
-                end
-            elseif self.config.following_method == "closest" then
-                -- closest: player goes to the closest target point from a leader
-                pos = GetClosestMethodNextPosition(self, target, isleadernear)
-                if pos then
-                    previousbuffered, interrupted = ThreadInterruptOnPauseAction(
-                        self,
-                        previousbuffered
-                    )
-
-                    if interrupted then
-                        WalkToPosition(self, pos)
-                    end
-
-                    if not self.ispaused
-                        and (not previouspos or GetDistSqBetweenPositions(pos, previouspos) > .1)
-                    then
-                        WalkToPosition(self, pos)
-                        previouspos = pos
-                    end
-                end
-            end
-
-            self.isleadernear = isleadernear
-
-            Sleep(FRAMES)
-        end
-
-        self:ClearFollowingThread()
-    end, _FOLLOWING_THREAD_ID)
+    end, function()
+        self.isfollowing = false
+        self.starttime = nil
+        self:ClearFollowingPathThread()
+    end)
 end
 
+--- Stops the following thread.
+--
+-- Stops the thread started earlier by the `StartFollowingThread`.
 function KeepFollowing:ClearFollowingThread()
-    if self.followingthread then
-        self:DebugString("[" .. self.followingthread.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.followingthread.id)
-        self.followingthread:SetList(nil)
-        self.followingthread = nil
-    end
+    return Utils.ThreadClear(self.followingthread)
 end
 
-function KeepFollowing:StartPathThread()
-    self.followingpaththread = StartThread(function()
-        local pos, previouspos
+--- Starts the following path thread.
+--
+-- Starts the thread to follow the leader based on the following method in the configurations.
+function KeepFollowing:StartFollowingPathThread()
+    local pos, pos_prev
 
-        self:DebugString("Started gathering path coordinates...")
-
-        while self.inst and self.inst:IsValid() and self:IsFollowing() do
-            if not self.leader or not self.leader.entity:IsValid() then
-                self:DebugString("Leader doesn't exist anymore")
-                self:StopFollowing()
-                return
-            end
-
-            pos = self.leader:GetPosition()
-
-            if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
-                pos = GetClosestPosition(self.inst, self.leader)
-            end
-
-            if not previouspos then
-                table.insert(self.leaderpositions, pos)
-                previouspos = pos
-            end
-
-            if IsPassable(pos) == IsPassable(previouspos) then
-                -- 1 is the most optimal value so far
-                if GetDistBetweenPositions(pos, previouspos) > 1
-                    and pos ~= previouspos
-                    and self.leaderpositions[#self.leaderpositions] ~= pos
-                then
-                    table.insert(self.leaderpositions, pos)
-                    previouspos = pos
-                end
-            end
-
-            Sleep(FRAMES)
+    self.followingpaththread = Utils.ThreadStart(_FOLLOWING_PATH_THREAD_ID, function()
+        if not self.leader or not self.leader.entity:IsValid() then
+            self:DebugString("Leader doesn't exist anymore")
+            self:StopFollowing()
+            return
         end
 
-        self:ClearPathThread()
-    end, _FOLLOWING_PATH_THREAD_ID)
+        pos = self.leader:GetPosition()
+
+        if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+            pos = GetClosestPosition(self.inst, self.leader)
+        end
+
+        if not pos_prev then
+            table.insert(self.leaderpositions, pos)
+            pos_prev = pos
+        end
+
+        if IsPassable(pos) == IsPassable(pos_prev) then
+            -- 1 is the most optimal value so far
+            if GetDistBetweenPositions(pos, pos_prev) > 1
+                and pos ~= pos_prev
+                and self.leaderpositions[#self.leaderpositions] ~= pos
+            then
+                table.insert(self.leaderpositions, pos)
+                pos_prev = pos
+            end
+        end
+
+        Sleep(FRAMES)
+    end, function()
+        return self.inst and self.inst:IsValid() and self:IsFollowing()
+    end, function()
+        self:DebugString("Started gathering path coordinates...")
+    end)
 end
 
-function KeepFollowing:ClearPathThread()
-    if self.followingpaththread then
-        self:DebugString("[" .. self.followingpaththread.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.followingpaththread.id)
-        self.followingpaththread:SetList(nil)
-        self.followingpaththread = nil
-    end
+--- Stops the following path thread.
+--
+-- Stops the thread started earlier by the `StartFollowingPathThread`.
+function KeepFollowing:ClearFollowingPathThread()
+    return Utils.ThreadClear(self.followingpaththread)
 end
 
 function KeepFollowing:StartFollowing(leader)
@@ -598,7 +594,7 @@ function KeepFollowing:StopFollowing()
         self.leader = nil
         self.leaderpositions = {}
         self.starttime = nil
-        self:ClearPathThread()
+        self:ClearFollowingPathThread()
         self:ClearFollowingThread()
     end
 end
@@ -607,53 +603,52 @@ end
 -- Pushing
 --
 
+--- Gets the pushing state.
+-- @treturn boolean
 function KeepFollowing:IsPushing()
     return self.leader and self.ispushing
 end
 
+--- Starts the pushing thread.
+--
+-- Starts the thread to push the leader.
 function KeepFollowing:StartPushingThread()
-    self.pushingthread = StartThread(function()
-        local buffered, previousbuffered, interrupted
-        local pos
+    local buffered, buffered_prev, interrupted, pos
 
-        self.ispushing = true
-        self.starttime = os.clock()
-
-        self:DebugString("Thread started")
-
-        while self.inst and self.inst:IsValid() and self:IsPushing() do
-            if not self.leader or not self.leader.entity:IsValid() then
-                self:DebugString("Leader doesn't exist anymore")
-                self:StopPushing()
-                return
-            end
-
-            buffered = self.inst:GetBufferedAction()
-            pos = self.leader:GetPosition()
-
-            previousbuffered, interrupted = ThreadInterruptOnPauseAction(self, previousbuffered)
-            if interrupted
-                or (not buffered and self:IsMovementPredictionEnabled())
-            then
-                WalkToPosition(self, pos)
-            end
-
-            WalkToPosition(self, pos)
-
-            Sleep(FRAMES)
+    self.followingthread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
+        if not self.leader or not self.leader.entity:IsValid() then
+            self:DebugString("Leader doesn't exist anymore")
+            self:StopPushing()
+            return
         end
 
-        self:ClearPushingThread()
-    end, _PUSHING_THREAD_ID)
+        buffered = self.inst:GetBufferedAction()
+        pos = self.leader:GetPosition()
+
+        buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
+        if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
+            WalkToPosition(self, pos)
+        end
+
+        WalkToPosition(self, pos)
+
+        Sleep(FRAMES)
+    end, function()
+        return self.inst and self.inst:IsValid() and self:IsPushing()
+    end, function()
+        self.ispushing = true
+        self.starttime = os.clock()
+    end, function()
+        self.ispushing = false
+        self.starttime = nil
+    end)
 end
 
+--- Stops the pushing thread.
+--
+-- Stops the thread started earlier by the `StartPushingThread`.
 function KeepFollowing:ClearPushingThread()
-    if self.pushingthread then
-        self:DebugString("[" .. self.pushingthread.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.pushingthread.id)
-        self.pushingthread:SetList(nil)
-        self.pushingthread = nil
-    end
+    return Utils.ThreadClear(self.pushingthread)
 end
 
 function KeepFollowing:StartPushing(leader)
