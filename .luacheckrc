@@ -89,7 +89,7 @@ files["scripts/**/*.lua"] = {
         "SendRPCToServer",
         "TheWorld",
 
-        -- project (general)
+        -- project
         "Debug",
     },
     read_globals = {
@@ -111,4 +111,38 @@ files["scripts/**/*.lua"] = {
         "Sleep",
         "StartThread",
     },
+}
+
+files["spec/**/*.lua"] = {
+  max_code_line_length = 100,
+  max_comment_line_length = 250,
+  max_line_length = 100,
+  max_string_line_length = 100,
+
+  -- globals
+  globals = {
+    -- general
+    "Class",
+    "ClassRegistry",
+    "_G",
+    "package",
+
+    -- project
+    "AssertChainNil",
+    "DebugSpyClear",
+    "DebugSpyInit",
+    "DebugSpyTerm",
+    "Empty",
+    "ReturnValueFn",
+    "ReturnValues",
+    "ReturnValuesFn",
+  },
+  read_globals = {
+    -- general
+    "rawget",
+    "setmetatable",
+
+    -- project
+
+  },
 }
