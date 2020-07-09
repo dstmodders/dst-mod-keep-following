@@ -10,8 +10,8 @@
 ----
 local Utils = require "keepfollowing/utils"
 
+local _FOLLOWING_PATH_THREAD_ID = "following_path_thread"
 local _FOLLOWING_THREAD_ID = "following_thread"
-local _PATH_THREAD_ID = "path_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
@@ -423,7 +423,7 @@ function KeepFollowing:IsFollowing()
 end
 
 function KeepFollowing:StartFollowingThread()
-    self.threadfollowing = StartThread(function()
+    self.followingthread = StartThread(function()
         local buffered, previousbuffered, interrupted
         local pos, previouspos, isleadernear
         local stuck
@@ -515,16 +515,16 @@ function KeepFollowing:StartFollowingThread()
 end
 
 function KeepFollowing:ClearFollowingThread()
-    if self.threadfollowing then
-        self:DebugString("[" .. self.threadfollowing.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.threadfollowing.id)
-        self.threadfollowing:SetList(nil)
-        self.threadfollowing = nil
+    if self.followingthread then
+        self:DebugString("[" .. self.followingthread.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.followingthread.id)
+        self.followingthread:SetList(nil)
+        self.followingthread = nil
     end
 end
 
 function KeepFollowing:StartPathThread()
-    self.threadpath = StartThread(function()
+    self.followingpaththread = StartThread(function()
         local pos, previouspos
 
         self:DebugString("Started gathering path coordinates...")
@@ -562,15 +562,15 @@ function KeepFollowing:StartPathThread()
         end
 
         self:ClearPathThread()
-    end, _PATH_THREAD_ID)
+    end, _FOLLOWING_PATH_THREAD_ID)
 end
 
 function KeepFollowing:ClearPathThread()
-    if self.threadpath then
-        self:DebugString("[" .. self.threadpath.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.threadpath.id)
-        self.threadpath:SetList(nil)
-        self.threadpath = nil
+    if self.followingpaththread then
+        self:DebugString("[" .. self.followingpaththread.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.followingpaththread.id)
+        self.followingpaththread:SetList(nil)
+        self.followingpaththread = nil
     end
 end
 
@@ -612,7 +612,7 @@ function KeepFollowing:IsPushing()
 end
 
 function KeepFollowing:StartPushingThread()
-    self.threadpushing = StartThread(function()
+    self.pushingthread = StartThread(function()
         local buffered, previousbuffered, interrupted
         local pos
 
@@ -648,11 +648,11 @@ function KeepFollowing:StartPushingThread()
 end
 
 function KeepFollowing:ClearPushingThread()
-    if self.threadpushing then
-        self:DebugString("[" .. self.threadpushing.id .. "]", "Thread cleared")
-        KillThreadsWithID(self.threadpushing.id)
-        self.threadpushing:SetList(nil)
-        self.threadpushing = nil
+    if self.pushingthread then
+        self:DebugString("[" .. self.pushingthread.id .. "]", "Thread cleared")
+        KillThreadsWithID(self.pushingthread.id)
+        self.pushingthread:SetList(nil)
+        self.pushingthread = nil
     end
 end
 
@@ -707,16 +707,16 @@ function KeepFollowing:DoInit(inst)
     self.world = TheWorld
 
     -- following
+    self.followingpaththread = nil
+    self.followingthread = nil
     self.isfollowing = false
     self.isleadernear = false
     self.ispaused = false
     self.leaderpositions = {}
-    self.threadfollowing = nil
-    self.threadpath = nil
 
     -- pushing
     self.ispushing = false
-    self.threadpushing = nil
+    self.pushingthread = nil
 
     -- debugging
     self.debugrequests = 0
