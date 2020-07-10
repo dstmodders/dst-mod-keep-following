@@ -225,12 +225,16 @@ function KeepFollowing:IsLeaderOnPlatform()
     return IsOnPlatform(self.world, self.leader)
 end
 
+--- Checks if a leader can be followed.
+--
+-- Checks whether an entity is valid and has either a `locomotor` or `balloon` tag.
+--
+-- @tparam EntityScript entity An entity as a potential leader to follow
+-- @treturn boolean
 function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
-    if not entity or (entity.entity and not entity.entity:IsValid()) then
-        return false
-    end
-
-    return entity:HasTag("locomotor") or entity:HasTag("balloon")
+    return Utils.ChainGet(entity, "entity", "IsValid", true)
+        and (entity:HasTag("locomotor") or entity:HasTag("balloon"))
+        or false
 end
 
 function KeepFollowing:CanBePushed(entity)
