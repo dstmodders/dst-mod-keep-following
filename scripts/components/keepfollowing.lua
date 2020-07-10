@@ -50,8 +50,8 @@ local function IsOnPlatform(world, inst)
     end
 end
 
-local function IsPlayerInGame(player)
-    return player and player.HUD and not player.HUD:HasInputFocus()
+local function IsHUDFocused(player)
+    return not Utils.ChainGet(player, "HUD", "HasInputFocus", true)
 end
 
 local function IsPassable(pos)
@@ -152,7 +152,7 @@ function KeepFollowing:IsOnPlatform()
 end
 
 function KeepFollowing:Stop()
-    if IsPlayerInGame(self.inst) then
+    if IsHUDFocused(self.inst) then
         if self:IsFollowing() then
             self:StopFollowing()
         end
@@ -727,6 +727,11 @@ function KeepFollowing:DoInit(inst)
 
     -- update
     inst:StartUpdatingComponent(self)
+
+    -- tests
+    if _G.TEST then
+        self._IsHUDFocused = IsHUDFocused
+    end
 end
 
 return KeepFollowing
