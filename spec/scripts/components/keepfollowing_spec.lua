@@ -18,6 +18,10 @@ describe("KeepFollowing", function()
 
         -- globals
         _G.TEST = true
+        _G.COLLISION = {
+            FLYERS = 2048,
+            SANITY = 4096,
+        }
     end)
 
     teardown(function()
@@ -26,7 +30,8 @@ describe("KeepFollowing", function()
 
         -- globals
         _G.ACTIONS = nil
-        _G.TEST = true
+        _G.COLLISION = nil
+        _G.TEST = false
         _G.TheWorld = nil
     end)
 
@@ -44,6 +49,10 @@ describe("KeepFollowing", function()
             GetPosition = ReturnValueFn({
                 Get = ReturnValuesFn(1, 0, -1),
             }),
+            HasTag = spy.new(ReturnValueFn(false)),
+            Physics = {
+                GetMass = ReturnValueFn(1),
+            },
             StartUpdatingComponent = Empty,
         })
 
@@ -360,6 +369,181 @@ describe("KeepFollowing", function()
 
                     it("should return false", function()
                         assert.is_false(keepfollowing:CanBeFollowed(entity))
+                    end)
+                end)
+            end)
+        end)
+
+        describe("CanBePushed", function()
+            local entity
+
+            before_each(function()
+                entity = {
+                    entity = {
+                        IsValid = spy.new(ReturnValueFn(true)),
+                    },
+                    Physics = {
+                        GetCollisionGroup = spy.new(ReturnValueFn(0)),
+                        GetMass = spy.new(ReturnValueFn(1)),
+                    },
+                    HasTag = spy.new(ReturnValueFn(false)),
+                }
+            end)
+
+            local function TestCollisionGroup(name, group, called)
+                called = called ~= nil and called or 1
+
+                describe("and the passed entity has a " .. name .. " collision group", function()
+                    before_each(function()
+                        entity.Physics.GetCollisionGroup = spy.new(
+                            ReturnValueFn(group)
+                        )
+                    end)
+
+                    it("should call the entity.Physics:GetCollisionGroup()", function()
+                        assert.spy(entity.Physics.GetCollisionGroup).was_called(0)
+                        keepfollowing:CanBePushed(entity)
+                        assert.spy(entity.Physics.GetCollisionGroup).was_called(called)
+                        assert.spy(entity.Physics.GetCollisionGroup).was_called_with(
+                            match.is_ref(entity.Physics)
+                        )
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(keepfollowing:CanBePushed(entity))
+                    end)
+                end)
+            end
+
+            describe("when there is no passed entity", function()
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBePushed())
+                end)
+            end)
+
+            describe("when the entity.Physics is not set", function()
+                before_each(function()
+                    entity.Physics = nil
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBePushed(entity))
+                end)
+            end)
+
+            describe("when the self.inst is not set", function()
+                before_each(function()
+                    keepfollowing.inst = nil
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBePushed(entity))
+                end)
+            end)
+
+            describe('when the self.inst has a "playerghost" tag', function()
+                before_each(function()
+                    keepfollowing.inst.HasTag = spy.new(function(_, tag)
+                        return tag == "playerghost"
+                    end)
+                end)
+
+                it("should call the self.inst:HasTag()", function()
+                    assert.spy(keepfollowing.inst.HasTag).was_called(0)
+                    keepfollowing:CanBePushed(entity)
+                    assert.spy(keepfollowing.inst.HasTag).was_called(1)
+                    assert.spy(keepfollowing.inst.HasTag).was_called_with(
+                        match.is_ref(keepfollowing.inst),
+                        "playerghost"
+                    )
+                end)
+
+                describe('and the passed entity has a "player" tag', function()
+                    before_each(function()
+                        entity.HasTag = spy.new(function(_, tag)
+                            return tag == "player"
+                        end)
+                    end)
+
+                    it("should call the entity:HasTag()", function()
+                        assert.spy(entity.HasTag).was_called(0)
+                        keepfollowing:CanBePushed(entity)
+                        assert.spy(entity.HasTag).was_called(1)
+                        assert.spy(entity.HasTag).was_called_with(match.is_ref(entity), "player")
+                    end)
+
+                    it("should return true", function()
+                        assert.is_true(keepfollowing:CanBePushed(entity))
+                    end)
+                end)
+
+                TestCollisionGroup("FLYERS", _G.COLLISION.FLYERS)
+                TestCollisionGroup("SANITY", _G.COLLISION.SANITY)
+            end)
+
+            describe('when the passed entity has a "bird" tag', function()
+                before_each(function()
+                    entity.HasTag = spy.new(function(_, tag)
+                        return tag == "bird"
+                    end)
+                end)
+
+                it("should call the entity:HasTag()", function()
+                    assert.spy(entity.HasTag).was_called(0)
+                    keepfollowing:CanBePushed(entity)
+                    assert.spy(entity.HasTag).was_called(1)
+                    assert.spy(entity.HasTag).was_called_with(match.is_ref(entity), "bird")
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBePushed(entity))
+                end)
+            end)
+
+            describe('when the mass difference is <= 925', function()
+                before_each(function()
+                    entity.Physics.GetMass = spy.new(ReturnValueFn(1000))
+                    keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(75))
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:CanBePushed(entity))
+                end)
+            end)
+
+            describe('when the mass difference is > 925', function()
+                before_each(function()
+                    entity.Physics.GetMass = spy.new(ReturnValueFn(9999))
+                    keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(75))
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBePushed(entity))
+                end)
+            end)
+
+            describe('when the self.inst mass is 1 (player is a ghost)', function()
+                before_each(function()
+                    keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(1))
+                end)
+
+                describe('and the mass difference is <= 10', function()
+                    before_each(function()
+                        entity.Physics.GetMass = spy.new(ReturnValueFn(10))
+                    end)
+
+                    it("should return true", function()
+                        assert.is_true(keepfollowing:CanBePushed(entity))
+                    end)
+                end)
+
+                describe('and the mass difference is > 10', function()
+                    before_each(function()
+                        entity.Physics.GetMass = spy.new(ReturnValueFn(75))
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(keepfollowing:CanBePushed(entity))
                     end)
                 end)
             end)

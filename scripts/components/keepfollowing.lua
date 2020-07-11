@@ -237,6 +237,10 @@ function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
         or false
 end
 
+--- Checks if a leader can be pushed.
+--
+-- @tparam EntityScript entity An entity as a potential leader to push
+-- @treturn boolean
 function KeepFollowing:CanBePushed(entity)
     if not self.inst or not entity or not entity.Physics then
         return false
@@ -248,18 +252,11 @@ function KeepFollowing:CanBePushed(entity)
         return true
     end
 
-    -- different flyers don't collide with characters
-    if entity.Physics:GetCollisionGroup() == COLLISION.FLYERS then
-        return false
-    end
-
-    -- Shadow Creatures also don't collide with characters
-    if entity.Physics:GetCollisionGroup() == COLLISION.SANITY then
-        return false
-    end
-
-    -- so does birds
-    if entity:HasTag("bird") then
+    local collision_group = Utils.ChainGet(entity, "Physics", "GetCollisionGroup", true)
+    if collision_group == COLLISION.FLYERS -- different flyers don't collide with characters
+        or collision_group == COLLISION.SANITY -- Shadow Creatures also don't collide
+        or entity:HasTag("bird") -- so does birds
+    then
         return false
     end
 
@@ -275,19 +272,19 @@ function KeepFollowing:CanBePushed(entity)
     -- So far the only entities with a high mass that still can be useful to be pushed are bosses
     -- like Bearger or Toadstool. They both have a mass of 1000 which makes a perfect ceil value for
     -- us to disable pushing.
-    local mass = self.inst.Physics:GetMass()
-    local entitymass = entity.Physics:GetMass()
-    local massdiff = math.abs(entitymass - mass)
+    local entity_mass = entity.Physics:GetMass()
+    local inst_mass = self.inst.Physics:GetMass()
+    local mass_diff = math.abs(entity_mass - inst_mass)
 
     -- 925 = 1000 (boss) - 75 (player)
-    if massdiff > 925 then
+    if mass_diff > 925 then
         return false
     end
 
     -- When the player becomes a ghost his mass becomes 1. In that case, we just set the ceil
     -- difference to 10 (there is no point to push something with a mass higher than that) to allow
     -- pushing Frogs, Saladmanders and Critters as they all have a mass of 1.
-    if mass == 1 and massdiff > 10 then
+    if inst_mass == 1 and mass_diff > 10 then
         return false
     end
 
