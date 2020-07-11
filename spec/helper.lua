@@ -118,49 +118,49 @@ function AssertMethodExists(class, fn_name)
     )
 end
 
-function AssertMethodIsMissing(class, fnname)
+function AssertMethodIsMissing(class, fn_name)
     local assert = require 'busted'.assert
     local classname = class.name ~= nil and class.name or "Class"
-    assert.is_nil(class[fnname], string.format("Function %s:%s() exists", classname, fnname))
+    assert.is_nil(class[fn_name], string.format("Function %s:%s() exists", classname, fn_name))
 end
 
-function AssertGetter(class, field, fnname, testdata)
-    testdata = testdata ~= nil and testdata or "test"
+function AssertGetter(class, field, fn_name, test_data)
+    test_data = test_data ~= nil and test_data or "test"
 
     local assert = require 'busted'.assert
-    AssertMethodExists(class, fnname)
+    AssertMethodExists(class, fn_name)
     local classname = class.name ~= nil and class.name or "Class"
-    local fn = class[fnname]
+    local fn = class[fn_name]
 
     local msg = string.format(
         "Getter %s:%s() doesn't return the %s.%s value",
         classname,
-        fnname,
+        fn_name,
         classname,
         field
     )
 
     assert.is_equal(class[field], fn(class), msg)
-    class[field] = testdata
-    assert.is_equal(testdata, fn(class), msg)
+    class[field] = test_data
+    assert.is_equal(test_data, fn(class), msg)
 end
 
-function AssertSetter(class, field, fnname, testdata)
-    testdata = testdata ~= nil and testdata or "test"
+function AssertSetter(class, field, fn_name, test_data)
+    test_data = test_data ~= nil and test_data or "test"
 
     local assert = require 'busted'.assert
-    AssertMethodExists(class, fnname)
+    AssertMethodExists(class, fn_name)
     local classname = class.name ~= nil and class.name or "Class"
-    local fn = class[fnname]
+    local fn = class[fn_name]
 
     local msg = string.format(
         "Setter %s:%s() doesn't set the %s.%s value",
         classname,
-        fnname,
+        fn_name,
         classname,
         field
     )
 
-    fn(class, testdata)
-    assert.is_equal(testdata, class[field], msg)
+    fn(class, test_data)
+    assert.is_equal(test_data, class[field], msg)
 end
