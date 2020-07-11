@@ -108,3 +108,59 @@ function AssertChainNil(fn, src, ...)
         end
     end
 end
+
+function AssertMethodExists(class, fn_name)
+    local assert = require 'busted'.assert
+    local classname = class.name ~= nil and class.name or "Class"
+    assert.is_not_nil(
+        class[fn_name],
+        string.format("Function %s:%s() is missing", classname, fn_name)
+    )
+end
+
+function AssertMethodIsMissing(class, fnname)
+    local assert = require 'busted'.assert
+    local classname = class.name ~= nil and class.name or "Class"
+    assert.is_nil(class[fnname], string.format("Function %s:%s() exists", classname, fnname))
+end
+
+function AssertGetter(class, field, fnname, testdata)
+    testdata = testdata ~= nil and testdata or "test"
+
+    local assert = require 'busted'.assert
+    AssertMethodExists(class, fnname)
+    local classname = class.name ~= nil and class.name or "Class"
+    local fn = class[fnname]
+
+    local msg = string.format(
+        "Getter %s:%s() doesn't return the %s.%s value",
+        classname,
+        fnname,
+        classname,
+        field
+    )
+
+    assert.is_equal(class[field], fn(class), msg)
+    class[field] = testdata
+    assert.is_equal(testdata, fn(class), msg)
+end
+
+function AssertSetter(class, field, fnname, testdata)
+    testdata = testdata ~= nil and testdata or "test"
+
+    local assert = require 'busted'.assert
+    AssertMethodExists(class, fnname)
+    local classname = class.name ~= nil and class.name or "Class"
+    local fn = class[fnname]
+
+    local msg = string.format(
+        "Setter %s:%s() doesn't set the %s.%s value",
+        classname,
+        fnname,
+        classname,
+        field
+    )
+
+    fn(class, testdata)
+    assert.is_equal(testdata, class[field], msg)
+end

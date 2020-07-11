@@ -129,6 +129,10 @@ files["spec/**/*.lua"] = {
 
     -- project
     "AssertChainNil",
+    "AssertGetter",
+    "AssertMethodExists",
+    "AssertMethodIsMissing",
+    "AssertSetter",
     "DebugSpyClear",
     "DebugSpyInit",
     "DebugSpyTerm",
