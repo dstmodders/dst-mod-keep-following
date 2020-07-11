@@ -244,6 +244,29 @@ describe("KeepFollowing", function()
     end)
 
     describe("leader", function()
+        local entity
+
+        before_each(function()
+            entity = {
+                entity = {
+                    IsValid = spy.new(ReturnValueFn(true)),
+                },
+                Physics = {
+                    GetCollisionGroup = spy.new(ReturnValueFn(0)),
+                    GetMass = spy.new(ReturnValueFn(1)),
+                },
+                HasTag = spy.new(ReturnValueFn(false)),
+            }
+        end)
+
+        describe("should have the getter", function()
+            describe("getter", function()
+                it("GetLeader", function()
+                    AssertGetter(keepfollowing, "leader", "GetLeader")
+                end)
+            end)
+        end)
+
         describe("IsLeaderOnPlatform", function()
             describe("when some self.world chain fields are missing", function()
                 it("should return nil", function()
@@ -296,17 +319,6 @@ describe("KeepFollowing", function()
         end)
 
         describe("CanBeFollowed", function()
-            local entity
-
-            before_each(function()
-                entity = {
-                    entity = {
-                        IsValid = spy.new(ReturnValueFn(true)),
-                    },
-                    HasTag = spy.new(ReturnValueFn(false)),
-                }
-            end)
-
             local function TestHasValidTag(tag, result)
                 describe('and has a "' .. tag .. '" tag', function()
                     before_each(function()
@@ -375,21 +387,6 @@ describe("KeepFollowing", function()
         end)
 
         describe("CanBePushed", function()
-            local entity
-
-            before_each(function()
-                entity = {
-                    entity = {
-                        IsValid = spy.new(ReturnValueFn(true)),
-                    },
-                    Physics = {
-                        GetCollisionGroup = spy.new(ReturnValueFn(0)),
-                        GetMass = spy.new(ReturnValueFn(1)),
-                    },
-                    HasTag = spy.new(ReturnValueFn(false)),
-                }
-            end)
-
             local function TestCollisionGroup(name, group, called)
                 called = called ~= nil and called or 1
 
@@ -545,6 +542,64 @@ describe("KeepFollowing", function()
                     it("should return false", function()
                         assert.is_false(keepfollowing:CanBePushed(entity))
                     end)
+                end)
+            end)
+        end)
+
+        describe("CanBeLeader", function()
+            local function TestEntityAndInstAreSame()
+                describe('and the self.inst is the same as the passed entity', function()
+                    before_each(function()
+                        keepfollowing.inst = entity
+                    end)
+
+                    it("shouldn't call the self:CanBeFollowed()", function()
+                        assert.spy(keepfollowing.CanBeFollowed).was_called(0)
+                        keepfollowing:CanBeLeader(entity)
+                        assert.spy(keepfollowing.CanBeFollowed).was_called(0)
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(keepfollowing:CanBeLeader(entity))
+                    end)
+                end)
+            end
+
+            local function TestCanBeFollowedIsCalled()
+                it("should call the self:CanBeFollowed()", function()
+                    assert.spy(keepfollowing.CanBeFollowed).was_called(0)
+                    keepfollowing:CanBeLeader(entity)
+                    assert.spy(keepfollowing.CanBeFollowed).was_called(1)
+                    assert.spy(keepfollowing.CanBeFollowed).was_called_with(
+                        match.is_ref(keepfollowing),
+                        match.is_ref(entity)
+                    )
+                end)
+            end
+
+            describe('when the self:CanBeFollowed() returns true', function()
+                before_each(function()
+                    keepfollowing.CanBeFollowed = spy.new(ReturnValueFn(true))
+                end)
+
+                TestEntityAndInstAreSame()
+                TestCanBeFollowedIsCalled()
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:CanBeLeader(entity))
+                end)
+            end)
+
+            describe('when the self:CanBeFollowed() returns false', function()
+                before_each(function()
+                    keepfollowing.CanBeFollowed = spy.new(ReturnValueFn(false))
+                end)
+
+                TestEntityAndInstAreSame()
+                TestCanBeFollowedIsCalled()
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:CanBeLeader(entity))
                 end)
             end)
         end)

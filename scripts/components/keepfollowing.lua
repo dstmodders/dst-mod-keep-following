@@ -219,6 +219,12 @@ end
 -- Leader
 --
 
+--- Gets the leader.
+-- @treturn EntityScript
+function KeepFollowing:GetLeader()
+    return self.leader
+end
+
 --- Checks if a leader is on the platform.
 -- @treturn boolean
 function KeepFollowing:IsLeaderOnPlatform()
@@ -238,7 +244,6 @@ function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
 end
 
 --- Checks if a leader can be pushed.
---
 -- @tparam EntityScript entity An entity as a potential leader to push
 -- @treturn boolean
 function KeepFollowing:CanBePushed(entity)
@@ -291,12 +296,11 @@ function KeepFollowing:CanBePushed(entity)
     return true
 end
 
+--- Checks if an entity can be a leader.
+-- @tparam EntityScript entity An entity as a potential leader
+-- @treturn boolean
 function KeepFollowing:CanBeLeader(entity)
-    if not entity or not entity.entity:IsValid() or entity == self.inst then
-        return false
-    end
-
-    return self:CanBeFollowed(entity)
+    return entity ~= self.inst and self:CanBeFollowed(entity) or false
 end
 
 function KeepFollowing:SetLeader(entity)
@@ -308,10 +312,6 @@ function KeepFollowing:SetLeader(entity)
             math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
         ))
     end
-end
-
-function KeepFollowing:GetLeader()
-    return self.leader
 end
 
 --
