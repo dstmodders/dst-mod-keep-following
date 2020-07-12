@@ -46,6 +46,9 @@ describe("KeepFollowing", function()
 
         -- initialization
         inst = mock({
+            components = {
+                locomotor = {},
+            },
             GetPosition = ReturnValueFn({
                 Get = ReturnValuesFn(1, 0, -1),
             }),
@@ -238,6 +241,38 @@ describe("KeepFollowing", function()
 
                 it("should return true", function()
                     assert.is_true(keepfollowing:IsOnPlatform())
+                end)
+            end)
+        end)
+    end)
+
+    describe("movement prediction", function()
+        describe("IsMovementPrediction", function()
+            describe("when some chain fields are missing", function()
+                it("should return false", function()
+                    AssertChainNil(function()
+                        assert.is_false(keepfollowing:IsMovementPrediction())
+                    end, keepfollowing, "inst", "components", "locomotor")
+                end)
+            end)
+
+            describe("when the self.inst locomotor component is available", function()
+                before_each(function()
+                    keepfollowing.inst.components.locomotor = {}
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:IsMovementPrediction())
+                end)
+            end)
+
+            describe("when the self.inst locomotor component is not available", function()
+                before_each(function()
+                    keepfollowing.inst.components.locomotor = nil
+                end)
+
+                it("should return true", function()
+                    assert.is_false(keepfollowing:IsMovementPrediction())
                 end)
             end)
         end)

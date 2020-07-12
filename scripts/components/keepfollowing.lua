@@ -92,10 +92,6 @@ local function GetPauseAction(action)
     return nil
 end
 
---
--- General
---
-
 local function ThreadInterruptOnPauseAction(self, previousbuffered)
     local pauseaction, pauseactiontime
 
@@ -112,7 +108,7 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
                 Sleep(FRAMES / FRAMES * pauseactiontime)
             end
         end
-    elseif not self:IsMovementPredictionEnabled() then
+    elseif not self:IsMovementPrediction() then
         if not self.inst:HasTag("ignorewalkableplatforms")
             and (self.playercontroller:IsBusy() or self.inst.replica.builder:IsBusy())
             and not self.inst.replica.inventory:GetActiveItem()
@@ -145,6 +141,10 @@ local function WalkToPosition(self, pos)
     end
 end
 
+--
+-- General
+--
+
 --- Checks if the player is on the platform.
 -- @treturn boolean
 function KeepFollowing:IsOnPlatform()
@@ -169,7 +169,7 @@ end
 
 local function MovementPredictionOnPush(self)
     self:DebugString("Checking movement prediction current state...")
-    local state = self:IsMovementPredictionEnabled()
+    local state = self:IsMovementPrediction()
     self:DebugString("Current state:", state and "enabled" or "disabled")
 
     if self.movementpredictionstate == nil then
@@ -196,8 +196,10 @@ local function MovementPredictionOnStop(self)
     self.movementpredictionstate = nil
 end
 
-function KeepFollowing:IsMovementPredictionEnabled()
-    return self.inst.components.locomotor ~= nil
+--- Checks if the movement prediction is enabled.
+-- @treturn boolean
+function KeepFollowing:IsMovementPrediction()
+    return Utils.ChainGet(self, "inst", "components", "locomotor") ~= nil
 end
 
 function KeepFollowing:MovementPrediction(enable)
@@ -454,7 +456,7 @@ function KeepFollowing:StartFollowingThread()
             if pos then
                 buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
 
-                if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
+                if interrupted or (not buffered and self:IsMovementPrediction()) then
                     WalkToPosition(self, pos)
                     pos_prev = pos
                 end
@@ -627,7 +629,7 @@ function KeepFollowing:StartPushingThread()
         pos = self.leader:GetPosition()
 
         buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-        if interrupted or (not buffered and self:IsMovementPredictionEnabled()) then
+        if interrupted or (not buffered and self:IsMovementPrediction()) then
             WalkToPosition(self, pos)
         end
 
