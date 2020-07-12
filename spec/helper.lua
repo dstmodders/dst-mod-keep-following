@@ -53,10 +53,10 @@ function DebugSpyInit(spy)
         "DebugTerm",
     }
 
-    _G.Debug = require "keepfollowing/debug"
+    _G.KeepFollowingDebug = require "keepfollowing/debug"
     for _, method in pairs(methods) do
         if not _DEBUG_SPY[method] then
-            _DEBUG_SPY[method] = spy.on(_G.Debug, method)
+            _DEBUG_SPY[method] = spy.on(_G.KeepFollowingDebug, method)
         end
     end
 end
@@ -65,7 +65,7 @@ function DebugSpyTerm()
     for name, _ in pairs(_DEBUG_SPY) do
         _DEBUG_SPY[name] = nil
     end
-    _G.Debug = nil
+    _G.KeepFollowingDebug = nil
 end
 
 function DebugSpyClear(name)
@@ -80,6 +80,28 @@ function DebugSpyClear(name)
             method:clear()
         end
     end
+end
+
+function DebugSpy(name)
+    for _name, method in pairs(_DEBUG_SPY) do
+        if _name == name then
+            return method
+        end
+    end
+end
+
+function DebugSpyAssert(name)
+    local assert = require "luassert.assert"
+    return assert.spy(DebugSpy(name))
+end
+
+function DebugSpyAssertWasCalled(name, calls, args)
+    local match = require "luassert.match"
+    calls = calls ~= nil and calls or 0
+    if calls > 0 then
+        DebugSpyAssert(name).was_called(calls)
+    end
+    DebugSpyAssert(name).was_called_with(match.is_ref(_G.KeepFollowingDebug), unpack(args))
 end
 
 --
@@ -110,7 +132,7 @@ function AssertChainNil(fn, src, ...)
 end
 
 function AssertMethodExists(class, fn_name)
-    local assert = require 'busted'.assert
+    local assert = require "busted".assert
     local classname = class.name ~= nil and class.name or "Class"
     assert.is_not_nil(
         class[fn_name],
@@ -119,7 +141,7 @@ function AssertMethodExists(class, fn_name)
 end
 
 function AssertMethodIsMissing(class, fn_name)
-    local assert = require 'busted'.assert
+    local assert = require "busted".assert
     local classname = class.name ~= nil and class.name or "Class"
     assert.is_nil(class[fn_name], string.format("Function %s:%s() exists", classname, fn_name))
 end
@@ -127,7 +149,7 @@ end
 function AssertGetter(class, field, fn_name, test_data)
     test_data = test_data ~= nil and test_data or "test"
 
-    local assert = require 'busted'.assert
+    local assert = require "busted".assert
     AssertMethodExists(class, fn_name)
     local classname = class.name ~= nil and class.name or "Class"
     local fn = class[fn_name]
@@ -148,7 +170,7 @@ end
 function AssertSetter(class, field, fn_name, test_data)
     test_data = test_data ~= nil and test_data or "test"
 
-    local assert = require 'busted'.assert
+    local assert = require "busted".assert
     AssertMethodExists(class, fn_name)
     local classname = class.name ~= nil and class.name or "Class"
     local fn = class[fn_name]
