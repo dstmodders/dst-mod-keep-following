@@ -17,11 +17,19 @@ describe("KeepFollowing", function()
         DebugSpyInit(spy)
 
         -- globals
-        _G.TEST = true
+        _G.ACTIONS = {
+            WALKTO = {
+                code = 163,
+            },
+        }
         _G.COLLISION = {
             FLYERS = 2048,
             SANITY = 4096,
         }
+        _G.RPC = {
+            LeftClick = {},
+        }
+        _G.TEST = true
     end)
 
     teardown(function()
@@ -31,13 +39,14 @@ describe("KeepFollowing", function()
         -- globals
         _G.ACTIONS = nil
         _G.COLLISION = nil
+        _G.SendRPCToServer = nil
         _G.TEST = false
         _G.TheWorld = nil
     end)
 
     before_each(function()
         -- globals
-        _G.ACTIONS = {}
+        _G.SendRPCToServer = spy.new(Empty)
         _G.TheWorld = mock({
             Map = {
                 GetPlatformAtPoint = ReturnValueFn({}),
@@ -47,8 +56,11 @@ describe("KeepFollowing", function()
         -- initialization
         inst = mock({
             components = {
-                locomotor = {},
+                locomotor = {
+                    Stop = Empty,
+                },
             },
+            EnableMovementPrediction = ReturnValueFn(Empty),
             GetPosition = ReturnValueFn({
                 Get = ReturnValuesFn(1, 0, -1),
             }),
@@ -57,6 +69,9 @@ describe("KeepFollowing", function()
                 GetMass = ReturnValueFn(1),
             },
             StartUpdatingComponent = Empty,
+            Transform = {
+                GetWorldPosition = ReturnValuesFn(1, 0, -1),
+            },
         })
 
         leader = mock({
@@ -247,6 +262,105 @@ describe("KeepFollowing", function()
     end)
 
     describe("movement prediction", function()
+        local function TestMovementPrediction(enable_fn, disable_fn, inst_fn)
+            local _inst
+
+            before_each(function()
+                _inst = inst_fn()
+            end)
+
+            describe("when enabling", function()
+                it("should call the SendRPCToServer()", function()
+                    assert.spy(_G.SendRPCToServer).was_called(0)
+                    enable_fn()
+                    assert.spy(_G.SendRPCToServer).was_called(1)
+                    assert.spy(_G.SendRPCToServer).was_called_with(
+                        match.is_ref(_G.RPC.LeftClick),
+                        _G.ACTIONS.WALKTO.code,
+                        1,
+                        -1
+                    )
+                end)
+
+                it("should call the inst:EnableMovementPrediction() with true", function()
+                    assert.spy(_inst.EnableMovementPrediction).was_called(0)
+                    enable_fn()
+                    assert.spy(_inst.EnableMovementPrediction).was_called(1)
+                    assert.spy(_inst.EnableMovementPrediction).was_called_with(
+                        match.is_ref(_inst),
+                        true
+                    )
+                end)
+
+                it("should return true", function()
+                    assert.is_true(enable_fn())
+                end)
+            end)
+
+            describe("when disabling", function()
+                it("shouldn't call the SendRPCToServer()", function()
+                    assert.spy(_G.SendRPCToServer).was_called(0)
+                    disable_fn()
+                    assert.spy(_G.SendRPCToServer).was_called(0)
+                end)
+
+                it("should call the locomotor:Stop()", function()
+                    assert.spy(_inst.components.locomotor.Stop).was_called(0)
+                    disable_fn()
+                    assert.spy(_inst.components.locomotor.Stop).was_called(1)
+                    assert.spy(_inst.components.locomotor.Stop).was_called_with(
+                        match.is_ref(_inst.components.locomotor)
+                    )
+                end)
+
+                it("should call the inst:EnableMovementPrediction() with false", function()
+                    assert.spy(_inst.EnableMovementPrediction).was_called(0)
+                    disable_fn()
+                    assert.spy(_inst.EnableMovementPrediction).was_called(1)
+                    assert.spy(_inst.EnableMovementPrediction).was_called_with(
+                        match.is_ref(_inst),
+                        false
+                    )
+                end)
+
+                it("should return false", function()
+                    assert.is_false(disable_fn())
+                end)
+            end)
+        end
+
+        describe("local", function()
+            local _inst
+
+            before_each(function()
+                _inst = mock({
+                    components = {
+                        locomotor = {
+                            Stop = Empty,
+                        },
+                    },
+                    EnableMovementPrediction = ReturnValueFn(Empty),
+                    Transform = {
+                        GetWorldPosition = ReturnValuesFn(1, 0, -1),
+                    },
+                })
+            end)
+
+            describe("MovementPrediction", function()
+                local enable_fn = function()
+                    return keepfollowing._MovementPrediction(_inst, true)
+                end
+
+                local disable_fn = function()
+                    return keepfollowing._MovementPrediction(_inst, false)
+                end
+
+                TestMovementPrediction(enable_fn, disable_fn, function()
+                    return _inst
+                end)
+            end)
+        end)
+
         describe("IsMovementPrediction", function()
             describe("when some chain fields are missing", function()
                 it("should return false", function()
@@ -273,6 +387,39 @@ describe("KeepFollowing", function()
 
                 it("should return true", function()
                     assert.is_false(keepfollowing:IsMovementPrediction())
+                end)
+            end)
+        end)
+
+        describe("MovementPrediction", function()
+            local enable_fn = function()
+                return keepfollowing:MovementPrediction(true)
+            end
+
+            local disable_fn = function()
+                return keepfollowing:MovementPrediction(false)
+            end
+
+            TestMovementPrediction(enable_fn, disable_fn, function()
+                return keepfollowing.inst
+            end)
+
+            describe("when enabling", function()
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    enable_fn()
+                    DebugSpyAssertWasCalled("DebugString", 1, { "Movement prediction:", "enabled" })
+                end)
+            end)
+
+            describe("when disabling", function()
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    disable_fn()
+                    DebugSpyAssertWasCalled("DebugString", 1, {
+                        "Movement prediction:",
+                        "disabled"
+                    })
                 end)
             end)
         end)

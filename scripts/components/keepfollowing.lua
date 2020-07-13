@@ -167,6 +167,19 @@ end
 -- Movement prediction
 --
 
+local function MovementPrediction(inst, enable)
+    if enable then
+        local x, _, z = inst.Transform:GetWorldPosition()
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
+        inst:EnableMovementPrediction(true)
+        return true
+    elseif inst.components and inst.components.locomotor then
+        inst.components.locomotor:Stop()
+        inst:EnableMovementPrediction(false)
+        return false
+    end
+end
+
 local function MovementPredictionOnPush(self)
     self:DebugString("Checking movement prediction current state...")
     local state = self:IsMovementPrediction()
@@ -202,19 +215,13 @@ function KeepFollowing:IsMovementPrediction()
     return Utils.ChainGet(self, "inst", "components", "locomotor") ~= nil
 end
 
+--- Enables/Disables the movement prediction.
+-- @tparam boolean enable
+-- @treturn boolean
 function KeepFollowing:MovementPrediction(enable)
-    if enable then
-        local x, _, z = self.inst.Transform:GetWorldPosition()
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
-        self.inst:EnableMovementPrediction(true)
-        self:DebugString("Movement prediction: enabled")
-        return true
-    elseif self.inst.components and self.inst.components.locomotor then
-        self.inst.components.locomotor:Stop()
-        self.inst:EnableMovementPrediction(false)
-        self:DebugString("Movement prediction: disabled")
-        return false
-    end
+    local is_enabled = MovementPrediction(self.inst, enable)
+    self:DebugString("Movement prediction:", is_enabled and "enabled" or "disabled")
+    return is_enabled
 end
 
 --
@@ -734,6 +741,7 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.TEST then
         self._IsHUDFocused = IsHUDFocused
+        self._MovementPrediction = MovementPrediction
     end
 end
 
