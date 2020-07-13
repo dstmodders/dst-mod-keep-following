@@ -22,6 +22,23 @@ describe("KeepFollowing", function()
                 code = 163,
             },
         }
+        _G.AllPlayers = {
+            {
+                GUID = 100000,
+                entity = { IsVisible = spy.new(ReturnValueFn(false)) },
+                GetDistanceSqToPoint = spy.new(ReturnValueFn(27)),
+            },
+            {
+                GUID = 100001,
+                entity = { IsVisible = spy.new(ReturnValueFn(false)) },
+                GetDistanceSqToPoint = spy.new(ReturnValueFn(9)),
+            },
+            {
+                GUID = 100002,
+                entity = { IsVisible = spy.new(ReturnValueFn(true)) },
+                GetDistanceSqToPoint = spy.new(ReturnValueFn(9)),
+            },
+        }
         _G.COLLISION = {
             FLYERS = 2048,
             SANITY = 4096,
@@ -38,6 +55,7 @@ describe("KeepFollowing", function()
 
         -- globals
         _G.ACTIONS = nil
+        _G.AllPlayers = nil
         _G.COLLISION = nil
         _G.SendRPCToServer = nil
         _G.TEST = false
@@ -883,6 +901,29 @@ describe("KeepFollowing", function()
 
                 it("should return false", function()
                     assert.is_false(keepfollowing:CanBeLeader(entity))
+                end)
+            end)
+        end)
+    end)
+
+    describe("tent", function()
+        describe("local FindClosestInvisiblePlayerInRange", function()
+            describe("when there is an invisible player in the range", function()
+                it("should return the player and the squared range", function()
+                    local closest, range_sq = keepfollowing
+                        ._FindClosestInvisiblePlayerInRange(1, 0, -1, 27)
+                    assert.is_equal(100001, closest.GUID)
+                    assert.is_equal(9, range_sq)
+                    assert.is_false(closest.entity:IsVisible())
+                end)
+            end)
+
+            describe("when there is no invisible player in the range", function()
+                it("should return nil values", function()
+                    local closest, range_sq = keepfollowing
+                        ._FindClosestInvisiblePlayerInRange(1, 0, -1, 3)
+                    assert.is_nil(closest)
+                    assert.is_nil(range_sq)
                 end)
             end)
         end)

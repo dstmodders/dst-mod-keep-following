@@ -331,20 +331,18 @@ end
 --
 
 local function FindClosestInvisiblePlayerInRange(x, y, z, range)
-    local closestPlayer
-    local rangesq = range * range
-
+    local closest, dist_sq
+    local range_sq = range * range
     for _, v in ipairs(AllPlayers) do
         if not v.entity:IsVisible() then
-            local distsq = v:GetDistanceSqToPoint(x, y, z)
-            if distsq < rangesq then
-                rangesq = distsq
-                closestPlayer = v
+            dist_sq = v:GetDistanceSqToPoint(x, y, z)
+            if dist_sq < range_sq then
+                range_sq = dist_sq
+                closest = v
             end
         end
     end
-
-    return closestPlayer, closestPlayer ~= nil and rangesq or nil
+    return closest, closest ~= nil and range_sq or nil
 end
 
 function KeepFollowing:GetTentSleeper(entity)
@@ -743,6 +741,7 @@ function KeepFollowing:DoInit(inst)
 
     -- tests
     if _G.TEST then
+        self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
         self._IsHUDFocused = IsHUDFocused
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
