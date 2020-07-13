@@ -54,8 +54,11 @@ local function IsHUDFocused(player)
     return not Utils.ChainGet(player, "HUD", "HasInputFocus", true)
 end
 
-local function IsPassable(pos)
-    return TheWorld.Map:IsPassableAtPoint(pos:Get())
+local function IsPassable(world, pos)
+    return Utils.ChainValidate(world, "Map", "IsPassableAtPoint")
+        and Utils.ChainValidate(pos, "Get")
+        and world.Map:IsPassableAtPoint(pos:Get())
+        or false
 end
 
 local function GetClosestPosition(entity1, entity2)
@@ -414,7 +417,7 @@ local function GetClosestMethodNextPosition(self, target, isleadernear)
     if not isleadernear or self.config.keep_target_distance then
         local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
 
-        if IsPassable(pos) then
+        if IsPassable(self.world, pos) then
             return pos
         end
 
@@ -554,7 +557,7 @@ function KeepFollowing:StartFollowingPathThread()
             pos_prev = pos
         end
 
-        if IsPassable(pos) == IsPassable(pos_prev) then
+        if IsPassable(self.world, pos) == IsPassable(self.world, pos_prev) then
             -- 1 is the most optimal value so far
             if GetDistBetweenPositions(pos, pos_prev) > 1
                 and pos ~= pos_prev
@@ -742,6 +745,7 @@ function KeepFollowing:DoInit(inst)
     if _G.TEST then
         self._IsHUDFocused = IsHUDFocused
         self._IsOnPlatform = IsOnPlatform
+        self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
     end
 end
