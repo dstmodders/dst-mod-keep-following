@@ -315,14 +315,21 @@ function KeepFollowing:CanBeLeader(entity)
     return entity ~= self.inst and self:CanBeFollowed(entity) or false
 end
 
+--- Sets an entity as a leader.
+--
+-- Verifies if the passed entity can become a leader using the `CanBeLeader` and sets it.
+--
+-- @tparam EntityScript entity An entity as a potential leader
+-- @treturn EntityScript A leader that has been set
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
         self:DebugString(string.format(
             "New leader: %s. Distance: %0.2f",
-            self.leader:GetDisplayName(),
-            math.sqrt(self.inst:GetDistanceSqToPoint(self.leader:GetPosition()))
+            entity:GetDisplayName(),
+            math.sqrt(self.inst:GetDistanceSqToPoint(entity:GetPosition()))
         ))
+        return entity
     end
 end
 

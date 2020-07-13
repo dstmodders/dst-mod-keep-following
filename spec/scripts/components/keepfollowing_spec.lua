@@ -87,6 +87,7 @@ describe("KeepFollowing", function()
                 },
             },
             EnableMovementPrediction = ReturnValueFn(Empty),
+            GetDistanceSqToPoint = ReturnValueFn(9),
             GetPosition = ReturnValueFn({
                 Get = ReturnValuesFn(1, 0, -1),
             }),
@@ -556,16 +557,18 @@ describe("KeepFollowing", function()
         local entity
 
         before_each(function()
-            entity = {
+            entity = mock({
                 entity = {
-                    IsValid = spy.new(ReturnValueFn(true)),
+                    IsValid = ReturnValueFn(true),
                 },
+                GetDisplayName = ReturnValueFn("Wilson"),
+                GetPosition = ReturnValuesFn(1, 0, -1),
                 Physics = {
-                    GetCollisionGroup = spy.new(ReturnValueFn(0)),
-                    GetMass = spy.new(ReturnValueFn(1)),
+                    GetCollisionGroup = ReturnValueFn(0),
+                    GetMass = ReturnValueFn(1),
                 },
-                HasTag = spy.new(ReturnValueFn(false)),
-            }
+                HasTag = ReturnValueFn(false),
+            })
         end)
 
         describe("should have the getter", function()
@@ -909,6 +912,58 @@ describe("KeepFollowing", function()
 
                 it("should return false", function()
                     assert.is_false(keepfollowing:CanBeLeader(entity))
+                end)
+            end)
+        end)
+
+        describe("SetLeader", function()
+            before_each(function()
+                keepfollowing.inst.GetDistanceSqToPoint = ReturnValueFn(9)
+            end)
+
+            describe("when an entity can become a leader", function()
+                before_each(function()
+                    keepfollowing.CanBeLeader = spy.new(ReturnValueFn(true))
+                end)
+
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:SetLeader(entity)
+                    DebugSpyAssertWasCalled("DebugString", 1, {
+                        "New leader: Wilson. Distance: 3.00",
+                    })
+                end)
+
+                it("should set the self.leader", function()
+                    assert.is_nil(keepfollowing.leader)
+                    keepfollowing:SetLeader(entity)
+                    assert.is_equal(entity, keepfollowing.leader)
+                end)
+
+                it("should return the passed entity", function()
+                    assert.is_equal(entity, keepfollowing:SetLeader(entity))
+                end)
+            end)
+
+            describe("when an entity can't become a leader", function()
+                before_each(function()
+                    keepfollowing.CanBeLeader = spy.new(ReturnValueFn(false))
+                end)
+
+                it("shouldn't debug string", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:SetLeader(entity)
+                    DebugSpyAssertWasCalled("DebugString", 0)
+                end)
+
+                it("shouldn't set the self.leader", function()
+                    assert.is_nil(keepfollowing.leader)
+                    keepfollowing:SetLeader(entity)
+                    assert.is_nil(keepfollowing.leader)
+                end)
+
+                it("should return nil", function()
+                    assert.is_nil(keepfollowing:SetLeader(entity))
                 end)
             end)
         end)
