@@ -741,6 +741,7 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.TEST then
         self._IsHUDFocused = IsHUDFocused
+        self._IsOnPlatform = IsOnPlatform
         self._MovementPrediction = MovementPrediction
     end
 end

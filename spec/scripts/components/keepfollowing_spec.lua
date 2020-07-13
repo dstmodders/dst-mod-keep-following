@@ -155,7 +155,90 @@ describe("KeepFollowing", function()
         end)
     end)
 
+    local function TestIsOnPlatform(fn, world_fn, inst_fn)
+        local world, _inst
+
+        before_each(function()
+            world = world_fn()
+            _inst = inst_fn()
+        end)
+
+        describe("when some of the world chain fields are missing", function()
+            it("should return nil", function()
+                AssertChainNil(function()
+                    fn()
+                end, world, "Map", "GetPlatformAtPoint")
+            end)
+        end)
+
+        describe("when some of the inst chain fields are missing", function()
+            it("should return nil", function()
+                AssertChainNil(function()
+                    fn()
+                end, _inst, "GetPosition", "Get")
+            end)
+        end)
+
+        describe("when both world and inst are set", function()
+            local GetPlatformAtPoint, GetPosition
+
+            before_each(function()
+                GetPlatformAtPoint = world.Map.GetPlatformAtPoint
+                GetPosition = _inst.GetPosition
+            end)
+
+            it("should call the self.inst.GetPosition()", function()
+                assert.spy(GetPosition).was_called(0)
+                fn()
+                assert.spy(GetPosition).was_called(1)
+                assert.spy(GetPosition).was_called_with(match.is_ref(_inst))
+            end)
+
+            it("should call the self.world.Map.GetPlatformAtPoint()", function()
+                assert.spy(GetPlatformAtPoint).was_called(0)
+                fn()
+                assert.spy(GetPlatformAtPoint).was_called(1)
+                assert.spy(GetPlatformAtPoint).was_called_with(
+                    match.is_ref(world.Map),
+                    1,
+                    0,
+                    -1
+                )
+            end)
+
+            it("should return true", function()
+                fn()
+            end)
+        end)
+    end
+
     describe("helper", function()
+        describe("IsOnPlatform", function()
+            local world, _inst
+
+            before_each(function()
+                world = mock({
+                    Map = {
+                        GetPlatformAtPoint = ReturnValueFn({}),
+                    },
+                })
+
+                _inst = mock({
+                    GetPosition = ReturnValueFn({
+                        Get = ReturnValuesFn(1, 0, -1),
+                    }),
+                })
+            end)
+
+            TestIsOnPlatform(function()
+                return keepfollowing._IsOnPlatform(world, _inst)
+            end, function()
+                return world
+            end, function()
+                return _inst
+            end)
+        end)
+
         describe("IsHUDFocused", function()
             local player
 
@@ -215,54 +298,12 @@ describe("KeepFollowing", function()
     end)
 
     describe("general", function()
-        describe("IsOnPlatform", function()
-            describe("when some self.world chain fields are missing", function()
-                it("should return nil", function()
-                    AssertChainNil(function()
-                        assert.is_nil(keepfollowing:IsOnPlatform())
-                    end, keepfollowing, "world", "Map", "GetPlatformAtPoint")
-                end)
-            end)
-
-            describe("when some self.inst chain fields are missing", function()
-                it("should return nil", function()
-                    AssertChainNil(function()
-                        assert.is_nil(keepfollowing:IsOnPlatform())
-                    end, keepfollowing, "inst", "GetPosition", "Get")
-                end)
-            end)
-
-            describe("when both self.world and self.leader are set", function()
-                local GetPlatformAtPoint, GetPosition
-
-                before_each(function()
-                    GetPlatformAtPoint = keepfollowing.world.Map.GetPlatformAtPoint
-                    GetPosition = keepfollowing.inst.GetPosition
-                end)
-
-                it("should call the self.inst.GetPosition()", function()
-                    assert.spy(GetPosition).was_called(0)
-                    keepfollowing:IsOnPlatform()
-                    assert.spy(GetPosition).was_called(1)
-                    assert.spy(GetPosition).was_called_with(match.is_ref(keepfollowing.inst))
-                end)
-
-                it("should call the self.world.Map.GetPlatformAtPoint()", function()
-                    assert.spy(GetPlatformAtPoint).was_called(0)
-                    keepfollowing:IsOnPlatform()
-                    assert.spy(GetPlatformAtPoint).was_called(1)
-                    assert.spy(GetPlatformAtPoint).was_called_with(
-                        match.is_ref(keepfollowing.world.Map),
-                        1,
-                        0,
-                        -1
-                    )
-                end)
-
-                it("should return true", function()
-                    assert.is_true(keepfollowing:IsOnPlatform())
-                end)
-            end)
+        TestIsOnPlatform(function()
+            return keepfollowing:IsOnPlatform()
+        end, function()
+            return keepfollowing.world
+        end, function()
+            return keepfollowing.inst
         end)
     end)
 
