@@ -111,22 +111,27 @@ describe("KeepFollowing", function()
             assert.is_equal(_G.TheWorld, self.world)
 
             -- following
+            assert.is_nil(self.followingpaththread)
+            assert.is_nil(self.followingthread)
             assert.is_false(self.isfollowing)
             assert.is_false(self.isleadernear)
             assert.is_false(self.ispaused)
             assert.is_same({}, self.leaderpositions)
-            assert.is_nil(self.threadfollowing)
-            assert.is_nil(self.threadpath)
 
             -- pushing
             assert.is_false(self.ispushing)
-            assert.is_nil(self.threadpushing)
+            assert.is_nil(self.pushingthread)
 
-            -- upvalues
-            assert.is_nil(self.weathermoisturefloor)
-            assert.is_nil(self.weathermoisturerate)
-            assert.is_nil(self.weatherpeakprecipitationrate)
-            assert.is_nil(self.weatherwetrate)
+            -- debugging
+            assert.is_equal(0, self.debugrequests)
+
+            -- config
+            assert.is_table(self.config)
+            assert.is_equal("default", self.config.following_method)
+            assert.is_false(self.config.keep_target_distance)
+            assert.is_true(self.config.push_lag_compensation)
+            assert.is_true(self.config.push_mass_checking)
+            assert.is_equal(2.5, self.config.target_distance)
         end
 
         describe("using the constructor", function()
