@@ -22,23 +22,31 @@ describe("KeepFollowing", function()
                 code = 163,
             },
         }
-        _G.AllPlayers = {
+        _G.AllPlayers = mock({
             {
                 GUID = 100000,
-                entity = { IsVisible = spy.new(ReturnValueFn(false)) },
-                GetDistanceSqToPoint = spy.new(ReturnValueFn(27)),
+                entity = { IsVisible = ReturnValueFn(false) },
+                GetDisplayName = ReturnValueFn("Willow"),
+                GetDistanceSqToPoint = ReturnValueFn(27),
+                HasTag = ReturnValueFn(false),
             },
             {
                 GUID = 100001,
-                entity = { IsVisible = spy.new(ReturnValueFn(false)) },
-                GetDistanceSqToPoint = spy.new(ReturnValueFn(9)),
+                entity = { IsVisible = ReturnValueFn(false) },
+                GetDisplayName = ReturnValueFn("Wilson"),
+                GetDistanceSqToPoint = ReturnValueFn(9),
+                HasTag = function(_, tag)
+                    return tag == "sleeping"
+                end,
             },
             {
                 GUID = 100002,
-                entity = { IsVisible = spy.new(ReturnValueFn(true)) },
-                GetDistanceSqToPoint = spy.new(ReturnValueFn(9)),
+                entity = { IsVisible = ReturnValueFn(true) },
+                GetDisplayName = ReturnValueFn("Wendy"),
+                GetDistanceSqToPoint = ReturnValueFn(9),
+                HasTag = ReturnValueFn(false),
             },
-        }
+        })
         _G.COLLISION = {
             FLYERS = 2048,
             SANITY = 4096,
@@ -924,6 +932,98 @@ describe("KeepFollowing", function()
                         ._FindClosestInvisiblePlayerInRange(1, 0, -1, 3)
                     assert.is_nil(closest)
                     assert.is_nil(range_sq)
+                end)
+            end)
+        end)
+
+        describe("GetTentSleeper", function()
+            local entity
+
+            before_each(function()
+                entity = {
+                    components = {
+                        sleepingbag = {
+                            sleeper = _G.AllPlayers[2],
+                        },
+                    },
+                    GetDisplayName = spy.new(ReturnValueFn("Tent")),
+                    HasTag = spy.new(function(_, tag)
+                        return tag == "tent" or tag == "hassleeper"
+                    end),
+                    Transform = {
+                        GetWorldPosition = ReturnValuesFn(1, 0, -1),
+                    },
+                }
+            end)
+
+            describe('when the "sleepingbag" component is available', function()
+                before_each(function()
+                    entity.components.sleepingbag.sleeper = _G.AllPlayers[2]
+                end)
+
+                describe("and some chain fields are missing", function()
+                    it("should return nil", function()
+                        AssertChainNil(function()
+                            keepfollowing:GetTentSleeper(entity)
+                        end, entity, "components", "sleepingbag", "sleeper")
+                    end)
+                end)
+
+                it("should debug strings", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:GetTentSleeper(entity)
+
+                    DebugSpyAssertWasCalled("DebugString", 2, {
+                        "Component sleepingbag is available",
+                    })
+
+                    DebugSpyAssertWasCalled("DebugString", 2, { "Found sleeper:", "Wilson" })
+                end)
+
+                it("should return sleeper", function()
+                    assert.is_equal(_G.AllPlayers[2], keepfollowing:GetTentSleeper(entity))
+                end)
+            end)
+
+            describe('when the "sleepingbag" component is not available', function()
+                before_each(function()
+                    entity.components.sleepingbag = nil
+                end)
+
+                describe('and the passed entity has no "tent" and "hassleeper" tags', function()
+                    before_each(function()
+                        entity.HasTag = spy.new(ReturnValueFn(false))
+                    end)
+
+                    it("should debug strings", function()
+                        DebugSpyClear("DebugString")
+                        keepfollowing:GetTentSleeper(entity)
+                        DebugSpyAssertWasCalled("DebugString", 1, {
+                            "Component sleepingbag is not available",
+                        })
+                    end)
+
+                    it("should return nil", function()
+                        assert.is_nil(keepfollowing:GetTentSleeper(entity))
+                    end)
+                end)
+
+                describe('and the passed entity has "tent" and "hassleeper" tags', function()
+                    it("should debug strings", function()
+                        DebugSpyClear("DebugString")
+                        keepfollowing:GetTentSleeper(entity)
+
+                        DebugSpyAssertWasCalled("DebugString", 3, {
+                            "Component sleepingbag is not available",
+                        })
+
+                        DebugSpyAssertWasCalled("DebugString", 3, { "Looking for sleepers..." })
+                        DebugSpyAssertWasCalled("DebugString", 3, { "Found sleeper:", "Wilson" })
+                    end)
+
+                    it("should return sleeper", function()
+                        assert.is_equal(_G.AllPlayers[2], keepfollowing:GetTentSleeper(entity))
+                    end)
                 end)
             end)
         end)

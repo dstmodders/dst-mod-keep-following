@@ -345,31 +345,29 @@ local function FindClosestInvisiblePlayerInRange(x, y, z, range)
     return closest, closest ~= nil and range_sq or nil
 end
 
+--- Gets a tent sleeper.
+-- @tparam EntityScript entity A tent, Siesta Lean-to, etc.
+-- @treturn EntityScript A sleeper (a player)
 function KeepFollowing:GetTentSleeper(entity)
     local player
-
-    if not entity:HasTag("tent") or not entity:HasTag("hassleeper") then
-        return nil
+    local sleepingbag = Utils.ChainGet(entity, "components", "sleepingbag")
+    if sleepingbag then
+        self:DebugString("Component sleepingbag is available")
+        player = sleepingbag.sleeper
+    else
+        self:DebugString("Component sleepingbag is not available")
     end
 
-    self:DebugString("Attempting to get a", entity:GetDisplayName(), "sleeper...")
-
-    if entity.components.sleepingbag and entity.components.sleepingbag.sleeper then
-        player = entity.components.sleepingbag.sleeper
-    else
+    if not player and entity:HasTag("tent") and entity:HasTag("hassleeper") then
+        self:DebugString("Looking for sleepers...")
         local x, y, z = entity.Transform:GetWorldPosition()
         player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
-        self:DebugString(
-            "Component sleepingbag is not available, looking for sleeping players nearby..."
-        )
     end
 
     if player and player:HasTag("sleeping") then
-        self:DebugString("Found sleeping", player:GetDisplayName())
+        self:DebugString("Found sleeper:", player:GetDisplayName())
         return player
     end
-
-    return nil
 end
 
 --
