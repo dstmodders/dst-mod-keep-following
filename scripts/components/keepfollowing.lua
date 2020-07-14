@@ -84,15 +84,9 @@ end
 local function GetPauseAction(action)
     for _, v in ipairs(_PAUSE_ACTIONS) do
         if v[1] == action then
-            if v[2] then
-                return v[1], v[2]
-            end
-
-            return v[1], 1.25 -- 1.25 is the most optimal so far as a default value
+            return v[1], v[2] or 1.25 -- 1.25 is the most optimal so far
         end
     end
-
-    return nil
 end
 
 local function ThreadInterruptOnPauseAction(self, previousbuffered)
@@ -747,6 +741,7 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
+        self._GetPauseAction = GetPauseAction
         self._IsHUDFocused = IsHUDFocused
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable

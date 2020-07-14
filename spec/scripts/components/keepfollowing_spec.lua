@@ -18,6 +18,12 @@ describe("KeepFollowing", function()
 
         -- globals
         _G.ACTIONS = {
+            BLINK = {
+                code = 14,
+            },
+            LOOKAT = {
+                code = 78,
+            },
             WALKTO = {
                 code = 163,
             },
@@ -375,6 +381,60 @@ describe("KeepFollowing", function()
 
             it("should return true", function()
                 assert.is_true(keepfollowing._IsPassable(world, pos))
+            end)
+        end)
+
+        describe("GetPauseAction", function()
+            local action
+
+            describe("when the passed action is supported", function()
+                describe("and it does have a time defined", function()
+                    before_each(function()
+                        action = _G.ACTIONS.LOOKAT
+                    end)
+
+                    it("should return nil action", function()
+                        local _action = keepfollowing._GetPauseAction(action)
+                        assert.is_equal(action, _action)
+                    end)
+
+                    it("should return nil action", function()
+                        local _, time = keepfollowing._GetPauseAction(action)
+                        assert.is_equal(0.25, time)
+                    end)
+                end)
+
+                describe("and it doesn't have a time defined", function()
+                    before_each(function()
+                        action = _G.ACTIONS.BLINK
+                    end)
+
+                    it("should return nil action", function()
+                        local _action = keepfollowing._GetPauseAction(action)
+                        assert.is_equal(action, _action)
+                    end)
+
+                    it("should return nil action", function()
+                        local _, time = keepfollowing._GetPauseAction(action)
+                        assert.is_equal(1.25, time)
+                    end)
+                end)
+            end)
+
+            describe("when the passed action is not supported", function()
+                before_each(function()
+                    action = _G.ACTIONS.WALKTO
+                end)
+
+                it("should return nil action", function()
+                    local _action = keepfollowing._GetPauseAction(action)
+                    assert.is_nil(_action)
+                end)
+
+                it("should return nil action", function()
+                    local _, time = keepfollowing._GetPauseAction(action)
+                    assert.is_nil(time)
+                end)
             end)
         end)
     end)
