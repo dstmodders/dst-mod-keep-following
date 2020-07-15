@@ -177,22 +177,6 @@ local function MovementPrediction(inst, enable)
     end
 end
 
-local function MovementPredictionOnPush(self)
-    self:DebugString("Checking movement prediction current state...")
-    local state = self:IsMovementPrediction()
-    self:DebugString("Current state:", state and "enabled" or "disabled")
-
-    if self.movementpredictionstate == nil then
-        self:DebugString("Setting movement prediction previous state...")
-        self.movementpredictionstate = state
-        self:DebugString("Previous state:", state and "enabled" or "disabled")
-    end
-
-    if self.movementpredictionstate then
-        self:MovementPrediction(false)
-    end
-end
-
 local function MovementPredictionOnFollow(self)
     local state = self.movementpredictionstate
     if state ~= nil then
@@ -613,6 +597,18 @@ end
 -- Pushing
 --
 
+local function MovementPredictionOnPush(self)
+    local state = self:IsMovementPrediction()
+
+    if self.movementpredictionstate == nil then
+        self.movementpredictionstate = state
+    end
+
+    if self.movementpredictionstate then
+        self:MovementPrediction(false)
+    end
+end
+
 --- Gets the pushing state.
 -- @treturn boolean
 function KeepFollowing:IsPushing()
@@ -746,6 +742,7 @@ function KeepFollowing:DoInit(inst)
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
+        self._MovementPredictionOnPush = MovementPredictionOnPush
     end
 end
 
