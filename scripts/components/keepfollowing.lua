@@ -351,14 +351,6 @@ end
 -- Following
 --
 
-local function MovementPredictionOnFollow(self)
-    local state = self.movementpredictionstate
-    if state ~= nil then
-        self:MovementPrediction(state)
-        self.movementpredictionstate = nil
-    end
-end
-
 local function GetDefaultMethodNextPosition(self, target)
     local pos = self.leaderpositions[1]
 
@@ -564,14 +556,26 @@ function KeepFollowing:ClearFollowingPathThread()
     return Utils.ThreadClear(self.followingpaththread)
 end
 
+--- Starts following a leader.
+--
+-- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
+-- Sets a leader using `SetLeader` and then starts the following thread by calling
+-- `StartFollowingThread`.
+--
+-- @tparam EntityScript leader A leader to follow
 function KeepFollowing:StartFollowing(leader)
     if self.config.push_lag_compensation and not self.ismastersim then
-        MovementPredictionOnFollow(self)
+        local state = self.movementpredictionstate
+        if state ~= nil then
+            self:MovementPrediction(state)
+            self.movementpredictionstate = nil
+        end
     end
 
-    self:SetLeader(leader)
-    self:DebugString(string.format("Started following %s...", self.leader:GetDisplayName()))
-    self:StartFollowingThread()
+    if self:SetLeader(leader) then
+        self:DebugString("Started following...")
+        self:StartFollowingThread()
+    end
 end
 
 function KeepFollowing:StopFollowing()
@@ -742,7 +746,6 @@ function KeepFollowing:DoInit(inst)
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
-        self._MovementPredictionOnFollow = MovementPredictionOnFollow
         self._MovementPredictionOnPush = MovementPredictionOnPush
     end
 end

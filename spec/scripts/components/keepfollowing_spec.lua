@@ -1146,52 +1146,6 @@ describe("KeepFollowing", function()
         end)
     end)
 
-    describe("following", function()
-        describe("local", function()
-            describe("MovementPredictionOnFollow", function()
-                local function TestUnsetMovementPredictionState(state)
-                    it("should unset self.movementpredictionstate", function()
-                        assert.is_equal(state, keepfollowing.movementpredictionstate)
-                        keepfollowing._MovementPredictionOnFollow(keepfollowing)
-                        assert.is_nil(keepfollowing.movementpredictionstate)
-                    end)
-                end
-
-                local function TestMovementPrediction(state)
-                    it("should call self:MovementPrediction()", function()
-                        assert.spy(keepfollowing.MovementPrediction).was_called(0)
-                        keepfollowing._MovementPredictionOnFollow(keepfollowing)
-                        assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                        assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                            match.is_ref(keepfollowing),
-                            state
-                        )
-                    end)
-                end
-
-                describe("when the previous movement prediction state is true", function()
-                    before_each(function()
-                        keepfollowing.movementpredictionstate = true
-                        keepfollowing.MovementPrediction = spy.new(Empty)
-                    end)
-
-                    TestUnsetMovementPredictionState(true)
-                    TestMovementPrediction(true)
-                end)
-
-                describe("when the previous movement prediction state is true", function()
-                    before_each(function()
-                        keepfollowing.movementpredictionstate = false
-                        keepfollowing.MovementPrediction = spy.new(Empty)
-                    end)
-
-                    TestUnsetMovementPredictionState(false)
-                    TestMovementPrediction(false)
-                end)
-            end)
-        end)
-    end)
-
     describe("pushing", function()
         describe("local", function()
             describe("MovementPredictionOnPush", function()
