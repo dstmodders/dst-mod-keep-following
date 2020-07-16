@@ -177,14 +177,6 @@ local function MovementPrediction(inst, enable)
     end
 end
 
-local function MovementPredictionOnFollow(self)
-    local state = self.movementpredictionstate
-    if state ~= nil then
-        self:MovementPrediction(state)
-        self.movementpredictionstate = nil
-    end
-end
-
 local function MovementPredictionOnStop(self)
     self:MovementPrediction(self.movementpredictionstate)
     self.movementpredictionstate = nil
@@ -358,6 +350,14 @@ end
 --
 -- Following
 --
+
+local function MovementPredictionOnFollow(self)
+    local state = self.movementpredictionstate
+    if state ~= nil then
+        self:MovementPrediction(state)
+        self.movementpredictionstate = nil
+    end
+end
 
 local function GetDefaultMethodNextPosition(self, target)
     local pos = self.leaderpositions[1]
@@ -742,6 +742,7 @@ function KeepFollowing:DoInit(inst)
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
+        self._MovementPredictionOnFollow = MovementPredictionOnFollow
         self._MovementPredictionOnPush = MovementPredictionOnPush
     end
 end

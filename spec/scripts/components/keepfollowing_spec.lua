@@ -1030,23 +1030,25 @@ describe("KeepFollowing", function()
     end)
 
     describe("tent", function()
-        describe("local FindClosestInvisiblePlayerInRange", function()
-            describe("when there is an invisible player in the range", function()
-                it("should return the player and the squared range", function()
-                    local closest, range_sq = keepfollowing
-                        ._FindClosestInvisiblePlayerInRange(1, 0, -1, 27)
-                    assert.is_equal(100001, closest.GUID)
-                    assert.is_equal(9, range_sq)
-                    assert.is_false(closest.entity:IsVisible())
+        describe("local", function()
+            describe("FindClosestInvisiblePlayerInRange", function()
+                describe("when there is an invisible player in the range", function()
+                    it("should return the player and the squared range", function()
+                        local closest, range_sq = keepfollowing
+                            ._FindClosestInvisiblePlayerInRange(1, 0, -1, 27)
+                        assert.is_equal(100001, closest.GUID)
+                        assert.is_equal(9, range_sq)
+                        assert.is_false(closest.entity:IsVisible())
+                    end)
                 end)
-            end)
 
-            describe("when there is no invisible player in the range", function()
-                it("should return nil values", function()
-                    local closest, range_sq = keepfollowing
-                        ._FindClosestInvisiblePlayerInRange(1, 0, -1, 3)
-                    assert.is_nil(closest)
-                    assert.is_nil(range_sq)
+                describe("when there is no invisible player in the range", function()
+                    it("should return nil values", function()
+                        local closest, range_sq = keepfollowing
+                            ._FindClosestInvisiblePlayerInRange(1, 0, -1, 3)
+                        assert.is_nil(closest)
+                        assert.is_nil(range_sq)
+                    end)
                 end)
             end)
         end)
@@ -1144,20 +1146,70 @@ describe("KeepFollowing", function()
         end)
     end)
 
+    describe("following", function()
+        describe("local", function()
+            describe("MovementPredictionOnFollow", function()
+                local function TestUnsetMovementPredictionState(state)
+                    it("should unset self.movementpredictionstate", function()
+                        assert.is_equal(state, keepfollowing.movementpredictionstate)
+                        keepfollowing._MovementPredictionOnFollow(keepfollowing)
+                        assert.is_nil(keepfollowing.movementpredictionstate)
+                    end)
+                end
+
+                local function TestMovementPrediction(state)
+                    it("should call self:MovementPrediction()", function()
+                        assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        keepfollowing._MovementPredictionOnFollow(keepfollowing)
+                        assert.spy(keepfollowing.MovementPrediction).was_called(1)
+                        assert.spy(keepfollowing.MovementPrediction).was_called_with(
+                            match.is_ref(keepfollowing),
+                            state
+                        )
+                    end)
+                end
+
+                describe("when the previous movement prediction state is true", function()
+                    before_each(function()
+                        keepfollowing.movementpredictionstate = true
+                        keepfollowing.MovementPrediction = spy.new(Empty)
+                    end)
+
+                    TestUnsetMovementPredictionState(true)
+                    TestMovementPrediction(true)
+                end)
+
+                describe("when the previous movement prediction state is true", function()
+                    before_each(function()
+                        keepfollowing.movementpredictionstate = false
+                        keepfollowing.MovementPrediction = spy.new(Empty)
+                    end)
+
+                    TestUnsetMovementPredictionState(false)
+                    TestMovementPrediction(false)
+                end)
+            end)
+        end)
+    end)
+
     describe("pushing", function()
         describe("local", function()
             describe("MovementPredictionOnPush", function()
+                local function TestSetMovementPredictionState(state)
+                    it("should set self.movementpredictionstate as true", function()
+                        assert.is_nil(keepfollowing.movementpredictionstate)
+                        keepfollowing._MovementPredictionOnPush(keepfollowing)
+                        assert.is_equal(state, keepfollowing.movementpredictionstate)
+                    end)
+                end
+
                 describe("when the movement prediction is enabled", function()
                     before_each(function()
                         keepfollowing.IsMovementPrediction = spy.new(ReturnValueFn(true))
                         keepfollowing.MovementPrediction = spy.new(Empty)
                     end)
 
-                    it("should set self.movementpredictionstate as true", function()
-                        assert.is_nil(keepfollowing.movementpredictionstate)
-                        keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.is_true(keepfollowing.movementpredictionstate)
-                    end)
+                    TestSetMovementPredictionState(true)
 
                     it("should call self:MovementPrediction()", function()
                         assert.spy(keepfollowing.MovementPrediction).was_called(0)
@@ -1176,11 +1228,7 @@ describe("KeepFollowing", function()
                         keepfollowing.MovementPrediction = spy.new(Empty)
                     end)
 
-                    it("should set self.movementpredictionstate as false", function()
-                        assert.is_nil(keepfollowing.movementpredictionstate)
-                        keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.is_false(keepfollowing.movementpredictionstate)
-                    end)
+                    TestSetMovementPredictionState(false)
 
                     it("shouldn't call self:MovementPrediction()", function()
                         assert.spy(keepfollowing.MovementPrediction).was_called(0)
