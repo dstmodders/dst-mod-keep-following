@@ -157,7 +157,7 @@ describe("KeepFollowing", function()
             assert.is_nil(self.pushing_thread)
 
             -- debugging
-            assert.is_equal(0, self.debug_requests)
+            assert.is_equal(0, self.debug_rpc_counter)
 
             -- config
             assert.is_table(self.config)

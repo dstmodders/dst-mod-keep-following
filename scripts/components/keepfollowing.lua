@@ -134,7 +134,7 @@ local function WalkToPosition(self, pos)
     end
 
     if _G.KeepFollowingDebug then
-        self.debug_requests = self.debug_requests + 1
+        self.debug_rpc_counter = self.debug_rpc_counter + 1
     end
 end
 
@@ -581,13 +581,13 @@ end
 function KeepFollowing:StopFollowing()
     if self.leader then
         self:DebugString(string.format(
-            "Stopped following %s. Requests: %d. Time: %2.4f",
+            "Stopped following %s. RPCs: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
-            self.debug_requests,
+            self.debug_rpc_counter,
             os.clock() - self.start_time
         ))
 
-        self.debug_requests = 0
+        self.debug_rpc_counter = 0
         self.is_following = false
         self.leader = nil
         self.leader_positions = {}
@@ -678,13 +678,13 @@ function KeepFollowing:StopPushing()
 
     if self.leader then
         self:DebugString(string.format(
-            "Stopped pushing %s. Requests: %d. Time: %2.4f",
+            "Stopped pushing %s. RPCs: %d. Time: %2.4f",
             self.leader:GetDisplayName(),
-            self.debug_requests,
+            self.debug_rpc_counter,
             os.clock() - self.start_time
         ))
 
-        self.debug_requests = 0
+        self.debug_rpc_counter = 0
         self.is_pushing = false
         self.leader = nil
         self.start_time = nil
@@ -724,7 +724,7 @@ function KeepFollowing:DoInit(inst)
     self.pushingthread = nil
 
     -- debugging
-    self.debug_requests = 0
+    self.debug_rpc_counter = 0
 
     -- config
     self.config = {
