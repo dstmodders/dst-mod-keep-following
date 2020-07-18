@@ -89,20 +89,18 @@ local function GetPauseAction(action)
     end
 end
 
-local function ThreadInterruptOnPauseAction(self, previousbuffered)
-    local pauseaction, pauseactiontime
-
+local function ThreadInterruptOnPauseAction(self, buffered_previous)
+    local pause_action, pause_action_time
     local buffered = self.inst:GetBufferedAction()
-
     if buffered and buffered.action ~= ACTIONS.WALKTO then
-        if not previousbuffered or buffered ~= previousbuffered then
+        if not buffered_previous or buffered ~= buffered_previous then
             self:DebugString("Interrupted by action:", buffered.action.id)
-            previousbuffered = buffered
-            pauseaction, pauseactiontime = GetPauseAction(buffered.action)
-            if pauseaction then
+            buffered_previous = buffered
+            pause_action, pause_action_time = GetPauseAction(buffered.action)
+            if pause_action then
                 self.is_paused = true
-                self:DebugString(string.format("Pausing (%2.2f)...", pauseactiontime))
-                Sleep(FRAMES / FRAMES * pauseactiontime)
+                self:DebugString(string.format("Pausing (%2.2f)...", pause_action_time))
+                Sleep(pause_action_time)
             end
         end
     elseif not self:IsMovementPrediction() then
@@ -111,19 +109,19 @@ local function ThreadInterruptOnPauseAction(self, previousbuffered)
             and not self.inst.replica.inventory:GetActiveItem()
         then
             self.is_paused = true
-            pauseactiontime = 1.25 -- default
-            self:DebugString(string.format("Pausing (%2.2f)...", pauseactiontime))
-            Sleep(FRAMES / FRAMES * pauseactiontime)
+            pause_action_time = 1.25 -- default
+            self:DebugString(string.format("Pausing (%2.2f)...", pause_action_time))
+            Sleep(pause_action_time)
         end
     end
 
     if self.is_paused then
         self:DebugString("Unpausing...")
         self.is_paused = false
-        return previousbuffered, true
+        return buffered_previous, true
     end
 
-    return previousbuffered, false
+    return buffered_previous, false
 end
 
 local function WalkToPosition(self, pos)
@@ -360,10 +358,9 @@ end
 
 local function GetDefaultMethodNextPosition(self, target)
     local pos = self.leader_positions[1]
-
     if pos then
-        local distinstsq = self.inst:GetDistanceSqToPoint(pos)
-        local distinst = math.sqrt(distinstsq)
+        local inst_dist_sq = self.inst:GetDistanceSqToPoint(pos)
+        local inst_dist = math.sqrt(inst_dist_sq)
 
         -- This represents the distance where the gathered points (leaderpositions) will be
         -- ignored/removed. There is no real point to step on each coordinate and we still need to
@@ -371,17 +368,17 @@ local function GetDefaultMethodNextPosition(self, target)
         -- However, when lag compensation is off the movement becomes less smooth. I don't recommend
         -- using anything < 1 diameter.
         local step = self.inst.Physics:GetRadius() * 3
-        local isleadernear = self.inst:IsNear(self.leader, target + step)
+        local is_leader_near = self.inst:IsNear(self.leader, target + step)
 
         if not self.is_leader_near
-            and isleadernear
-            or (isleadernear and self.config.keep_target_distance)
+            and is_leader_near
+            or (is_leader_near and self.config.keep_target_distance)
         then
             self.leader_positions = {}
             return self.inst:GetPositionAdjacentTo(self.leader, target)
         end
 
-        if not isleadernear and distinst > step then
+        if not is_leader_near and inst_dist > step then
             return pos
         else
             table.remove(self.leader_positions, 1)
@@ -389,12 +386,10 @@ local function GetDefaultMethodNextPosition(self, target)
             return pos
         end
     end
-
-    return nil
 end
 
-local function GetClosestMethodNextPosition(self, target, isleadernear)
-    if not isleadernear or self.config.keep_target_distance then
+local function GetClosestMethodNextPosition(self, target, is_leader_near)
+    if not is_leader_near or self.config.keep_target_distance then
         local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
 
         if IsPassable(self.world, pos) then
@@ -407,8 +402,6 @@ local function GetClosestMethodNextPosition(self, target, isleadernear)
 
         return pos
     end
-
-    return nil
 end
 
 --- Gets the following state.
