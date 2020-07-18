@@ -99,6 +99,7 @@ function DebugSpyAssertWasCalled(name, calls, args)
     local match = require "luassert.match"
     calls = calls ~= nil and calls or 0
     args = args ~= nil and args or {}
+    args = type(args) == "string" and { args } or args
     DebugSpyAssert(name).was_called(calls)
     if calls > 0 then
         DebugSpyAssert(name).was_called_with(match.is_ref(_G.KeepFollowingDebug), unpack(args))
