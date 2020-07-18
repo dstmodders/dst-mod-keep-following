@@ -290,7 +290,7 @@ end
 -- Verifies if the passed entity can become a leader using the `CanBeLeader` and sets it.
 --
 -- @tparam EntityScript entity An entity as a potential leader
--- @treturn EntityScript A leader that has been set
+-- @treturn boolean
 function KeepFollowing:SetLeader(entity)
     if self:CanBeLeader(entity) then
         self.leader = entity
@@ -299,8 +299,15 @@ function KeepFollowing:SetLeader(entity)
             entity:GetDisplayName(),
             math.sqrt(self.inst:GetDistanceSqToPoint(entity:GetPosition()))
         ))
-        return entity
+        return true
+    elseif entity == self.inst then
+        self:DebugError("You", "can't become a leader")
+    else
+        local _entity = entity == self.inst and "You" or nil
+        _entity = _entity == nil and entity.GetDisplayName and entity:GetDisplayName() or "Entity"
+        self:DebugError(_entity, "can't become a leader")
     end
+    return false
 end
 
 --

@@ -93,6 +93,7 @@ describe("KeepFollowing", function()
                 },
             },
             EnableMovementPrediction = ReturnValueFn(Empty),
+            GetDisplayName = ReturnValueFn("Wendy"),
             GetDistanceSqToPoint = ReturnValueFn(9),
             GetPosition = ReturnValueFn({
                 Get = ReturnValuesFn(1, 0, -1),
@@ -978,6 +979,24 @@ describe("KeepFollowing", function()
         end)
 
         describe("SetLeader", function()
+            local function TestNotValidLeader(fn, msg)
+                it("should debug error", function()
+                    DebugSpyClear("DebugError")
+                    fn()
+                    DebugSpyAssertWasCalled("DebugError", 1, msg)
+                end)
+
+                it("shouldn't set self.leader", function()
+                    assert.is_nil(keepfollowing.leader)
+                    fn()
+                    assert.is_nil(keepfollowing.leader)
+                end)
+
+                it("should return false", function()
+                    assert.is_false(fn())
+                end)
+            end
+
             before_each(function()
                 keepfollowing.inst.GetDistanceSqToPoint = ReturnValueFn(9)
             end)
@@ -999,9 +1018,15 @@ describe("KeepFollowing", function()
                     assert.is_equal(entity, keepfollowing.leader)
                 end)
 
-                it("should return the passed entity", function()
-                    assert.is_equal(entity, keepfollowing:SetLeader(entity))
+                it("should return true", function()
+                    assert.is_true(keepfollowing:SetLeader(entity))
                 end)
+            end)
+
+            describe("when the player sets himself/herself", function()
+                TestNotValidLeader(function()
+                    return keepfollowing:SetLeader(keepfollowing.inst)
+                end, { "You", "can't become a leader" })
             end)
 
             describe("when an entity can't become a leader", function()
@@ -1009,20 +1034,24 @@ describe("KeepFollowing", function()
                     keepfollowing.CanBeLeader = spy.new(ReturnValueFn(false))
                 end)
 
-                it("shouldn't debug string", function()
-                    DebugSpyClear("DebugString")
-                    keepfollowing:SetLeader(entity)
-                    DebugSpyAssertWasCalled("DebugString", 0)
+                describe("and has a GetDisplayName()", function()
+                    before_each(function()
+                        entity.GetDisplayName = ReturnValueFn("Wilson")
+                    end)
+
+                    TestNotValidLeader(function()
+                        return keepfollowing:SetLeader(entity)
+                    end, { "Wilson", "can't become a leader" })
                 end)
 
-                it("shouldn't set self.leader", function()
-                    assert.is_nil(keepfollowing.leader)
-                    keepfollowing:SetLeader(entity)
-                    assert.is_nil(keepfollowing.leader)
-                end)
+                describe("and doesn't have a GetDisplayName()", function()
+                    before_each(function()
+                        entity.GetDisplayName = nil
+                    end)
 
-                it("should return nil", function()
-                    assert.is_nil(keepfollowing:SetLeader(entity))
+                    TestNotValidLeader(function()
+                        return keepfollowing:SetLeader(entity)
+                    end, { "Entity", "can't become a leader" })
                 end)
             end)
         end)
@@ -1315,10 +1344,10 @@ describe("KeepFollowing", function()
                     keepfollowing.CanBeLeader = spy.new(ReturnValueFn(false))
                 end)
 
-                it("shouldn't debug strings", function()
-                    DebugSpyClear("DebugString")
+                it("should debug error", function()
+                    DebugSpyClear("DebugError")
                     keepfollowing:StartFollowing(leader)
-                    DebugSpyAssertWasCalled("DebugString", 0)
+                    DebugSpyAssertWasCalled("DebugError", 1, { "Wilson", "can't become a leader" })
                 end)
 
                 it("shouldn't call self:StartFollowingThread()", function()
