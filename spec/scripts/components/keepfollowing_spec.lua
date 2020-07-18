@@ -1198,26 +1198,6 @@ describe("KeepFollowing", function()
                 end)
             end
 
-            local function TestUnsetMovementPredictionState(state)
-                it("should unset self.movement_prediction_state", function()
-                    assert.is_equal(state, keepfollowing.movement_prediction_state)
-                    keepfollowing:StartFollowing(leader)
-                    assert.is_nil(keepfollowing.movement_prediction_state)
-                end)
-            end
-
-            local function TestMovementPrediction(state)
-                it("should call self:StartFollowing()", function()
-                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
-                    keepfollowing:StartFollowing(leader)
-                    assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                    assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                        match.is_ref(keepfollowing),
-                        state
-                    )
-                end)
-            end
-
             describe("when push lag compensation is enabled", function()
                 before_each(function()
                     keepfollowing.config.push_lag_compensation = true
@@ -1263,8 +1243,21 @@ describe("KeepFollowing", function()
                             keepfollowing.movement_prediction_state = true
                         end)
 
-                        TestUnsetMovementPredictionState(true)
-                        TestMovementPrediction(true)
+                        it("should unset self.movement_prediction_state", function()
+                            assert.is_true(keepfollowing.movement_prediction_state)
+                            keepfollowing:StartFollowing(leader)
+                            assert.is_nil(keepfollowing.movement_prediction_state)
+                        end)
+
+                        it("should call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartFollowing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
+                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
+                                match.is_ref(keepfollowing),
+                                true
+                            )
+                        end)
 
                         it("should return false", function()
                             assert.is_false(keepfollowing:StartFollowing(leader))
@@ -1276,8 +1269,21 @@ describe("KeepFollowing", function()
                             keepfollowing.movement_prediction_state = false
                         end)
 
-                        TestUnsetMovementPredictionState(false)
-                        TestMovementPrediction(false)
+                        it("should unset self.movement_prediction_state", function()
+                            assert.is_false(keepfollowing.movement_prediction_state)
+                            keepfollowing:StartFollowing(leader)
+                            assert.is_nil(keepfollowing.movement_prediction_state)
+                        end)
+
+                        it("should call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartFollowing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
+                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
+                                match.is_ref(keepfollowing),
+                                false
+                            )
+                        end)
 
                         it("should return false", function()
                             assert.is_false(keepfollowing:StartFollowing(leader))
@@ -1503,48 +1509,246 @@ describe("KeepFollowing", function()
     end)
 
     describe("pushing", function()
-        describe("local", function()
-            describe("MovementPredictionOnPush", function()
-                local function TestSetMovementPredictionState(state)
-                    it("should set self.movement_prediction_state as true", function()
-                        assert.is_nil(keepfollowing.movement_prediction_state)
-                        keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.is_equal(state, keepfollowing.movement_prediction_state)
-                    end)
-                end
+        describe("StartFollowing", function()
+            before_each(function()
+                keepfollowing.config = {}
+                keepfollowing.MovementPrediction = spy.new(Empty)
+                keepfollowing.StartPushingThread = spy.new(Empty)
+            end)
 
-                describe("when the movement prediction is enabled", function()
+            local function TestNoPushLagCompensation(state)
+                it("shouldn't set a new self.movement_prediction_state value", function()
+                    assert.is_equal(state, keepfollowing.movement_prediction_state)
+                end)
+
+                it("shouldn't call self:StartPushing()", function()
+                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                    keepfollowing:StartPushing(leader)
+                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                end)
+            end
+
+            describe("when push lag compensation is enabled", function()
+                before_each(function()
+                    keepfollowing.config.push_lag_compensation = true
+                end)
+
+                describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.IsMovementPrediction = spy.new(ReturnValueFn(true))
-                        keepfollowing.MovementPrediction = spy.new(Empty)
+                        keepfollowing.is_master_sim = true
                     end)
 
-                    TestSetMovementPredictionState(true)
+                    describe("when the previous movement prediction state is true", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = true
+                        end)
 
-                    it("should call self:MovementPrediction()", function()
-                        assert.spy(keepfollowing.MovementPrediction).was_called(0)
-                        keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                        assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                            match.is_ref(keepfollowing),
-                            false
-                        )
+                        TestNoPushLagCompensation(true)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+
+                    describe("when the previous movement prediction state is false", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = false
+                        end)
+
+                        TestNoPushLagCompensation(false)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
                     end)
                 end)
 
-                describe("when the movement prediction is disabled", function()
+                describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.IsMovementPrediction = spy.new(ReturnValueFn(false))
-                        keepfollowing.MovementPrediction = spy.new(Empty)
+                        keepfollowing.is_master_sim = false
                     end)
 
-                    TestSetMovementPredictionState(false)
+                    describe("when the previous movement prediction state is true", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = true
+                        end)
 
-                    it("shouldn't call self:MovementPrediction()", function()
-                        assert.spy(keepfollowing.MovementPrediction).was_called(0)
-                        keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        it("should set self.movement_prediction_state", function()
+                            assert.is_true(keepfollowing.movement_prediction_state)
+                            keepfollowing:StartPushing(leader)
+                            assert.is_true(keepfollowing.movement_prediction_state)
+                        end)
+
+                        it("should call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
+                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
+                                match.is_ref(keepfollowing),
+                                false
+                            )
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
                     end)
+
+                    describe("when the previous movement prediction state is false", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = false
+                        end)
+
+                        it("should set self.movement_prediction_state", function()
+                            assert.is_false(keepfollowing.movement_prediction_state)
+                            keepfollowing:StartPushing(leader)
+                            assert.is_false(keepfollowing.movement_prediction_state)
+                        end)
+
+                        it("shouldn't call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+                end)
+            end)
+
+            describe("when push lag compensation is disabled", function()
+                before_each(function()
+                    keepfollowing.config.push_lag_compensation = false
+                end)
+
+                describe("and is a master simulation", function()
+                    before_each(function()
+                        keepfollowing.is_master_sim = true
+                    end)
+
+                    describe("when the previous movement prediction state is true", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = true
+                            keepfollowing.MovementPrediction = spy.new(Empty)
+                        end)
+
+                        it("shouldn't call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+
+                    describe("when the previous movement prediction state is false", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = false
+                            keepfollowing.MovementPrediction = spy.new(Empty)
+                        end)
+
+                        it("shouldn't call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+                end)
+
+                describe("and is a not master simulation", function()
+                    before_each(function()
+                        keepfollowing.is_master_sim = false
+                    end)
+
+                    describe("when the previous movement prediction state is true", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = true
+                            keepfollowing.MovementPrediction = spy.new(Empty)
+                        end)
+
+                        it("shouldn't call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+
+                    describe("when the previous movement prediction state is false", function()
+                        before_each(function()
+                            keepfollowing.movement_prediction_state = false
+                            keepfollowing.MovementPrediction = spy.new(Empty)
+                        end)
+
+                        it("shouldn't call self:MovementPrediction()", function()
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            keepfollowing:StartPushing(leader)
+                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                        end)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartPushing(leader))
+                        end)
+                    end)
+                end)
+            end)
+
+            describe("when a valid leader", function()
+                before_each(function()
+                    keepfollowing.CanBeLeader = spy.new(ReturnValueFn(true))
+                end)
+
+                it("should debug strings", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:StartPushing(leader)
+                    DebugSpyAssertWasCalled("DebugString", 2, "New leader: Wilson. Distance: 3.00")
+                    DebugSpyAssertWasCalled("DebugString", 2, "Started pushing...")
+                end)
+
+                it("should call self:StartPushingThread()", function()
+                    assert.spy(keepfollowing.StartPushingThread).was_called(0)
+                    keepfollowing:StartPushing(leader)
+                    assert.spy(keepfollowing.StartPushingThread).was_called(1)
+                    assert.spy(keepfollowing.StartPushingThread).was_called_with(
+                        match.is_ref(keepfollowing)
+                    )
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:StartPushing(leader))
+                end)
+            end)
+
+            describe("when a not valid leader", function()
+                before_each(function()
+                    keepfollowing.CanBeLeader = spy.new(ReturnValueFn(false))
+                end)
+
+                it("should debug error", function()
+                    DebugSpyClear("DebugError")
+                    keepfollowing:StartPushing(leader)
+                    DebugSpyAssertWasCalled("DebugError", 1, { "Wilson", "can't become a leader" })
+                end)
+
+                it("shouldn't call self:StartPushingThread()", function()
+                    assert.spy(keepfollowing.StartPushingThread).was_called(0)
+                    keepfollowing:StartPushing(leader)
+                    assert.spy(keepfollowing.StartPushingThread).was_called(0)
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:StartPushing(leader))
                 end)
             end)
         end)

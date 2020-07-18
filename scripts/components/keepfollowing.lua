@@ -610,18 +610,6 @@ end
 -- Pushing
 --
 
-local function MovementPredictionOnPush(self)
-    local state = self:IsMovementPrediction()
-
-    if self.movement_prediction_state == nil then
-        self.movement_prediction_state = state
-    end
-
-    if self.movement_prediction_state then
-        self:MovementPrediction(false)
-    end
-end
-
 --- Gets the pushing state.
 -- @treturn boolean
 function KeepFollowing:IsPushing()
@@ -670,14 +658,32 @@ function KeepFollowing:ClearPushingThread()
     return Utils.ThreadClear(self.pushingthread)
 end
 
+--- Starts pushing a leader.
+--
+-- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
+-- Sets a leader using `SetLeader` and then starts the pushing thread by calling
+-- `StartPushingThread`.
+--
+-- @tparam EntityScript leader A leader to push
+-- @treturn boolean
 function KeepFollowing:StartPushing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
-        MovementPredictionOnPush(self)
+        if self.movement_prediction_state == nil then
+            self.movement_prediction_state = self:IsMovementPrediction()
+        end
+
+        if self.movement_prediction_state then
+            self:MovementPrediction(false)
+        end
     end
 
-    self:SetLeader(leader)
-    self:DebugString("Started pushing leader...")
-    self:StartPushingThread()
+    if self:SetLeader(leader) then
+        self:DebugString("Started pushing...")
+        self:StartPushingThread()
+        return true
+    end
+
+    return false
 end
 
 function KeepFollowing:StopPushing()
@@ -755,7 +761,6 @@ function KeepFollowing:DoInit(inst)
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
-        self._MovementPredictionOnPush = MovementPredictionOnPush
     end
 end
 
