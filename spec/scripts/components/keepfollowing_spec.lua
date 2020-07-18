@@ -135,29 +135,29 @@ describe("KeepFollowing", function()
         local function AssertDefaults(self)
             -- general
             assert.is_equal(inst, self.inst)
-            assert.is_false(self.isclient)
-            assert.is_false(self.isdst)
-            assert.is_equal(_G.TheWorld.ismastersim, self.ismastersim)
+            assert.is_false(self.is_client)
+            assert.is_false(self.is_dst)
+            assert.is_equal(_G.TheWorld.ismastersim, self.is_master_sim)
             assert.is_nil(self.leader)
-            assert.is_nil(self.movementpredictionstate)
-            assert.is_nil(self.playercontroller)
-            assert.is_nil(self.starttime)
+            assert.is_nil(self.movement_prediction_state)
+            assert.is_nil(self.player_controller)
+            assert.is_nil(self.start_time)
             assert.is_equal(_G.TheWorld, self.world)
 
             -- following
-            assert.is_nil(self.followingpaththread)
-            assert.is_nil(self.followingthread)
-            assert.is_false(self.isfollowing)
-            assert.is_false(self.isleadernear)
-            assert.is_false(self.ispaused)
-            assert.is_same({}, self.leaderpositions)
+            assert.is_nil(self.following_path_thread)
+            assert.is_nil(self.following_thread)
+            assert.is_false(self.is_following)
+            assert.is_false(self.is_leader_near)
+            assert.is_false(self.is_paused)
+            assert.is_same({}, self.leader_positions)
 
             -- pushing
-            assert.is_false(self.ispushing)
-            assert.is_nil(self.pushingthread)
+            assert.is_false(self.is_pushing)
+            assert.is_nil(self.pushing_thread)
 
             -- debugging
-            assert.is_equal(0, self.debugrequests)
+            assert.is_equal(0, self.debug_requests)
 
             -- config
             assert.is_table(self.config)
@@ -1151,8 +1151,8 @@ describe("KeepFollowing", function()
 
         describe("StartFollowing", function()
             local function TestNoPushLagCompensation(state)
-                it("shouldn't set a new self.movementpredictionstate value", function()
-                    assert.is_equal(state, keepfollowing.movementpredictionstate)
+                it("shouldn't set a new self.movement_prediction_state value", function()
+                    assert.is_equal(state, keepfollowing.movement_prediction_state)
                 end)
 
                 it("shouldn't call self:StartFollowing()", function()
@@ -1163,10 +1163,10 @@ describe("KeepFollowing", function()
             end
 
             local function TestUnsetMovementPredictionState(state)
-                it("should unset self.movementpredictionstate", function()
-                    assert.is_equal(state, keepfollowing.movementpredictionstate)
+                it("should unset self.movement_prediction_state", function()
+                    assert.is_equal(state, keepfollowing.movement_prediction_state)
                     keepfollowing:StartFollowing(leader)
-                    assert.is_nil(keepfollowing.movementpredictionstate)
+                    assert.is_nil(keepfollowing.movement_prediction_state)
                 end)
             end
 
@@ -1189,12 +1189,12 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.ismastersim = true
+                        keepfollowing.is_master_sim = true
                     end)
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = true
+                            keepfollowing.movement_prediction_state = true
                         end)
 
                         TestNoPushLagCompensation(true)
@@ -1202,7 +1202,7 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = false
+                            keepfollowing.movement_prediction_state = false
                         end)
 
                         TestNoPushLagCompensation(false)
@@ -1211,12 +1211,12 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.ismastersim = false
+                        keepfollowing.is_master_sim = false
                     end)
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = true
+                            keepfollowing.movement_prediction_state = true
                         end)
 
                         TestUnsetMovementPredictionState(true)
@@ -1225,7 +1225,7 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = false
+                            keepfollowing.movement_prediction_state = false
                         end)
 
                         TestUnsetMovementPredictionState(false)
@@ -1241,12 +1241,12 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.ismastersim = true
+                        keepfollowing.is_master_sim = true
                     end)
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = true
+                            keepfollowing.movement_prediction_state = true
                             keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
@@ -1255,7 +1255,7 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = false
+                            keepfollowing.movement_prediction_state = false
                             keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
@@ -1265,12 +1265,12 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.ismastersim = false
+                        keepfollowing.is_master_sim = false
                     end)
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = true
+                            keepfollowing.movement_prediction_state = true
                             keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
@@ -1279,7 +1279,7 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
-                            keepfollowing.movementpredictionstate = false
+                            keepfollowing.movement_prediction_state = false
                             keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
@@ -1334,10 +1334,10 @@ describe("KeepFollowing", function()
         describe("local", function()
             describe("MovementPredictionOnPush", function()
                 local function TestSetMovementPredictionState(state)
-                    it("should set self.movementpredictionstate as true", function()
-                        assert.is_nil(keepfollowing.movementpredictionstate)
+                    it("should set self.movement_prediction_state as true", function()
+                        assert.is_nil(keepfollowing.movement_prediction_state)
                         keepfollowing._MovementPredictionOnPush(keepfollowing)
-                        assert.is_equal(state, keepfollowing.movementpredictionstate)
+                        assert.is_equal(state, keepfollowing.movement_prediction_state)
                     end)
                 end
 

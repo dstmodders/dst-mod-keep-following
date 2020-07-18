@@ -157,10 +157,9 @@ local function OnPlayerActivated(player, world)
     local keepfollowing = player.components.keepfollowing
 
     if keepfollowing then
-        keepfollowing.isclient = IsClient()
-        keepfollowing.isdst = IsDST()
-        keepfollowing.ismastersim = world.ismastersim
-        keepfollowing.modname = modname
+        keepfollowing.is_client = IsClient()
+        keepfollowing.is_dst = IsDST()
+        keepfollowing.is_master_sim = world.ismastersim
         keepfollowing.world = world
 
         -- GetModConfigData
@@ -333,7 +332,7 @@ local function PlayerControllerPostInit(_self, _player)
         local action = act.action
 
         if keepfollowing then
-            keepfollowing.playercontroller = _self
+            keepfollowing.player_controller = _self
         end
 
         if IsOurAction(action) then
