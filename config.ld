@@ -4,9 +4,9 @@ full_description = 'Mod for the game [Don\'t Starve Together](https://www.klei.c
 title = 'Keep Following Mod Documentation'
 
 dir = 'doc'
-file = './scripts'
+file = './scripts/'
 format = 'markdown'
 readme = 'readme'
 sort_modules = false
-style = './doc/ldoc'
+style = './doc/ldoc/'
 use_markdown_titles = true

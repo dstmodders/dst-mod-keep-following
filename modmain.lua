@@ -1,7 +1,10 @@
+----
+-- Modmain.
 --
--- Requires
---
-
+-- @author Victor Popkov
+-- @copyright 2019
+-- @license MIT
+----
 local _G = GLOBAL
 local require = _G.require
 
