@@ -425,7 +425,7 @@ function KeepFollowing:StartFollowingThread()
 
     self.following_thread = Utils.ThreadStart(_FOLLOWING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
-            self:DebugString("Leader doesn't exist anymore")
+            self:DebugError("Leader doesn't exist anymore")
             self:StopFollowing()
             return
         end
@@ -511,7 +511,7 @@ function KeepFollowing:StartFollowingPathThread()
 
     self.following_path_thread = Utils.ThreadStart(_FOLLOWING_PATH_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
-            self:DebugString("Leader doesn't exist anymore")
+            self:DebugError("Leader doesn't exist anymore")
             self:StopFollowing()
             return
         end
@@ -636,7 +636,7 @@ function KeepFollowing:StartPushingThread()
 
     self.following_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
-            self:DebugString("Leader doesn't exist anymore")
+            self:DebugError("Leader doesn't exist anymore")
             self:StopPushing()
             return
         end
