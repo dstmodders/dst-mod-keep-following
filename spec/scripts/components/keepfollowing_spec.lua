@@ -1752,5 +1752,82 @@ describe("KeepFollowing", function()
                 end)
             end)
         end)
+
+        describe("StopPushing", function()
+            before_each(function()
+                keepfollowing.ClearPushingThread = spy.new(Empty)
+                keepfollowing.debug_rpc_counter = 1
+                keepfollowing.is_pushing = true
+                keepfollowing.leader = leader
+                keepfollowing.start_time = 1
+            end)
+
+            describe("when the self.leader is set", function()
+                before_each(function()
+                    keepfollowing.leader = leader
+                end)
+
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:StopPushing()
+                    DebugSpyAssertWasCalled(
+                        "DebugString",
+                        2,
+                        "Stopped pushing Wilson. RPCs: 1. Time: 1.0000"
+                    )
+                end)
+
+                it("should call self:ClearPushingThread()", function()
+                    assert.spy(keepfollowing.ClearPushingThread).was_called(0)
+                    keepfollowing:StopPushing()
+                    assert.spy(keepfollowing.ClearPushingThread).was_called(1)
+                    assert.spy(keepfollowing.ClearPushingThread).was_called_with(
+                        match.is_ref(keepfollowing)
+                    )
+                end)
+
+                it("should reset fields", function()
+                    keepfollowing:StopPushing()
+                    assert.is_equal(0, keepfollowing.debug_rpc_counter)
+                    assert.is_false(keepfollowing.is_pushing)
+                    assert.is_nil(keepfollowing.leader)
+                    assert.is_nil(keepfollowing.start_time)
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:StopPushing())
+                end)
+            end)
+
+            describe("when the self.leader is not set", function()
+                before_each(function()
+                    keepfollowing.leader = nil
+                end)
+
+                it("should debug error", function()
+                    DebugSpyClear("DebugError")
+                    keepfollowing:StopPushing()
+                    DebugSpyAssertWasCalled("DebugError", 1, "No leader")
+                end)
+
+                it("shouldn't call self:ClearPushingThread()", function()
+                    assert.spy(keepfollowing.ClearPushingThread).was_called(0)
+                    keepfollowing:StopPushing()
+                    assert.spy(keepfollowing.ClearPushingThread).was_called(0)
+                end)
+
+                it("should reset fields", function()
+                    keepfollowing:StopPushing()
+                    assert.is_equal(1, keepfollowing.debug_rpc_counter)
+                    assert.is_true(keepfollowing.is_pushing)
+                    assert.is_nil(keepfollowing.leader)
+                    assert.is_equal(1, keepfollowing.start_time)
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:StopPushing())
+                end)
+            end)
+        end)
     end)
 end)

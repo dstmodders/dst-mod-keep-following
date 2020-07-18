@@ -175,11 +175,6 @@ local function MovementPrediction(inst, enable)
     end
 end
 
-local function MovementPredictionOnStop(self)
-    self:MovementPrediction(self.movement_prediction_state)
-    self.movement_prediction_state = nil
-end
-
 --- Checks if the movement prediction is enabled.
 -- @treturn boolean
 function KeepFollowing:IsMovementPrediction()
@@ -492,6 +487,8 @@ function KeepFollowing:StartFollowingThread()
             self:StartFollowingPathThread()
         end
     end, function()
+        self.is_following = false
+        self.start_time = nil
         self:ClearFollowingPathThread()
     end)
 end
@@ -686,9 +683,12 @@ function KeepFollowing:StartPushing(leader)
     return false
 end
 
+--- Stops pushing a leader.
+-- @treturn boolean
 function KeepFollowing:StopPushing()
     if self.config.push_lag_compensation and not self.is_master_sim then
-        MovementPredictionOnStop(self)
+        self:MovementPrediction(self.movement_prediction_state)
+        self.movement_prediction_state = nil
     end
 
     if self.leader then
@@ -699,12 +699,19 @@ function KeepFollowing:StopPushing()
             os.clock() - self.start_time
         ))
 
+        self:ClearPushingThread()
+
         self.debug_rpc_counter = 0
         self.is_pushing = false
         self.leader = nil
         self.start_time = nil
-        self:ClearPushingThread()
+
+        return true
+    else
+        self:DebugError("No leader")
     end
+
+    return false
 end
 
 --- Initializes.
