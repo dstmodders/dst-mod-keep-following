@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Support for the hide changelog configuration
+- Tests and documentation
+
+### Changed
+
+- Configuration to be splitted into sections
+- Refactored most of the existing code
+
+### Removed
+
+- Mobs configuration in favour of the "all" behaviour
+
 ## [0.19.0][] - 2019-10-04
 
 ### Changed
