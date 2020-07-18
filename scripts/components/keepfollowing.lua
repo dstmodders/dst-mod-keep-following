@@ -570,6 +570,7 @@ end
 -- `StartFollowingThread`.
 --
 -- @tparam EntityScript leader A leader to follow
+-- @treturn boolean
 function KeepFollowing:StartFollowing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
         local state = self.movement_prediction_state
@@ -582,7 +583,10 @@ function KeepFollowing:StartFollowing(leader)
     if self:SetLeader(leader) then
         self:DebugString("Started following...")
         self:StartFollowingThread()
+        return true
     end
+
+    return false
 end
 
 function KeepFollowing:StopFollowing()

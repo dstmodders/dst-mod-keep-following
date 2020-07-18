@@ -1227,6 +1227,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(true)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
 
                     describe("when the previous movement prediction state is false", function()
@@ -1235,6 +1239,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(false)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
                 end)
 
@@ -1250,6 +1258,10 @@ describe("KeepFollowing", function()
 
                         TestUnsetMovementPredictionState(true)
                         TestMovementPrediction(true)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
 
                     describe("when the previous movement prediction state is false", function()
@@ -1259,6 +1271,10 @@ describe("KeepFollowing", function()
 
                         TestUnsetMovementPredictionState(false)
                         TestMovementPrediction(false)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
                 end)
             end)
@@ -1280,6 +1296,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(true)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
 
                     describe("when the previous movement prediction state is false", function()
@@ -1289,6 +1309,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(false)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
                 end)
 
@@ -1304,6 +1328,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(true)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
 
                     describe("when the previous movement prediction state is false", function()
@@ -1313,6 +1341,10 @@ describe("KeepFollowing", function()
                         end)
 
                         TestNoPushLagCompensation(false)
+
+                        it("should return false", function()
+                            assert.is_false(keepfollowing:StartFollowing(leader))
+                        end)
                     end)
                 end)
             end)
@@ -1337,6 +1369,10 @@ describe("KeepFollowing", function()
                         match.is_ref(keepfollowing)
                     )
                 end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:StartFollowing(leader))
+                end)
             end)
 
             describe("when a not valid leader", function()
@@ -1354,6 +1390,10 @@ describe("KeepFollowing", function()
                     assert.spy(keepfollowing.StartFollowingThread).was_called(0)
                     keepfollowing:StartFollowing(leader)
                     assert.spy(keepfollowing.StartFollowingThread).was_called(0)
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:StartFollowing(leader))
                 end)
             end)
         end)
