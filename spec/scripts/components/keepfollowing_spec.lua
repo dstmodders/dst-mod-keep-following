@@ -3,6 +3,7 @@ require "busted.runner"()
 describe("KeepFollowing", function()
     -- setup
     local match
+    local _os
 
     -- before_each initialization
     local inst, leader
@@ -17,6 +18,8 @@ describe("KeepFollowing", function()
         DebugSpyInit(spy)
 
         -- globals
+        _os = _G.os
+
         _G.ACTIONS = {
             BLINK = {
                 code = 14,
@@ -57,6 +60,9 @@ describe("KeepFollowing", function()
             FLYERS = 2048,
             SANITY = 4096,
         }
+        _G.os = mock({
+            clock = ReturnValueFn(2),
+        })
         _G.RPC = {
             LeftClick = {},
         }
@@ -72,6 +78,7 @@ describe("KeepFollowing", function()
         _G.AllPlayers = nil
         _G.COLLISION = nil
         _G.SendRPCToServer = nil
+        _G.os = _os
         _G.TEST = false
         _G.TheWorld = nil
     end)
@@ -1172,13 +1179,13 @@ describe("KeepFollowing", function()
     end)
 
     describe("following", function()
-        before_each(function()
-            keepfollowing.config = {}
-            keepfollowing.MovementPrediction = spy.new(Empty)
-            keepfollowing.StartFollowingThread = spy.new(Empty)
-        end)
-
         describe("StartFollowing", function()
+            before_each(function()
+                keepfollowing.config = {}
+                keepfollowing.MovementPrediction = spy.new(Empty)
+                keepfollowing.StartFollowingThread = spy.new(Empty)
+            end)
+
             local function TestNoPushLagCompensation(state)
                 it("shouldn't set a new self.movement_prediction_state value", function()
                     assert.is_equal(state, keepfollowing.movement_prediction_state)
@@ -1394,6 +1401,102 @@ describe("KeepFollowing", function()
 
                 it("should return false", function()
                     assert.is_false(keepfollowing:StartFollowing(leader))
+                end)
+            end)
+        end)
+
+        describe("StopFollowing", function()
+            before_each(function()
+                keepfollowing.ClearFollowingPathThread = spy.new(Empty)
+                keepfollowing.ClearFollowingThread = spy.new(Empty)
+                keepfollowing.debug_rpc_counter = 1
+                keepfollowing.is_following = true
+                keepfollowing.leader = leader
+                keepfollowing.leader_positions = { {} }
+                keepfollowing.start_time = 1
+            end)
+
+            describe("when the self.leader is set", function()
+                before_each(function()
+                    keepfollowing.leader = leader
+                end)
+
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    keepfollowing:StopFollowing()
+                    DebugSpyAssertWasCalled(
+                        "DebugString",
+                        1,
+                        "Stopped following Wilson. RPCs: 1. Time: 1.0000"
+                    )
+                end)
+
+                it("should call self:ClearFollowingPathThread()", function()
+                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
+                    keepfollowing:StopFollowing()
+                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(1)
+                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called_with(
+                        match.is_ref(keepfollowing)
+                    )
+                end)
+
+                it("should call self:ClearFollowingThread()", function()
+                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
+                    keepfollowing:StopFollowing()
+                    assert.spy(keepfollowing.ClearFollowingThread).was_called(1)
+                    assert.spy(keepfollowing.ClearFollowingThread).was_called_with(
+                        match.is_ref(keepfollowing)
+                    )
+                end)
+
+                it("should reset fields", function()
+                    keepfollowing:StopFollowing()
+                    assert.is_equal(0, keepfollowing.debug_rpc_counter)
+                    assert.is_false(keepfollowing.is_following)
+                    assert.is_nil(keepfollowing.leader)
+                    assert.is_same({}, keepfollowing.leader_positions)
+                    assert.is_nil(keepfollowing.start_time)
+                end)
+
+                it("should return true", function()
+                    assert.is_true(keepfollowing:StopFollowing())
+                end)
+            end)
+
+            describe("when the self.leader is not set", function()
+                before_each(function()
+                    keepfollowing.leader = nil
+                end)
+
+                it("should debug error", function()
+                    DebugSpyClear("DebugError")
+                    keepfollowing:StopFollowing()
+                    DebugSpyAssertWasCalled("DebugError", 1, "No leader")
+                end)
+
+                it("shouldn't call self:ClearFollowingPathThread()", function()
+                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
+                    keepfollowing:StopFollowing()
+                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
+                end)
+
+                it("shouldn't call self:ClearFollowingThread()", function()
+                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
+                    keepfollowing:StopFollowing()
+                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
+                end)
+
+                it("should reset fields", function()
+                    keepfollowing:StopFollowing()
+                    assert.is_equal(1, keepfollowing.debug_rpc_counter)
+                    assert.is_true(keepfollowing.is_following)
+                    assert.is_nil(keepfollowing.leader)
+                    assert.is_same({ {} }, keepfollowing.leader_positions)
+                    assert.is_equal(1, keepfollowing.start_time)
+                end)
+
+                it("should return false", function()
+                    assert.is_false(keepfollowing:StopFollowing())
                 end)
             end)
         end)

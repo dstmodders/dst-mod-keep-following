@@ -495,20 +495,17 @@ function KeepFollowing:StartFollowingThread()
     end, function()
         self.is_following = true
         self.start_time = os.clock()
-
         if self.config.following_method == "default" then
             self:StartFollowingPathThread()
         end
     end, function()
-        self.is_following = false
-        self.start_time = nil
         self:ClearFollowingPathThread()
     end)
 end
 
 --- Stops the following thread.
 --
--- Stops the thread started earlier by the `StartFollowingThread`.
+-- Stops the thread started earlier by `StartFollowingThread`.
 function KeepFollowing:ClearFollowingThread()
     return Utils.ThreadClear(self.following_thread)
 end
@@ -558,7 +555,7 @@ end
 
 --- Stops the following path thread.
 --
--- Stops the thread started earlier by the `StartFollowingPathThread`.
+-- Stops the thread started earlier by `StartFollowingPathThread`.
 function KeepFollowing:ClearFollowingPathThread()
     return Utils.ThreadClear(self.following_path_thread)
 end
@@ -589,6 +586,8 @@ function KeepFollowing:StartFollowing(leader)
     return false
 end
 
+--- Stops following a leader.
+-- @treturn boolean
 function KeepFollowing:StopFollowing()
     if self.leader then
         self:DebugString(string.format(
@@ -598,14 +597,20 @@ function KeepFollowing:StopFollowing()
             os.clock() - self.start_time
         ))
 
+        self:ClearFollowingPathThread()
+        self:ClearFollowingThread()
+
         self.debug_rpc_counter = 0
         self.is_following = false
         self.leader = nil
         self.leader_positions = {}
         self.start_time = nil
-        self:ClearFollowingPathThread()
-        self:ClearFollowingThread()
+
+        return true
+    else
+        self:DebugError("No leader")
     end
+    return false
 end
 
 --
@@ -667,7 +672,7 @@ end
 
 --- Stops the pushing thread.
 --
--- Stops the thread started earlier by the `StartPushingThread`.
+-- Stops the thread started earlier by `StartPushingThread`.
 function KeepFollowing:ClearPushingThread()
     return Utils.ThreadClear(self.pushingthread)
 end
