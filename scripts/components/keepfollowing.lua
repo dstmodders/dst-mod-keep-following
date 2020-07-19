@@ -619,7 +619,7 @@ end
 function KeepFollowing:StartPushingThread()
     local buffered, buffered_prev, interrupted, pos
 
-    self.following_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
+    self.pushing_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
             self:DebugError("Leader doesn't exist anymore")
             self:StopPushing()
@@ -652,7 +652,7 @@ end
 --
 -- Stops the thread started earlier by `StartPushingThread`.
 function KeepFollowing:ClearPushingThread()
-    return Utils.ThreadClear(self.pushingthread)
+    return Utils.ThreadClear(self.pushing_thread)
 end
 
 --- Starts pushing a leader.
@@ -743,7 +743,7 @@ function KeepFollowing:DoInit(inst)
 
     -- pushing
     self.is_pushing = false
-    self.pushingthread = nil
+    self.pushing_thread = nil
 
     -- debugging
     self.debug_rpc_counter = 0
