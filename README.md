@@ -53,7 +53,7 @@ Below are the features/improvements yet to be implemented:
 
 ## License
 
-Released under the [Unlicense](https://unlicense.org/).
+Released under the [MIT License](https://opensource.org/licenses/MIT).
 
 [don't starve together]: https://www.klei.com/games/dont-starve-together
 [ldoc]: https://stevedonovan.github.io/ldoc/
