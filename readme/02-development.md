@@ -22,7 +22,8 @@ already preinstalled is to pull the following [Docker][] image and incorporate
 that into your workflow:
 
 ```shell script
-$ cd dst-mod-dev-tools
+$ git clone https://github.com/victorpopkov/dst-mod-keep-following
+$ cd dst-mod-keep-following
 $ docker pull viktorpopkov/dst-mod
 ```
 
@@ -43,8 +44,8 @@ $ docker run --rm -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-m
 #### PowerShell
 
 ```powershell
-PS:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods"
-PS:\> docker run --rm -itv "${PWD}:/mod/" -v "$Env:DST_MODS:/mods/" viktorpopkov/dst-mod
+PS C:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods"
+PS C:\> docker run --rm -itv "${PWD}:/mod/" -v "$Env:DST_MODS:/mods/" viktorpopkov/dst-mod
 ```
 
 ## Lua
@@ -170,7 +171,7 @@ mentioned guide:
 - LDoc `@param`, `@tparam` and `@treturn` descriptions SHOULD have a first letter capitalized and no trailing dot
 - Use 4 spaces for indention (this is also more consistent between other languages)
 - Use PascalCase and camelCase for names of the functions and methods
-- Use lowercase without any delimiters for the class and local variables
+- Use snake_case for the class fields and local variables
 
 If at some point the mentioned style guide suggests a different approach that
 wasn't mentioned earlier use the existing code as a guide instead.
@@ -315,11 +316,9 @@ the corresponding rules:
 $ make help
 Please use 'make <target>' where '<target>' is one of:
 
-   gitrelease     to commit modinfo.lua and CHANGELOG.md + add the new tag
    install        to install the mod
    ldoc           to generate an LDoc documentation
-   lint           to run Luacheck linting
-   packassets     to pack images
+   lint           to run code linting
    test           to run Busted tests
    testcoverage   to print the tests coverage report
    testlist       to list all existing tests
