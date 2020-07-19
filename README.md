@@ -16,6 +16,15 @@ To stop following use `WASD` movement keys, `SPACEBAR` action key or click `LMB`
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
 
+## Documentation
+
+The [LDoc][] documentation generator has been used for generating documentation,
+and the most recent version can be found here:
+http://github.victorpopkov.com/dst-mod-keep-following/
+
+- [Installation](readme/01-installation.md)
+- [Development](readme/02-development.md)
+
 ## Configuration
 
 Don't like the default behaviour? Choose your own configuration to match your
@@ -33,15 +42,6 @@ needs:
 | **Push lag compensation** | _Yes_     | Should the lag compensation be automatically disabled while pushing?  |
 | **Hide changelog**        | _Yes_     | Should the changelog in the mod description be hidden?                |
 | **Debug**                 | _No_      | Should the debug mode be enabled?                                     |
-
-## Documentation
-
-The [LDoc][] documentation generator has been used for generating documentation,
-and the most recent version can be found here:
-http://github.victorpopkov.com/dst-mod-keep-following/
-
-- [Installation](readme/01-installation.md)
-- [Development](readme/02-development.md)
 
 ## Roadmap
 
