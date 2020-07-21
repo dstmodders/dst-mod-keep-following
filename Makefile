@@ -3,6 +3,7 @@ help:
 	@echo "   install        to install the mod"
 	@echo "   ldoc           to generate an LDoc documentation"
 	@echo "   lint           to run code linting"
+	@echo "   modicon        to pack modicon"
 	@echo "   test           to run Busted tests"
 	@echo "   testcoverage   to print the tests coverage report"
 	@echo "   testlist       to list all existing tests"
@@ -37,6 +38,10 @@ lint:
 		printf "\nPrettier (XML):\n\n"; prettier --check ./**/*.xml || EXIT=$$?; \
 		printf "\nPrettier (YAML):\n\n"; prettier --check ./**/*.yml || EXIT=$$?; \
 		exit $${EXIT}
+
+modicon:
+	@:$(call check_defined, DS_KTOOLS_KTECH)
+	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
 
 test:
 	@busted . && luacov-console . && luacov-console -s
