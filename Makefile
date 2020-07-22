@@ -17,10 +17,12 @@ install:
 		--exclude 'CHANGELOG.md' \
 		--exclude 'Makefile' \
 		--exclude 'README.md' \
+		--exclude 'busted.out' \
 		--exclude 'config.ld' \
 		--exclude 'description.txt*' \
 		--exclude 'doc/' \
 		--exclude 'luacov*' \
+		--exclude 'modicon.png' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
 		--exclude 'workshop/' \
