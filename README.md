@@ -1,5 +1,8 @@
 # dst-mod-keep-following
 
+[![GitHub Workflow CI Status][]](https://github.com/victorpopkov/dst-mod-keep-following/actions?query=workflow%3ACI)
+[![GitHub Workflow Documentation Status][]](https://github.com/victorpopkov/dst-mod-keep-following/actions?query=workflow%3ADocumentation)
+
 [![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
 
 ## Overview
@@ -57,6 +60,8 @@ Released under the [MIT License](https://opensource.org/licenses/MIT).
 
 [development]: readme/02-development.md
 [don't starve together]: https://www.klei.com/games/dont-starve-together
+[github workflow ci status]: https://github.com/victorpopkov/dst-mod-keep-following/workflows/CI/badge.svg
+[github workflow documentation status]: https://github.com/victorpopkov/dst-mod-keep-following/workflows/Documentation/badge.svg
 [installation]: readme/01-installation.md
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
