@@ -13,10 +13,14 @@ trim_trailing_whitespace = true
 indent_size = 4
 max_line_length = 100
 
-# Makefile
-[Makefile]
-indent_style = tab
-
 # XML
 [*.xml]
 indent_size = 4
+
+# .luacheckrc
+[.luacheckrc]
+indent_size = 2
+
+# Makefile
+[Makefile]
+indent_style = tab
