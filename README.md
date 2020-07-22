@@ -47,11 +47,9 @@ needs:
 
 ## Roadmap
 
-Below are the features/improvements yet to be implemented:
-
-- [ ] Auto-hide in a Bush Hat if equipped
-- [ ] Auto-hide in a Snurtle Shell Armor if in the inventory
-- [ ] Follow players through wormholes and possibly cave entrances
+You can always find and track the current states of the upcoming features/fixes
+on the following [Trello][] board:
+https://trello.com/b/De8QnsZd/mod-keep-following
 
 ## License
 
@@ -62,3 +60,4 @@ Released under the [MIT License](https://opensource.org/licenses/MIT).
 [installation]: readme/01-installation.md
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
+[trello]: https://trello.com/
