@@ -771,8 +771,12 @@ th {
   line-height: 1.5;
 }
 
-h5 {
+h5,
+h6 {
   font-size: 1em;
+}
+
+h6 {
   margin: 0;
   padding: 0;
 }
