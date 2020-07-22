@@ -10,45 +10,40 @@ This topic has been created for those who are planning to contribute to this
 project, so you could easier join into the workflow and for those who are
 already contributing to follow the best practices.
 
-- [Docker](#docker)
-- [Lua](#lua)
-- [Tools](#tools)
+- [Quick Start](#quick-start)
+- [Environment](#environment)
 - [Best Practices](#best-practises)
 
-## Docker
+## Quick Start
 
 The easiest way to set up the development environment with most of the tools
 already preinstalled is to pull the following [Docker][] image and incorporate
-that into your workflow:
-
-```shell script
-$ git clone https://github.com/victorpopkov/dst-mod-keep-following
-$ cd dst-mod-keep-following
-$ docker pull viktorpopkov/dst-mod
-```
+that into your workflow.
 
 To learn more, consider checking out the corresponding [Docker Hub][] image:
 [https://hub.docker.com/r/viktorpopkov/dst-mod][]
 
-### Linux
-
-#### Bash
+### Linux (Shell/Bash)
 
 ```shell script
+$ git clone https://github.com/victorpopkov/dst-mod-keep-following
+$ cd dst-mod-keep-following
 $ export DST_MODS="${HOME}/.steam/steam/steamapps/common/Don't Starve Together/mods/"
 $ docker run --rm -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
 ```
 
-### Windows
-
-#### PowerShell
+### Windows (PowerShell)
 
 ```powershell
+PS C:\> git clone https://github.com/victorpopkov/dst-mod-keep-following
+PS C:\> cd dst-mod-keep-following
 PS C:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods"
 PS C:\> docker run --rm -itv "${PWD}:/mod/" -v "$Env:DST_MODS:/mods/" viktorpopkov/dst-mod
 ```
 
-## Lua
+## Environment
+
+### Lua
 
 The game engine uses the [Lua][] interpreter v5.1, so it's RECOMMENDED to use
 the same version locally as well. In this project, we use the v5.1.5 so if you
@@ -58,11 +53,11 @@ version instead.
 Also, we RECOMMEND installing the latest [LuaRocks][] to install some tools used
 in this project as well.
 
-### Installation
+#### Installation
 
-#### Linux
+##### Linux
 
-##### [Lua][]
+###### [Lua][]
 
 ```shell script
 $ sudo apt install build-essential libreadline-dev
@@ -73,7 +68,7 @@ $ make linux test
 $ sudo make install
 ```
 
-##### [LuaRocks][]
+###### [LuaRocks][]
 
 ```shell script
 $ wget https://luarocks.org/releases/luarocks-3.3.1.tar.gz
@@ -84,7 +79,7 @@ $ make
 $ sudo make install
 ```
 
-## Tools
+### Tools
 
 The project uses the following tools to improve overall code quality and
 encourage following the best practices and standards:
@@ -96,21 +91,18 @@ encourage following the best practices and standards:
 - [LuaCov][]
 - [Luacheck][]
 - [Prettier][]
+- [ktools][]
 
 We do RECOMMEND getting familiar with these tools and integrate them into your
 workflow when developing this project. Their usage is OPTIONAL but is strongly
 advisable. Consider running at least code linting and tests (if there are any)
 throughout the development.
 
-Also, the [ktools][] is used for converting images into Klei Entertainment's TEX
-texture format so if you are planning to change any existing assets or add your
-own you SHOULD install that as well.
+#### Installation
 
-### Installation
+##### Linux
 
-#### Linux
-
-##### [Busted][], [LDoc][], [Luacheck][] and [LuaCov][]
+###### [Busted][], [LDoc][], [Luacheck][] and [LuaCov][]
 
 ```shell script
 $ sudo luarocks install busted
@@ -120,7 +112,15 @@ $ sudo luarocks install luacov
 $ sudo luarocks install luacov-console
 ```
 
-##### [ktools][]
+###### [Prettier][]
+
+```shell script
+$ npm install -g prettier
+# or
+$ yarn global add prettier
+```
+
+###### [ktools][]
 
 ```shell script
 $ sudo apt install pkg-config imagemagick=8:6.9.10.23+dfsg-2.1
@@ -171,7 +171,7 @@ mentioned guide:
 - LDoc `@param`, `@tparam` and `@treturn` descriptions SHOULD have a first letter capitalized and no trailing dot
 - Use 4 spaces for indention (this is also more consistent between other languages)
 - Use PascalCase and camelCase for names of the functions and methods
-- Use snake_case for the class fields and local variables
+- Use snake_case for the class fields and variables
 
 If at some point the mentioned style guide suggests a different approach that
 wasn't mentioned earlier use the existing code as a guide instead.
@@ -181,7 +181,7 @@ rational reason has been found.
 
 ### Communication
 
-For communication, we use [Slack][].
+For communication, we suggest using [Slack][].
 
 ### Git
 
@@ -319,6 +319,7 @@ Please use 'make <target>' where '<target>' is one of:
    install        to install the mod
    ldoc           to generate an LDoc documentation
    lint           to run code linting
+   modicon        to pack modicon
    test           to run Busted tests
    testcoverage   to print the tests coverage report
    testlist       to list all existing tests
