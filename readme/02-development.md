@@ -12,18 +12,19 @@ already contributing to follow the best practices.
 
 - [Quick Start](#quick-start)
 - [Environment](#environment)
-- [Best Practices](#best-practises)
+- [Code Style](#code-style)
+- [Workflow](#workflow)
 
 ## Quick Start
 
-The easiest way to set up the development environment with most of the tools
-already preinstalled is to pull the following [Docker][] image and incorporate
-that into your workflow.
+The easiest and RECOMMENDED way to set up a development environment with most
+of the tools already preinstalled is to pull the following [Docker][] image and
+incorporate that into your workflow.
 
 To learn more, consider checking out the corresponding [Docker Hub][] image:
 [https://hub.docker.com/r/viktorpopkov/dst-mod][]
 
-### Linux (Shell/Bash)
+### Shell/Bash (Linux)
 
 ```shell script
 $ git clone https://github.com/victorpopkov/dst-mod-keep-following
@@ -32,7 +33,7 @@ $ export DST_MODS="${HOME}/.steam/steam/steamapps/common/Don't Starve Together/m
 $ docker run --rm -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
 ```
 
-### Windows (PowerShell)
+### PowerShell (Windows)
 
 ```powershell
 PS C:\> git clone https://github.com/victorpopkov/dst-mod-keep-following
@@ -46,18 +47,16 @@ PS C:\> docker run --rm -itv "${PWD}:/mod/" -v "$Env:DST_MODS:/mods/" viktorpopk
 ### Lua
 
 The game engine uses the [Lua][] interpreter v5.1, so it's RECOMMENDED to use
-the same version locally as well. In this project, we use the v5.1.5 so if you
+the same version locally as well. In this project, the v5.1.5 is used so if you
 happen to stumble upon on some compatibility issues consider switching to that
 version instead.
 
-Also, we RECOMMEND installing the latest [LuaRocks][] to install some tools used
-in this project as well.
+Also, I RECOMMEND installing the latest [LuaRocks][] to install some tools used
+throughout the project as well.
 
-#### Installation
+#### Installation (Linux)
 
-##### Linux
-
-###### [Lua][]
+##### [Lua][]
 
 ```shell script
 $ sudo apt install build-essential libreadline-dev
@@ -68,7 +67,7 @@ $ make linux test
 $ sudo make install
 ```
 
-###### [LuaRocks][]
+##### [LuaRocks][]
 
 ```shell script
 $ wget https://luarocks.org/releases/luarocks-3.3.1.tar.gz
@@ -82,7 +81,7 @@ $ sudo make install
 ### Tools
 
 The project uses the following tools to improve overall code quality and
-encourage following the best practices and standards:
+encourage following some of the best practices:
 
 - [Busted][]
 - [EditorConfig][]
@@ -93,16 +92,14 @@ encourage following the best practices and standards:
 - [Prettier][]
 - [ktools][]
 
-We do RECOMMEND getting familiar with these tools and integrate them into your
+I do RECOMMEND getting familiar with these tools and integrate them into your
 workflow when developing this project. Their usage is OPTIONAL but is strongly
 advisable. Consider running at least code linting and tests (if there are any)
 throughout the development.
 
-#### Installation
+#### Installation (Linux)
 
-##### Linux
-
-###### [Busted][], [LDoc][], [Luacheck][] and [LuaCov][]
+##### [Busted][], [LDoc][], [Luacheck][] and [LuaCov][]
 
 ```shell script
 $ sudo luarocks install busted
@@ -112,7 +109,7 @@ $ sudo luarocks install luacov
 $ sudo luarocks install luacov-console
 ```
 
-###### [Prettier][]
+##### [Prettier][]
 
 ```shell script
 $ npm install -g prettier
@@ -120,7 +117,7 @@ $ npm install -g prettier
 $ yarn global add prettier
 ```
 
-###### [ktools][]
+##### [ktools][]
 
 ```shell script
 $ sudo apt install pkg-config imagemagick=8:6.9.10.23+dfsg-2.1
@@ -138,34 +135,14 @@ $ make
 $ make install
 ```
 
-## Best Practises
-
-- [CI/CD](#cicd)
-- [Code Style](#code-style)
-- [Communication](#communication)
-- [Git](#git)
-- [Project Management](#project-management)
-- [Makefile](#makefile)
-
-### CI/CD
-
-[GitHub Actions][] are used as a [Continuous Integration][] (CI) provider for
-running both code linting and tests on every commit and release. The same goes
-with the [Continuous Deployment][] (CD) of the latest documentation.
-
-Make sure CI/CD doesn't report any issues and consider fixing them if it does.
-However, the CI/CD reports SHOULD only be the last resort as most of the issues
-SHOULD be fixed locally either before making any pull requests or pushing into
-the repository.
-
-### Code Style
+## Code Style
 
 In addition to the general code style that is described in the [EditorConfig][]
 and some stylistic errors that can be caught by the [Luacheck][], the
 [Lua Style Guide][] can be used as a reference throughout the project.
 
-Based on the game engine, the following suggestions apply which differ from the
-mentioned guide:
+Based on the game engine, the following suggestions SHOULD apply which differ
+from the mentioned guide:
 
 - Comments SHOULD neither have a capitalized first letter, nor a trailing dot (unless there are multiple sentences)
 - LDoc `@param`, `@tparam` and `@treturn` descriptions SHOULD have a first letter capitalized and no trailing dot
@@ -179,97 +156,24 @@ wasn't mentioned earlier use the existing code as a guide instead.
 All the suggestions are negotiable and can be changed in the future when a
 rational reason has been found.
 
+## Workflow
+
+- [Communication](#communication)
+- [Project Management](#project-management)
+- [Git](#git)
+- [CI/CD](#cicd)
+- [Makefile](#makefile)
+
 ### Communication
 
-For communication, we suggest using [Slack][].
-
-### Git
-
-#### Branches
-
-While developing, the `master` branch MAY be used for development. However,
-after the first release, all development in the public repository MUST be done
-in the `develop` branch instead.
-
-Each branch MUST start with the corresponding prefix:
-
-- **Feature**: `feature/`
-- **Hotfix**: `hotfix/`
-- **Issue**: `issue/`
-- **Release**: `release/`
-
-> The general logic behind the branch prefixing:
->
-> 1. Branch `develop` is created from `master`
-> 2. Branch `release` is created from `develop`
-> 3. Branch `feature` is created from `develop`
-> 4. When the `feature` is complete it is merged into the `develop` branch
-> 5. When the `release` branch is done it is merged into `develop` and `master`
-> 6. If an issue in the `master` is detected a `hotfix` branch is created from `master`
-> 7. Once the `hotfix` is complete it is merged to both `develop` and `master`
-
-After the prefix, a label as short as possible MUST be used (or MAY be used if
-there is a corresponding OPTIONAL card/issue reference number), so we could
-differentiate active branches:
-
-- **Feature**: `feature/controller-support`
-- **Hotfix**: `hotfix/movement-prediction`
-- **Issue**: `issue/sendrpctoserver`
-- **Release**: `release/0.1.0`
-
-You can add an OPTIONAL number pointing to the corresponding [Trello][] card
-number or [GitHub][] issue (you MUST add a "G" letter before the number:
-`issue-G1/`). In this case, the label becomes OPTIONAL:
-
-- **Feature**: `feature-42/controller-support` or `feature-42`
-- **Hotfix**: `hotfix-46/movement-prediction` or `hotfix-46`
-- **Issue**: `issue-G2/sendrpctoserver` or `issue-G2`
-
-> In general, a shorter version without a label is RECOMMENDED if there is a
-> reference number.
-
-Furthermore, when starting developing a certain feature or fixing a certain
-issue you MUST work in a named branch by adding your [GitHub][] username prefix:
-
-- **Feature**: `<your username>/feature-42/controller-support` or `<your username>/feature-42`
-- **Hotfix**: `<your username>/hotfix-46/movement-prediction` or `<your username>/hotfix-46`
-- **Issue**: `<your username>/issue-G2/sendrpctoserver` or `<your username>/issue-G2`
-
-> In general, a shorter version without a label is RECOMMENDED if there is a
-> reference number.
-
-This not only allows you to work peacefully on a certain feature/issue and no
-one will interfere into your work but also allows you not to bother with commits
-as in the end they will be rebased into the non-prefixed branch before merging
-anyway.
-
-In the end, you MUST just follow this workflow:
-
-1. Create or pick a [Trello][] card or a [GitHub][] issue (Reference example: #42)
-2. Create the corresponding branch: `<your username>/issue-42` (from `develop` branch)
-3. Commit and push your work into your branch
-4. Repeat
-
-#### Commits
-
-There are no specific suggestions for commits in this project, so the best bet
-would be to look at the previous commits as a source of reference, be consistent
-and use common sense.
-
-You MAY follow these rules:
-
-1. Be short and descriptive
-2. Capitalize the first letter
-3. Describe your changes in an imperative mood as if you are giving orders to the codebase
-4. Use the present tense
-
-However, the [Conventional Commits][] specification is currently under
-consideration.
+For communication, I RECOMMEND using [Slack][].
 
 ### Project Management
 
-For project management, we use [Trello][] as a tool, the [Agile][] software
-development approach along with the [Scrum][] structure.
+For project management, I use [Trello][], the [Agile][] software development
+approach along with the [Scrum][] structure.
+
+The board: [https://trello.com/b/De8QnsZd/mod-keep-following][]
 
 #### Labels
 
@@ -303,11 +207,91 @@ You SHOULD follow these rules:
 14. Use existing templates (when possible)
 15. You should look through the cards in each column from bottom to top
 
+### Git
+
+#### Branches
+
+While developing, the `master` branch MAY be used for development. However,
+after the first release, all development in the public repository MUST be done
+in the `develop` branch instead.
+
+Each branch MUST start with the corresponding prefix:
+
+- **Feature**: `feature/`
+- **Hotfix**: `hotfix/`
+- **Issue**: `issue/`
+- **Release**: `release/`
+
+After the prefix, a label as short as possible MUST be used (or MAY be used if
+there is a corresponding OPTIONAL card/issue reference number), so we could
+differentiate active branches:
+
+- **Feature**: `feature/controller-support`
+- **Hotfix**: `hotfix/movement-prediction`
+- **Issue**: `issue/sendrpctoserver`
+- **Release**: `release/0.1.0`
+
+You can add an OPTIONAL number pointing to the corresponding [Trello][] card
+number or [GitHub][] issue (you MUST add a "G" letter before the number:
+`issue-G1/`). In this case, the label becomes OPTIONAL:
+
+- **Feature**: `feature-42/controller-support` or `feature-42`
+- **Hotfix**: `hotfix-46/movement-prediction` or `hotfix-46`
+- **Issue**: `issue-G2/sendrpctoserver` or `issue-G2`
+
+In general, a shorter version without a label is RECOMMENDED when a reference
+number is available.
+
+Furthermore, when starting developing a certain feature or fixing a certain
+issue you MUST work in a named branch by adding your [GitHub][] username prefix:
+
+- **Feature**: `<your username>/feature-42/controller-support` or `<your username>/feature-42`
+- **Hotfix**: `<your username>/hotfix-46/movement-prediction` or `<your username>/hotfix-46`
+- **Issue**: `<your username>/issue-G2/sendrpctoserver` or `<your username>/issue-G2`
+
+This not only allows you to work peacefully on a certain feature/issue and no
+one will interfere into your work but also allows you not to bother with commits
+as in the end they will be rebased into the non-prefixed branch before merging
+anyway.
+
+In the end, you MUST just follow this workflow:
+
+1. Create or pick a [Trello][] card or a [GitHub][] issue (Reference example: #42)
+2. Create the corresponding branch: `<your username>/issue-42` (from `develop` branch)
+3. Review, commit and push your work into your branch
+4. Repeat
+
+#### Commits
+
+There are no specific suggestions for commits in this project, so the best bet
+would be to look at the previous commits as a source of reference, be consistent
+and use common sense.
+
+You MAY follow these rules:
+
+1. Be short and descriptive
+2. Capitalize the first letter
+3. Describe your changes in an imperative mood as if you are giving orders to the codebase
+4. Use the present tense
+
+However, the [Conventional Commits][] specification is currently under
+consideration.
+
+### CI/CD
+
+[GitHub Actions][] are used as a [Continuous Integration][] (CI) provider for
+running both code linting and tests on every commit and release. The same goes
+with the [Continuous Deployment][] (CD) of the latest documentation.
+
+Make sure CI/CD doesn't report any issues and consider fixing them if it does.
+However, the CI/CD reports SHOULD only be the last resort as most of the issues
+SHOULD be fixed locally either before making any pull requests or pushing into
+the repository.
+
 ### Makefile
 
-_Currently, only Linux is supported. However, the Windows support is also
-considered to be added either by incorporating the [CMake][] or just adding the
-[NMake][] equivalent._
+_Currently, only Linux is supported. However, the Windows support has also been
+under consideration by incorporating a [CMake][] or [NMake][] equivalents._
 
 This project uses [Makefile][] so the most common tasks have been wrapped inside
 the corresponding rules:
@@ -340,6 +324,7 @@ Please use 'make <target>' where '<target>' is one of:
 [github]: https://github.com/
 [gnu make]: https://www.gnu.org/software/make/
 [https://hub.docker.com/r/viktorpopkov/dst-mod]: https://hub.docker.com/r/viktorpopkov/dst-mod
+[https://trello.com/b/de8qnszd/mod-keep-following]: https://trello.com/b/De8QnsZd/mod-keep-following
 [ktools]: https://github.com/nsimplex/ktools
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [lua style guide]: https://github.com/luarocks/lua-style-guide
