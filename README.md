@@ -60,8 +60,8 @@ Released under the [MIT License](https://opensource.org/licenses/MIT).
 
 [development]: readme/02-development.md
 [don't starve together]: https://www.klei.com/games/dont-starve-together
-[github workflow ci status]: https://github.com/victorpopkov/dst-mod-keep-following/workflows/CI/badge.svg
-[github workflow documentation status]: https://github.com/victorpopkov/dst-mod-keep-following/workflows/Documentation/badge.svg
+[github workflow ci status]: https://img.shields.io/github/workflow/status/victorpopkov/dst-mod-keep-following/CI?label=CI
+[github workflow documentation status]: https://img.shields.io/github/workflow/status/victorpopkov/dst-mod-keep-following/Documentation?label=Documentation
 [installation]: readme/01-installation.md
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
