@@ -145,11 +145,7 @@ files["spec/**/*.lua"] = {
     "ReturnValuesFn",
   },
   read_globals = {
-    -- general
     "rawget",
     "setmetatable",
-
-    -- project
-
   },
 }
