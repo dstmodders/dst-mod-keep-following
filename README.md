@@ -1,5 +1,7 @@
 # dst-mod-keep-following
 
+[![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
+
 ## Overview
 
 Mod for the game [Don't Starve Together][] which is available through the
@@ -22,8 +24,8 @@ The [LDoc][] documentation generator has been used for generating documentation,
 and the most recent version can be found here:
 http://github.victorpopkov.com/dst-mod-keep-following/
 
-- [Installation](readme/01-installation.md)
-- [Development](readme/02-development.md)
+- [Installation][]
+- [Development][]
 
 ## Configuration
 
@@ -55,6 +57,8 @@ Below are the features/improvements yet to be implemented:
 
 Released under the [MIT License](https://opensource.org/licenses/MIT).
 
+[development]: readme/02-development.md
 [don't starve together]: https://www.klei.com/games/dont-starve-together
+[installation]: readme/01-installation.md
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
