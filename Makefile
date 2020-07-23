@@ -61,6 +61,7 @@ uninstall:
 workshop:
 	@rm -Rf ./workshop/
 	@mkdir -p ./workshop/
+	@cp -R ./LICENSE ./workshop/LICENSE
 	@cp -R ./modicon.tex ./workshop/
 	@cp -R ./modicon.xml ./workshop/
 	@cp -R ./modinfo.lua ./workshop/
