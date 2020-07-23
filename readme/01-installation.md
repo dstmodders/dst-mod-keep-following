@@ -37,9 +37,8 @@ C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods
 
 ## Makefile
 
-_Currently, only Linux is supported. However, the Windows support is also
-considered to be added either by incorporating the [CMake][] or just adding the
-[NMake][] equivalent._
+_Currently, only Linux is supported. However, the Windows support has also been
+under consideration by incorporating a [CMake][] or [NMake][] equivalents._
 
 Since this project uses [Makefile][] it includes the rule to install the mod for
 the game installed throughout [Steam][] as well:
