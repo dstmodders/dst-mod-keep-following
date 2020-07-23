@@ -3,10 +3,13 @@
 --
 -- Includes different debugging-related features/functionality.
 --
+-- **Repository:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
+--
 -- @classmod Debug
 -- @author Victor Popkov
 -- @copyright 2019
 -- @license MIT
+-- @release 0.20.0
 ----
 require "class"
 
