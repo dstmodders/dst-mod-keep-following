@@ -1,6 +1,9 @@
 return {
-  ["include"] = {
-    "modmain",
+  include = {
     "scripts",
   },
+  exclude = {
+    "spec",
+  },
+  runreport = true,
 }
