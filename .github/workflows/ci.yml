@@ -79,6 +79,7 @@ jobs:
         run: |
           # test
           make test > busted.out || true
+          busted . > /dev/null || true
           cat busted.out
 
           # data
