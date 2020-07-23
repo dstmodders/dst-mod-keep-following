@@ -3,7 +3,7 @@
 --
 -- Most of them are expected to be used in the gameplay console.
 --
--- **Repository:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
+-- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
 -- @module Utils
 -- @author Victor Popkov

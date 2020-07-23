@@ -3,7 +3,7 @@
 --
 -- Includes following and pushing features/functionality.
 --
--- **Repository:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
+-- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
 -- @classmod KeepFollowing
 -- @author Victor Popkov

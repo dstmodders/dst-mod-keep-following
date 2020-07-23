@@ -1,7 +1,8 @@
 project = 'Keep Following'
+title = 'Mod Keep Following | LDoc'
 description = 'dst-mod-keep-following'
-full_description = 'Mod for the game [Don\'t Starve Together](https://www.klei.com/games/dont-starve-together) to keep following players/entities.\n\n**Repository:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)'
-title = 'Keep Following Mod Documentation'
+full_description = [[Mod for the game [Don\'t Starve Together](https://www.klei.com/games/dont-starve-together) to keep following players/entities]] .. "\n\n" ..
+                   [[**Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)']]
 
 dir = 'doc'
 file = './scripts/'
