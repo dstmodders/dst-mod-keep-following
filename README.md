@@ -2,6 +2,7 @@
 
 [![GitHub Workflow CI Status][]](https://github.com/victorpopkov/dst-mod-keep-following/actions?query=workflow%3ACI)
 [![GitHub Workflow Documentation Status][]](https://github.com/victorpopkov/dst-mod-keep-following/actions?query=workflow%3ADocumentation)
+[![Codecov][]](https://codecov.io/gh/victorpopkov/dst-mod-keep-following)
 
 [![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
 
@@ -58,6 +59,7 @@ https://trello.com/b/De8QnsZd/mod-keep-following
 
 Released under the [MIT License](https://opensource.org/licenses/MIT).
 
+[codecov]: https://img.shields.io/codecov/c/github/victorpopkov/dst-mod-keep-following.svg
 [development]: readme/02-development.md
 [don't starve together]: https://www.klei.com/games/dont-starve-together
 [github workflow ci status]: https://img.shields.io/github/workflow/status/victorpopkov/dst-mod-keep-following/CI?label=CI
