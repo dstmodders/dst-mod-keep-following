@@ -53,7 +53,7 @@ http://github.victorpopkov.com/dst-mod-keep-following/
 
 You can always find and track the current states of the upcoming features/fixes
 on the following [Trello][] board:
-https://trello.com/b/De8QnsZd/mod-keep-following
+https://trello.com/b/De8QnsZd/dst-mod-keep-following
 
 ## License
 
