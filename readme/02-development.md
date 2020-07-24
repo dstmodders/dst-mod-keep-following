@@ -173,7 +173,7 @@ For communication, I RECOMMEND using [Slack][].
 For project management, I use [Trello][], the [Agile][] software development
 approach along with the [Scrum][] structure.
 
-The board: [https://trello.com/b/De8QnsZd/mod-keep-following][]
+The board: [https://trello.com/b/De8QnsZd/dst-mod-keep-following][]
 
 #### Labels
 
@@ -324,7 +324,7 @@ Please use 'make <target>' where '<target>' is one of:
 [github]: https://github.com/
 [gnu make]: https://www.gnu.org/software/make/
 [https://hub.docker.com/r/viktorpopkov/dst-mod]: https://hub.docker.com/r/viktorpopkov/dst-mod
-[https://trello.com/b/de8qnszd/mod-keep-following]: https://trello.com/b/De8QnsZd/mod-keep-following
+[https://trello.com/b/de8qnszd/dst-mod-keep-following]: https://trello.com/b/De8QnsZd/dst-mod-keep-following
 [ktools]: https://github.com/nsimplex/ktools
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [lua style guide]: https://github.com/luarocks/lua-style-guide
