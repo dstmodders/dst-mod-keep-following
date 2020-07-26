@@ -1,14 +1,14 @@
 name = "Keep Following"
-version = "0.19.0"
+version = "0.20.0-beta"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
-    [[v0.19.0:]] .. "\n" ..
-    [[- Changed mod icon]] .. "\n" ..
-    [[- Fixed PlayerActionPicker:DoGetMouseActions() override]] .. "\n" ..
-    [[- Improved compatibility with some other mods]] .. "\n" ..
-    [[- Improved debug output]] .. "\n" ..
-    [[- Removed pushing support for birds]]
+    [[v]] .. version .. [[:]] .. "\n" ..
+    [[- Added support for the hide changelog configuration]] .. "\n" ..
+    [[- Added tests and documentation]] .. "\n" ..
+    [[- Changed configuration to be divided into sections]] .. "\n" ..
+    [[- Refactored most of the existing code]] .. "\n" ..
+    [[- Removed mobs configuration in favour of the "all" behaviour]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
