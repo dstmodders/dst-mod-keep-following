@@ -300,10 +300,12 @@ the corresponding rules:
 $ make help
 Please use 'make <target>' where '<target>' is one of:
 
+   gitrelease     to commit modinfo.lua and CHANGELOG.md + add a new tag
    install        to install the mod
    ldoc           to generate an LDoc documentation
    lint           to run code linting
    modicon        to pack modicon
+   release        to update version
    test           to run Busted tests
    testcoverage   to print the tests coverage report
    testlist       to list all existing tests
