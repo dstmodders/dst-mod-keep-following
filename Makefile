@@ -1,9 +1,13 @@
+GIT_LATEST_TAG = $$(git describe --abbrev=0)
+MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
 check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(value 2)))))
 
 help:
 	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
+	@echo "   gitrelease     to commit modinfo.lua and CHANGELOG.md + add a new tag"
 	@echo "   install        to install the mod"
 	@echo "   ldoc           to generate an LDoc documentation"
 	@echo "   lint           to run code linting"
@@ -14,6 +18,23 @@ help:
 	@echo "   testlist       to list all existing tests"
 	@echo "   uninstall      to uninstall the mod"
 	@echo "   workshop       to prepare the Steam Workshop directory"
+
+gitrelease:
+	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
+	@echo "Modinfo version: ${MODINFO_VERSION}\n"
+
+	@printf '1/5: Resetting (git reset)...'
+	@git reset > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@printf '2/5: Adding and commiting modinfo.lua...'
+	@git add modinfo.lua > /dev/null 2>&1
+	@git commit -m 'Update modinfo: version and description' > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@printf '3/5: Adding and commiting CHANGELOG.md...'
+	@git add CHANGELOG.md > /dev/null 2>&1
+	@git commit -m "Update CHANGELOG.md: release ${MODINFO_VERSION}" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@printf "4/5: Creating a signed tag (v${MODINFO_VERSION})..."
+	@git tag -s "v${MODINFO_VERSION}" -m "Release v${MODINFO_VERSION}" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@echo "5/5: Verifying tag (v${MODINFO_VERSION})...\n"
+	@git verify-tag "v${MODINFO_VERSION}"
 
 install:
 	@:$(call check_defined, DST_MODS)
