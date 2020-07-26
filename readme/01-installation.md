@@ -19,7 +19,7 @@ don't have access to the [Steam Workshop][] you can:
 Keep in mind, that you will need to manually update the mod each time a new
 version has been released.
 
-### Linux (Steam)
+### Steam (Linux)
 
 The mods' directory path on Linux installed through [Steam][]:
 
@@ -27,7 +27,7 @@ The mods' directory path on Linux installed through [Steam][]:
 /home/<your username>/.steam/steam/steamapps/common/Don't Starve Together/mods
 ```
 
-### Windows (Steam)
+### Steam (Windows)
 
 The mods' directory path on Windows installed through [Steam][]:
 
