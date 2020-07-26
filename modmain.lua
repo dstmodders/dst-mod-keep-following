@@ -398,8 +398,8 @@ if GetModConfigData("hide_changelog") then
             and _self.savedata.known_mods[modname]
         then
             local modinfo = _self.savedata.known_mods[modname].modinfo
-            if modinfo and modinfo.description then
-                local changelog = string.find(modinfo.description, "v" .. modinfo.version)
+            if modinfo and type(modinfo.description) == "string" then
+                local changelog = modinfo.description:find("v" .. modinfo.version, 0, true)
                 if type(changelog) == "number" then
                     modinfo.description = TrimString(modinfo.description:sub(1, changelog - 1))
                 end
