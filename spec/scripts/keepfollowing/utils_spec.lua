@@ -205,4 +205,84 @@ describe("Utils", function()
             end)
         end)
     end)
+
+    describe("modmain", function()
+        describe("HideChangelog", function()
+            before_each(function()
+                _G.KnownModIndex = {
+                    GetModInfo = spy.new(Empty),
+                }
+            end)
+
+            after_each(function()
+                Utils.HideChangelog(nil, false)
+            end)
+
+            teardown(function()
+                _G.KnownModIndex = nil
+            end)
+
+            describe("when no modname is passed", function()
+                describe("and enabling", function()
+                    it("shouldn't override KnownModIndex:GetModInfo()", function()
+                        local old = _G.KnownModIndex.GetModInfo
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                        Utils.HideChangelog(nil, true)
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(Utils.HideChangelog(nil, true))
+                    end)
+                end)
+
+                describe("and disabling", function()
+                    it("shouldn't override KnownModIndex:GetModInfo()", function()
+                        local old = _G.KnownModIndex.GetModInfo
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                        Utils.HideChangelog(nil, false)
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(Utils.HideChangelog(nil, false))
+                    end)
+                end)
+            end)
+
+            describe("when modname is passed", function()
+                local modname
+
+                before_each(function()
+                    modname = "dst-mod-keep-following"
+                end)
+
+                describe("and enabling", function()
+                    it("should override KnownModIndex:GetModInfo()", function()
+                        local old = _G.KnownModIndex.GetModInfo
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                        Utils.HideChangelog(modname, true)
+                        assert.is_not_equal(old, _G.KnownModIndex.GetModInfo)
+                    end)
+
+                    it("should return true", function()
+                        assert.is_true(Utils.HideChangelog(modname, true))
+                    end)
+                end)
+
+                describe("and disabling", function()
+                    it("shouldn't override KnownModIndex:GetModInfo()", function()
+                        local old = _G.KnownModIndex.GetModInfo
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                        Utils.HideChangelog(modname, false)
+                        assert.is_equal(old, _G.KnownModIndex.GetModInfo)
+                    end)
+
+                    it("should return false", function()
+                        assert.is_false(Utils.HideChangelog(modname, false))
+                    end)
+                end)
+            end)
+        end)
+    end)
 end)

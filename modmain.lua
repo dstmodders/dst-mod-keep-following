@@ -11,6 +11,8 @@
 local _G = GLOBAL
 local require = _G.require
 
+local Utils = require "keepfollowing/utils"
+
 --
 -- Globals
 --
@@ -387,26 +389,5 @@ AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 --
 
 if GetModConfigData("hide_changelog") then
-    local KnownModIndex = _G.KnownModIndex
-    local OldGetModInfo = KnownModIndex.GetModInfo
-    local TrimString = _G.TrimString
-
-    KnownModIndex.GetModInfo = function(_self, _modname)
-        if _modname == modname
-            and _self.savedata
-            and _self.savedata.known_mods
-            and _self.savedata.known_mods[modname]
-        then
-            local modinfo = _self.savedata.known_mods[modname].modinfo
-            if modinfo and type(modinfo.description) == "string" then
-                local changelog = modinfo.description:find("v" .. modinfo.version, 0, true)
-                if type(changelog) == "number" then
-                    modinfo.description = TrimString(modinfo.description:sub(1, changelog - 1))
-                end
-            end
-        end
-        return OldGetModInfo(_self, _modname)
-    end
-
-    _G.KnownModIndex = KnownModIndex
+    Utils.HideChangelog(modname, true)
 end

@@ -92,6 +92,7 @@ files["scripts/**/*.lua"] = {
     "Networking_Say",
     "SendRPCToServer",
     "TheWorld",
+    "_G",
 
     -- project
     "Debug",
@@ -101,7 +102,6 @@ files["scripts/**/*.lua"] = {
     "AllPlayers",
     "BufferedAction",
     "KnownModIndex",
-    "_G",
 
     -- constants
     "ACTIONS",
