@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Configuration to be splitted into sections
+- Configuration to be divided into sections
 - Refactored most of the existing code
 
 ### Removed
