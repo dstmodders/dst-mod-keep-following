@@ -111,9 +111,9 @@ files["scripts/**/*.lua"] = {
 
     -- threads
     "KillThreadsWithID",
-    "scheduler",
     "Sleep",
     "StartThread",
+    "scheduler",
   },
 }
 
