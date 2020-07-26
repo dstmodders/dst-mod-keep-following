@@ -8,6 +8,7 @@ help:
 	@echo "   ldoc           to generate an LDoc documentation"
 	@echo "   lint           to run code linting"
 	@echo "   modicon        to pack modicon"
+	@echo "   release        to update version"
 	@echo "   test           to run Busted tests"
 	@echo "   testcoverage   to print the tests coverage report"
 	@echo "   testlist       to list all existing tests"
@@ -48,6 +49,15 @@ lint:
 modicon:
 	@:$(call check_defined, DS_KTOOLS_KTECH)
 	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+
+release:
+	@:$(call check_defined, MOD_VERSION)
+	@echo "Version: ${MOD_VERSION}\n"
+
+	@printf '1/2: Updating modinfo version...'
+	@sed -i "s/^version.*$$/version = \"${MOD_VERSION}\"/g" ./modinfo.lua && echo ' Done' || echo ' Error'
+	@printf '2/2: Syncing LDoc release code occurrences...'
+	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
 
 test:
 	@busted . && luacov-console . && luacov-console -s
