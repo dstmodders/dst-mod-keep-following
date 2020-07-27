@@ -38,10 +38,11 @@ local Debug
 if GetModConfigData("debug") then
     Debug = require "keepfollowing/debug"
     Debug:DoInit(modname)
-    Debug:SetIsEnabled(GetModConfigData("debug") and true or false)
+    Debug:SetIsEnabled(true)
     Debug:DebugModConfigs()
-    _G.KeepFollowingDebug = Debug
 end
+
+_G.KeepFollowingDebug = Debug
 
 local function DebugString(...)
     return Debug and Debug:DebugString(...)
