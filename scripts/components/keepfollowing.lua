@@ -772,6 +772,8 @@ function KeepFollowing:DoInit(inst)
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
     end
+
+    self:DebugInit("KeepFollowing")
 end
 
 return KeepFollowing
