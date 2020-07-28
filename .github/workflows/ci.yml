@@ -78,8 +78,7 @@ jobs:
       - name: Test
         run: |
           # test
-          make test > busted.out || true
-          busted . > /dev/null || true
+          make citest > busted.out || true
           cat busted.out
 
           # data
