@@ -6,6 +6,7 @@
 -- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
 -- @module Utils
+--
 -- @author Victor Popkov
 -- @copyright 2019
 -- @license MIT
