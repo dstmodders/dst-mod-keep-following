@@ -300,6 +300,7 @@ the corresponding rules:
 $ make help
 Please use 'make <target>' where '<target>' is one of:
 
+   citest         to run Busted tests for CI
    gitrelease     to commit modinfo.lua and CHANGELOG.md + add a new tag
    install        to install the mod
    ldoc           to generate an LDoc documentation
