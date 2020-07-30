@@ -21,7 +21,7 @@ help:
 	@echo "   workshop       to prepare the Steam Workshop directory"
 
 citest:
-	@busted . && awk '/^Summary$$/{if (a) print a;if (b) print b}{a=b;b=$$0;} /^Summary$$/,f' luacov.report.out
+	@busted .; awk '/^Summary$$/{if (a) print a;if (b) print b}{a=b;b=$$0;} /^Summary$$/,f' luacov.report.out
 
 gitrelease:
 	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
@@ -85,7 +85,7 @@ release:
 	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
 
 test:
-	@busted . && luacov-console . && luacov-console -s
+	@busted .; luacov-console . && luacov-console -s
 
 testcoverage:
 	@luacov-console . && luacov-console -s
