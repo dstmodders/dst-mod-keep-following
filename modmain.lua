@@ -77,10 +77,10 @@ local function IsMoveButton(control)
 end
 
 local function IsOurAction(action)
-    return action == ACTIONS.FOLLOW
-        or action == ACTIONS.PUSH
-        or action == ACTIONS.TENT_FOLLOW
-        or action == ACTIONS.TENT_PUSH
+    return action == ACTIONS.KEEP_FOLLOWING_FOLLOW
+        or action == ACTIONS.KEEP_FOLLOWING_PUSH
+        or action == ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW
+        or action == ACTIONS.KEEP_FOLLOWING_TENT_PUSH
 end
 
 --
@@ -151,10 +151,14 @@ local function ActionTentPush(act)
     return true
 end
 
-AddAction("FOLLOW", "Follow", ActionFollow)
-AddAction("PUSH", "Push", ActionPush)
-AddAction("TENT_FOLLOW", "Follow player in", ActionTentFollow)
-AddAction("TENT_PUSH", _PUSH_WITH_RMB and "Push player" or "Push player in", ActionTentPush)
+AddAction("KEEP_FOLLOWING_FOLLOW", "Follow", ActionFollow)
+AddAction("KEEP_FOLLOWING_PUSH", "Push", ActionPush)
+AddAction("KEEP_FOLLOWING_TENT_FOLLOW", "Follow player in", ActionTentFollow)
+AddAction(
+    "KEEP_FOLLOWING_TENT_PUSH",
+    _PUSH_WITH_RMB and "Push player" or "Push player in",
+    ActionTentPush
+)
 
 --
 -- Player
@@ -164,11 +168,11 @@ local function OnPlayerActivated(player, world)
     player:AddComponent("keepfollowing")
 
     local keepfollowing = player.components.keepfollowing
-
     if keepfollowing then
         keepfollowing.is_client = IsClient()
         keepfollowing.is_dst = IsDST()
         keepfollowing.is_master_sim = world.ismastersim
+        keepfollowing.player_controller = player.components.playercontroller
         keepfollowing.world = world
 
         -- GetModConfigData
@@ -258,31 +262,31 @@ local function PlayerActionPickerPostInit(_self, player)
 
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, target, ACTIONS.TENT_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.TENT_PUSH)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.TENT_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW)
                 end
             end
 
             if keepfollowing:CanBeLeader(target) then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, target, ACTIONS.FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
-                    lmb = BufferedAction(player, target, ACTIONS.PUSH)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_FOLLOW)
                 end
             end
 
             if _PUSH_WITH_RMB then
                 if target:HasTag("tent") and target:HasTag("hassleeper") then
-                    rmb = BufferedAction(player, target, ACTIONS.TENT_PUSH)
+                    rmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_PUSH)
                 end
 
                 if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
-                    rmb = BufferedAction(player, target, ACTIONS.PUSH)
+                    rmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_PUSH)
                 end
             end
         end
@@ -302,11 +306,9 @@ local function PlayerControllerPostInit(_self, _player)
 
     local function KeepFollowingStop()
         local keepfollowing = _player.components.keepfollowing
-        if not keepfollowing then
-            return
+        if keepfollowing then
+            keepfollowing:Stop()
         end
-
-        keepfollowing:Stop()
     end
 
     -- We ignore ActionQueue(DST) mod here intentionally. Our mod won't work with theirs if the same
