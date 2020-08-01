@@ -150,16 +150,24 @@ function KeepFollowing:IsOnPlatform()
     return IsOnPlatform(self.world, self.inst)
 end
 
+--- Stops following and pushing.
+--
+-- General wrapper to call `StopFollowing` and/or `StopPushing` based on the current state.
+--
+-- @treturn boolean
 function KeepFollowing:Stop()
     if IsHUDFocused(self.inst) then
         if self:IsFollowing() then
             self:StopFollowing()
+            return true
         end
 
         if self:IsPushing() then
             self:StopPushing()
+            return true
         end
     end
+    return false
 end
 
 --
@@ -720,7 +728,7 @@ end
 
 --- Initializes.
 --
--- Sets empty and default fields and adds debug methods.
+-- Sets default fields, adds debug methods and starts the component.
 --
 -- @tparam table inst Player instance.
 function KeepFollowing:DoInit(inst)
