@@ -730,7 +730,7 @@ end
 --
 -- Sets default fields, adds debug methods and starts the component.
 --
--- @tparam table inst Player instance.
+-- @tparam EntityScript inst Player instance
 function KeepFollowing:DoInit(inst)
     Utils.AddDebugMethods(self)
 
@@ -741,6 +741,7 @@ function KeepFollowing:DoInit(inst)
     self.is_master_sim = TheWorld.ismastersim
     self.leader = nil
     self.movement_prediction_state = nil
+    self.name = "KeepFollowing"
     self.player_controller = nil
     self.start_time = nil
     self.world = TheWorld
@@ -782,7 +783,7 @@ function KeepFollowing:DoInit(inst)
         self._MovementPrediction = MovementPrediction
     end
 
-    self:DebugInit("KeepFollowing")
+    self:DebugInit(self.name)
 end
 
 return KeepFollowing
