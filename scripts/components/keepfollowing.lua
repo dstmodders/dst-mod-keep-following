@@ -107,9 +107,10 @@ local function ThreadInterruptOnPauseAction(self, buffered_previous)
                 Sleep(pause_action_time)
             end
         end
-    elseif not self:IsMovementPrediction() then
+    elseif not Utils.IsLocomotorAvailable(self.inst) then
+        local player_controller = Utils.ChainGet(self.inst, "components", "playercontroller")
         if not self.inst:HasTag("ignorewalkableplatforms")
-            and (self.player_controller:IsBusy() or self.inst.replica.builder:IsBusy())
+            and (player_controller:IsBusy() or self.inst.replica.builder:IsBusy())
             and not self.inst.replica.inventory:GetActiveItem()
         then
             self.is_paused = true
@@ -128,13 +129,8 @@ local function ThreadInterruptOnPauseAction(self, buffered_previous)
     return buffered_previous, false
 end
 
-local function WalkToPosition(self, pos)
-    if self.is_master_sim or self.player_controller.locomotor then
-        self.player_controller:DoAction(BufferedAction(self.inst, nil, ACTIONS.WALKTO, nil, pos))
-    else
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pos.x, pos.z)
-    end
-
+local function WalkToPoint(self, pt)
+    Utils.WalkToPoint(self.inst, pt)
     if _G.KeepFollowingDebug then
         self.debug_rpc_counter = self.debug_rpc_counter + 1
     end
@@ -185,12 +181,6 @@ local function MovementPrediction(inst, enable)
         inst:EnableMovementPrediction(false)
         return false
     end
-end
-
---- Checks if the movement prediction is enabled.
--- @treturn boolean
-function KeepFollowing:IsMovementPrediction()
-    return Utils.ChainGet(self, "inst", "components", "locomotor") ~= nil
 end
 
 --- Enables/Disables the movement prediction.
@@ -446,14 +436,14 @@ function KeepFollowing:StartFollowingThread()
             if pos then
                 buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
 
-                if interrupted or (not buffered and self:IsMovementPrediction()) then
-                    WalkToPosition(self, pos)
+                if interrupted or (not buffered and Utils.IsLocomotorAvailable()) then
+                    WalkToPoint(self, pos)
                     pos_prev = pos
                 end
 
                 if not self.is_paused then
                     if not pos_prev or pos ~= pos_prev then
-                        WalkToPosition(self, pos)
+                        WalkToPoint(self, pos)
                         pos_prev = pos
                         stuck = false
                         stuck_frames = 0
@@ -475,13 +465,13 @@ function KeepFollowing:StartFollowingThread()
                 buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
 
                 if interrupted then
-                    WalkToPosition(self, pos)
+                    WalkToPoint(self, pos)
                 end
 
                 if not self.is_paused
                     and (not pos_prev or GetDistSqBetweenPositions(pos, pos_prev) > .1)
                 then
-                    WalkToPosition(self, pos)
+                    WalkToPoint(self, pos)
                     pos_prev = pos
                 end
             end
@@ -642,11 +632,11 @@ function KeepFollowing:StartPushingThread()
         pos = self.leader:GetPosition()
 
         buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-        if interrupted or (not buffered and self:IsMovementPrediction()) then
-            WalkToPosition(self, pos)
+        if interrupted or (not buffered and Utils.IsLocomotorAvailable()) then
+            WalkToPoint(self, pos)
         end
 
-        WalkToPosition(self, pos)
+        WalkToPoint(self, pos)
 
         Sleep(FRAMES)
     end, function()
@@ -678,7 +668,7 @@ end
 function KeepFollowing:StartPushing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
         if self.movement_prediction_state == nil then
-            self.movement_prediction_state = self:IsMovementPrediction()
+            self.movement_prediction_state = Utils.IsLocomotorAvailable()
         end
 
         if self.movement_prediction_state then
@@ -742,7 +732,6 @@ function KeepFollowing:DoInit(inst)
     self.leader = nil
     self.movement_prediction_state = nil
     self.name = "KeepFollowing"
-    self.player_controller = nil
     self.start_time = nil
     self.world = TheWorld
 

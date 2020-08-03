@@ -148,7 +148,6 @@ describe("KeepFollowing", function()
             assert.is_equal(_G.TheWorld.ismastersim, self.is_master_sim)
             assert.is_nil(self.leader)
             assert.is_nil(self.movement_prediction_state)
-            assert.is_nil(self.player_controller)
             assert.is_nil(self.start_time)
             assert.is_equal(_G.TheWorld, self.world)
 
@@ -554,36 +553,6 @@ describe("KeepFollowing", function()
 
                 TestMovementPrediction(enable_fn, disable_fn, function()
                     return _inst
-                end)
-            end)
-        end)
-
-        describe("IsMovementPrediction", function()
-            describe("when some chain fields are missing", function()
-                it("should return false", function()
-                    AssertChainNil(function()
-                        assert.is_false(keepfollowing:IsMovementPrediction())
-                    end, keepfollowing, "inst", "components", "locomotor")
-                end)
-            end)
-
-            describe("when self.inst locomotor component is available", function()
-                before_each(function()
-                    keepfollowing.inst.components.locomotor = {}
-                end)
-
-                it("should return true", function()
-                    assert.is_true(keepfollowing:IsMovementPrediction())
-                end)
-            end)
-
-            describe("when self.inst locomotor component is not available", function()
-                before_each(function()
-                    keepfollowing.inst.components.locomotor = nil
-                end)
-
-                it("should return true", function()
-                    assert.is_false(keepfollowing:IsMovementPrediction())
                 end)
             end)
         end)

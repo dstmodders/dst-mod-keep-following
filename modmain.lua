@@ -172,7 +172,6 @@ local function OnPlayerActivated(player, world)
         keepfollowing.is_client = IsClient()
         keepfollowing.is_dst = IsDST()
         keepfollowing.is_master_sim = world.ismastersim
-        keepfollowing.player_controller = player.components.playercontroller
         keepfollowing.world = world
 
         -- GetModConfigData
@@ -304,6 +303,10 @@ local function PlayerControllerPostInit(_self, _player)
         return
     end
 
+    --
+    -- Helpers
+    --
+
     local function KeepFollowingStop()
         local keepfollowing = _player.components.keepfollowing
         if keepfollowing then
@@ -333,19 +336,13 @@ local function PlayerControllerPostInit(_self, _player)
         actionqueuer:ClearSelectedEntities()
     end
 
-    local function OurMouseAction(player, act)
+    local function OurMouseAction(act)
         if not act then
             KeepFollowingStop()
             return
         end
 
-        local keepfollowing = player.components.keepfollowing
         local action = act.action
-
-        if keepfollowing then
-            keepfollowing.player_controller = _self
-        end
-
         if IsOurAction(action) then
             ClearActionQueueRebornEntities()
             return action.fn(act)
@@ -353,6 +350,10 @@ local function PlayerControllerPostInit(_self, _player)
             KeepFollowingStop()
         end
     end
+
+    --
+    -- Overrides
+    --
 
     local OldOnControl = _self.OnControl
 
@@ -366,13 +367,13 @@ local function PlayerControllerPostInit(_self, _player)
                 return OldOnControl(self, control, down)
             end
 
-            OurMouseAction(_player, self:GetLeftMouseAction())
+            OurMouseAction(self:GetLeftMouseAction())
         elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
             if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
 
-            OurMouseAction(_player, self:GetRightMouseAction())
+            OurMouseAction(self:GetRightMouseAction())
         end
 
         OldOnControl(self, control, down)
