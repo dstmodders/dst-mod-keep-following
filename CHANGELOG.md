@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Improved debug output
-- Improved leader approaching behaviour in the default mode
+- Improved a leader approaching behaviour in the default mode
 - Improved the target distance calculation
 - Optimized requests while following
 
@@ -129,7 +129,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Actions not showing on dedicated in all mobs mode
-- Distance calculation between follower and leader
+- Distance calculation between a follower and a leader
 
 ## [0.12.0][] - 2019-09-16
 
@@ -243,7 +243,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Crash when lag compensation is being turned off
+- Crash when lag compensation has been turned off
 
 ## [0.3.0][] - 2019-08-18
 
@@ -256,7 +256,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
-- Leader reinitialization if a leader didn't change
+- Leader initialization if a leader didn't change
 
 ### Fixed
 
