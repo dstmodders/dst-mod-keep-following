@@ -19,6 +19,12 @@ describe("Utils", function()
     teardown(function()
         -- debug
         DebugSpyTerm()
+
+        -- globals
+        _G.ACTIONS = nil
+        _G.BufferedAction = nil
+        _G.RPC = nil
+        _G.SendRPCToServer = nil
     end)
 
     before_each(function()
@@ -27,6 +33,20 @@ describe("Utils", function()
 
         -- debug
         DebugSpyClear()
+
+        -- globals
+        _G.ACTIONS = {
+            WALKTO = {
+                code = 163,
+            },
+        }
+        _G.BufferedAction = spy.new(ReturnValueFn({}))
+        _G.RPC = {
+            DirectWalking = 16,
+            LeftClick = 26,
+            StopWalking = 46,
+        }
+        _G.SendRPCToServer = spy.new(Empty)
     end)
 
     describe("chain", function()
@@ -201,6 +221,117 @@ describe("Utils", function()
                         "clock",
                         "GetTimeUntilPhase"
                     ))
+                end)
+            end)
+        end)
+    end)
+
+    describe("locomotor", function()
+        local pt
+
+        before_each(function()
+            pt = Vector3(1, 0, 1)
+        end)
+
+        describe("IsLocomotorAvailable", function()
+            local player
+
+            before_each(function()
+                player = {
+                    components = {
+                        locomotor = {},
+                    },
+                }
+            end)
+
+            describe("when some chain fields are missing", function()
+                it("should return false", function()
+                    AssertChainNil(function()
+                        assert.is_false(Utils.IsLocomotorAvailable(player))
+                    end, player, "components", "locomotor")
+                end)
+            end)
+
+            describe("when the locomotor component is available", function()
+                it("should return true", function()
+                    assert.is_true(Utils.IsLocomotorAvailable(player))
+                end)
+            end)
+
+            describe("when the locomotor component is not available", function()
+                before_each(function()
+                    player.components.locomotor = nil
+                end)
+
+                it("should return true", function()
+                    assert.is_false(Utils.IsLocomotorAvailable(player))
+                end)
+            end)
+        end)
+
+        describe("WalkToPoint", function()
+            local player
+
+            before_each(function()
+                player = {
+                    components = {
+                        playercontroller = {
+                            locomotor = {},
+                            DoAction = spy.new(Empty),
+                        },
+                    },
+                }
+            end)
+
+            describe("when the player controller is available", function()
+                describe("when the locomotor component is available", function()
+                    it("should call player.components.playercontroller:DoAction()", function()
+                        assert.spy(player.components.playercontroller.DoAction).was_called(0)
+                        Utils.WalkToPoint(player, pt)
+                        assert.spy(player.components.playercontroller.DoAction).was_called(1)
+                        assert.spy(player.components.playercontroller.DoAction).was_called_with(
+                            match.is_ref(player.components.playercontroller),
+                            {}
+                        )
+                    end)
+
+                    it("shouldn't call SendRPCToServer()", function()
+                        assert.spy(_G.SendRPCToServer).was_called(0)
+                        Utils.WalkToPoint(player, pt)
+                        assert.spy(_G.SendRPCToServer).was_called(0)
+                    end)
+                end)
+
+                describe("when the locomotor component is not available", function()
+                    before_each(function()
+                        player.components.playercontroller.locomotor = nil
+                    end)
+
+                    it("should call SendRPCToServer()", function()
+                        assert.spy(_G.SendRPCToServer).was_called(0)
+                        Utils.WalkToPoint(player, pt)
+                        assert.spy(_G.SendRPCToServer).was_called(1)
+                        assert.spy(_G.SendRPCToServer).was_called_with(
+                            _G.RPC.LeftClick,
+                            _G.ACTIONS.WALKTO.code,
+                            1,
+                            1
+                        )
+                    end)
+                end)
+            end)
+
+            describe("when the player controller is not available", function()
+                before_each(function()
+                    player.components.playercontroller = nil
+                end)
+
+                it("should debug string", function()
+                    DebugSpyClear("DebugString")
+                    Utils.WalkToPoint(player, pt)
+                    DebugSpyAssertWasCalled("DebugError", 1, {
+                        "Player controller is not available",
+                    })
                 end)
             end)
         end)

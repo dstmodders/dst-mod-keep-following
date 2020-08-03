@@ -1,5 +1,5 @@
 ----
--- Different global utilities.
+-- Different mod utilities.
 --
 -- Most of them are expected to be used in the gameplay console.
 --
@@ -20,6 +20,10 @@ local BaseGetModInfo
 --
 -- Helpers
 --
+
+local function DebugError(...)
+    return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugError(...)
+end
 
 local function DebugString(...)
     return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugString(...)
@@ -152,6 +156,42 @@ end
 -- @treturn boolean
 function Utils.ChainValidate(src, ...)
     return Utils.ChainGet(src, ...) and true or false
+end
+
+--
+-- Locomotor
+--
+
+--- Checks if the locomotor is available.
+--
+-- Can be used to check whether the movement prediction (lag compensation) is enabled or not as the
+-- locomotor component is not available when it's disabled.
+--
+-- @tparam EntityScript inst Player instance
+-- @treturn boolean
+function Utils.IsLocomotorAvailable(inst)
+    return Utils.ChainGet(inst, "components", "locomotor") ~= nil
+end
+
+--- Walks to a certain point.
+--
+-- Prepares a `WALKTO` action for `PlayerController.DoAction` when the locomotor component is
+-- available. Otherwise sends the corresponding `RPC.LeftClick`.
+--
+-- @tparam EntityScript inst Player instance
+-- @tparam Vector3 pt Destination point
+function Utils.WalkToPoint(inst, pt)
+    local player_controller = Utils.ChainGet(inst, "components", "playercontroller")
+    if not player_controller then
+        DebugError("Player controller is not available")
+        return
+    end
+
+    if player_controller.locomotor then
+        player_controller:DoAction(BufferedAction(inst, nil, ACTIONS.WALKTO, nil, pt))
+    else
+        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pt.x, pt.z)
+    end
 end
 
 --
