@@ -130,6 +130,8 @@ files["spec/**/*.lua"] = {
     "Class",
     "ClassRegistry",
     "package",
+    "ToVector3",
+    "Vector3",
 
     -- project
     "AssertChainNil",
