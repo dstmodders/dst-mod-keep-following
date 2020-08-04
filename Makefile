@@ -21,7 +21,13 @@ help:
 	@echo "   workshop       to prepare the Steam Workshop directory"
 
 citest:
-	@busted .; awk '/^Summary$$/{if (a) print a;if (b) print b}{a=b;b=$$0;} /^Summary$$/,f' luacov.report.out
+	@busted .; \
+		cp luacov.report.out luacov.report.out.bak \
+			&& luacov -r lcov > /dev/null 2>&1 \
+			&& cp luacov.report.out lcov.info \
+			&& cp luacov.report.out.bak luacov.report.out \
+			&& rm luacov.report.out.bak; \
+		awk '/^Summary$$/{if (a) print a;if (b) print b}{a=b;b=$$0;} /^Summary$$/,f' luacov.report.out
 
 gitrelease:
 	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
@@ -86,10 +92,10 @@ release:
 	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
 
 test:
-	@busted .; luacov-console . && luacov-console -s
+	@busted .; luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
 
 testcoverage:
-	@luacov-console . && luacov-console -s
+	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
 
 testlist:
 	@busted --list . | awk '{$$1=""}1' | awk '{gsub(/^[ \t]+|[ \t]+$$/,"");print}'
