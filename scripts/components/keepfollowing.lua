@@ -436,7 +436,7 @@ function KeepFollowing:StartFollowingThread()
             if pos then
                 buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
 
-                if interrupted or (not buffered and Utils.IsLocomotorAvailable()) then
+                if interrupted or (not buffered and Utils.IsLocomotorAvailable(self.inst)) then
                     WalkToPoint(self, pos)
                     pos_prev = pos
                 end
@@ -535,7 +535,7 @@ end
 --- Starts following a leader.
 --
 -- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
--- Sets a leader using `SetLeader` and then starts the following thread by calling
+-- Sets a leader using `SetLeader`, resets fields and starts the following thread by calling
 -- `StartFollowingThread`.
 --
 -- @tparam EntityScript leader A leader to follow
@@ -653,7 +653,7 @@ function KeepFollowing:StartPushingThread()
         pos = self.leader:GetPosition()
 
         buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-        if interrupted or (not buffered and Utils.IsLocomotorAvailable()) then
+        if interrupted or (not buffered and Utils.IsLocomotorAvailable(self.inst)) then
             WalkToPoint(self, pos)
         end
 
@@ -668,7 +668,7 @@ end
 --- Starts pushing a leader.
 --
 -- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
--- Sets a leader using `SetLeader` and then starts the pushing thread by calling
+-- Sets a leader using `SetLeader`, prepares fields and starts the pushing thread by calling
 -- `StartPushingThread`.
 --
 -- @tparam EntityScript leader A leader to push
@@ -676,7 +676,7 @@ end
 function KeepFollowing:StartPushing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
         if self.movement_prediction_state == nil then
-            self.movement_prediction_state = Utils.IsLocomotorAvailable()
+            self.movement_prediction_state = Utils.IsLocomotorAvailable(self.inst)
         end
 
         if self.movement_prediction_state then
