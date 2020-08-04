@@ -29,9 +29,9 @@ function Debug:IsEnabled()
 end
 
 --- Sets the debugging.
--- @tparam boolean value
-function Debug:SetIsEnabled(value)
-    self.is_enabled = value
+-- @tparam boolean enable
+function Debug:SetIsEnabled(enable)
+    self.is_enabled = enable
 end
 
 --- Enables the debugging.
