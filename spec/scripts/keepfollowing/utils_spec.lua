@@ -36,9 +36,7 @@ describe("Utils", function()
 
         -- globals
         _G.ACTIONS = {
-            WALKTO = {
-                code = 163,
-            },
+            WALKTO = { code = 163 },
         }
         _G.BufferedAction = spy.new(ReturnValueFn({}))
         _G.RPC = {

@@ -665,13 +665,6 @@ function KeepFollowing:StartPushingThread()
     end)
 end
 
---- Stops the pushing thread.
---
--- Stops the thread started earlier by `StartPushingThread`.
-function KeepFollowing:ClearPushingThread()
-    return Utils.ThreadClear(self.pushing_thread)
-end
-
 --- Starts pushing a leader.
 --
 -- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
@@ -691,9 +684,27 @@ function KeepFollowing:StartPushing(leader)
         end
     end
 
+    if self.is_pushing then
+        self:DebugError("Already pushing")
+        return false
+    end
+
     if self:SetLeader(leader) then
         self:DebugString("Started pushing...")
+
+        -- fields (general)
+        self.start_time = os.clock()
+
+        -- fields (pushing)
+        self.is_pushing = true
+        self.pushing_thread = nil
+
+        -- fields (debugging)
+        self.debug_rpc_counter = 0
+
+        -- start
         self:StartPushingThread()
+
         return true
     end
 
@@ -708,27 +719,44 @@ function KeepFollowing:StopPushing()
         self.movement_prediction_state = nil
     end
 
-    if self.leader then
-        self:DebugString(string.format(
-            "Stopped pushing %s. RPCs: %d. Time: %2.4f",
-            self.leader:GetDisplayName(),
-            self.debug_rpc_counter,
-            os.clock() - self.start_time
-        ))
-
-        self:ClearPushingThread()
-
-        self.debug_rpc_counter = 0
-        self.is_pushing = false
-        self.leader = nil
-        self.start_time = nil
-
-        return true
-    else
-        self:DebugError("No leader")
+    if not self.is_pushing then
+        self:DebugError("Not pushing")
+        return false
     end
 
-    return false
+    if not self.leader then
+        self:DebugError("No leader")
+        return false
+    end
+
+    if not self.pushing_thread then
+        self:DebugError("No active thread")
+        return false
+    end
+
+    -- debugging
+    self:DebugString(string.format(
+        "Stopped pushing %s. RPCs: %d. Time: %2.4f",
+        self.leader:GetDisplayName(),
+        self.debug_rpc_counter,
+        os.clock() - self.start_time
+    ))
+
+    -- thread
+    Utils.ThreadClear(self.pushing_thread)
+
+    -- fields (general)
+    self.leader = nil
+    self.start_time = nil
+
+    -- fields (pushing)
+    self.is_pushing = false
+    self.pushing_thread = nil
+
+    -- fields (debugging)
+    self.debug_rpc_counter = 0
+
+    return true
 end
 
 --- Initializes.
