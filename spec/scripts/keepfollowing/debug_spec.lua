@@ -383,6 +383,23 @@ describe("Debug", function()
             end)
         end)
 
+        describe("DebugError()", function()
+            before_each(function()
+                debug.DebugString = spy.new(Empty)
+            end)
+
+            it("should call DebugString() with corresponding arguments", function()
+                assert.spy(debug.DebugString).was_called(0)
+                debug:DebugError("hello")
+                assert.spy(debug.DebugString).was_called(1)
+                assert.spy(debug.DebugString).was_called_with(
+                    match.is_ref(debug),
+                    "[error]",
+                    "hello"
+                )
+            end)
+        end)
+
         describe("DebugModConfigs()", function()
             setup(function()
                 _G.KnownModIndex = {
