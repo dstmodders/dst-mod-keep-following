@@ -70,21 +70,6 @@ local function GetClosestPosition(entity1, entity2)
     return entity1:GetPositionAdjacentTo(entity2, distance)
 end
 
-local function GetDistSq(x1, y1, z1, x2, y2, z2)
-    local dx = x2 - x1
-    local dy = y2 - y1
-    local dz = z2 - z1
-    return dx * dx + dy * dy + dz * dz
-end
-
-local function GetDistSqBetweenPositions(p1, p2)
-    return GetDistSq(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
-end
-
-local function GetDistBetweenPositions(p1, p2)
-    return math.sqrt(GetDistSqBetweenPositions(p1, p2))
-end
-
 local function GetPauseAction(action)
     for _, v in ipairs(_PAUSE_ACTIONS) do
         if v[1] == action then
@@ -469,7 +454,7 @@ function KeepFollowing:StartFollowingThread()
                 end
 
                 if not self.is_paused
-                    and (not pos_prev or GetDistSqBetweenPositions(pos, pos_prev) > .1)
+                    and (not pos_prev or pos:DistSq(pos_prev) > .1)
                 then
                     WalkToPoint(self, pos)
                     pos_prev = pos
@@ -515,7 +500,7 @@ function KeepFollowing:StartFollowingPathThread()
 
         if IsPassable(self.world, pos) == IsPassable(self.world, pos_prev) then
             -- 1 is the most optimal value so far
-            if GetDistBetweenPositions(pos, pos_prev) > 1
+            if pos:DistSq(pos_prev) > 1
                 and pos ~= pos_prev
                 and self.leader_positions[#self.leader_positions] ~= pos
             then
