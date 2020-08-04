@@ -54,10 +54,6 @@ local function IsOnPlatform(world, inst)
     end
 end
 
-local function IsHUDFocused(player)
-    return not Utils.ChainGet(player, "HUD", "HasInputFocus", true)
-end
-
 local function IsPassable(world, pos)
     return Utils.ChainValidate(world, "Map", "IsPassableAtPoint")
         and Utils.ChainValidate(pos, "Get")
@@ -137,7 +133,7 @@ end
 --
 -- @treturn boolean
 function KeepFollowing:Stop()
-    if IsHUDFocused(self.inst) then
+    if Utils.IsHUDFocused(self.inst) then
         if self:IsFollowing() then
             self:StopFollowing()
             return true
@@ -794,7 +790,6 @@ function KeepFollowing:DoInit(inst)
     if _G.TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
         self._GetPauseAction = GetPauseAction
-        self._IsHUDFocused = IsHUDFocused
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction

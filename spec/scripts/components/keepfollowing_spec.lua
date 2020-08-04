@@ -280,63 +280,6 @@ describe("KeepFollowing", function()
             end)
         end)
 
-        describe("IsHUDFocused", function()
-            local player
-
-            before_each(function()
-                player = {
-                    HUD = {
-                        HasInputFocus = spy.new(ReturnValueFn(true)),
-                    },
-                }
-            end)
-
-            describe("when some chain fields are missing", function()
-                it("should return true", function()
-                    AssertChainNil(function()
-                        assert.is_true(keepfollowing._IsHUDFocused(player))
-                    end, player, "HUD", "HasInputFocus")
-                end)
-            end)
-
-            describe("when player.HUD:HasInputFocus()", function()
-                local function AssertCall()
-                    it("should call player.HUD:HasInputFocus()", function()
-                        assert.spy(player.HUD.HasInputFocus).was_called(0)
-                        keepfollowing._IsHUDFocused(player)
-                        assert.spy(player.HUD.HasInputFocus).was_called(1)
-                        assert.spy(player.HUD.HasInputFocus).was_called_with(
-                            match.is_ref(player.HUD)
-                        )
-                    end)
-                end
-
-                describe("returns true", function()
-                    before_each(function()
-                        player.HUD.HasInputFocus = spy.new(ReturnValueFn(true))
-                    end)
-
-                    AssertCall()
-
-                    it("should return false", function()
-                        assert.is_false(keepfollowing._IsHUDFocused(player))
-                    end)
-                end)
-
-                describe("returns false", function()
-                    before_each(function()
-                        player.HUD.HasInputFocus = spy.new(ReturnValueFn(false))
-                    end)
-
-                    AssertCall()
-
-                    it("should return true", function()
-                        assert.is_true(keepfollowing._IsHUDFocused(player))
-                    end)
-                end)
-            end)
-        end)
-
         describe("IsPassable", function()
             local world, pos
 

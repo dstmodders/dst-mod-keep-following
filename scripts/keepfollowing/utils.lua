@@ -66,6 +66,17 @@ function Utils.AddDebugMethods(dest)
 end
 
 --
+-- General
+--
+
+--- Checks if HUD has an input focus.
+-- @tparam EntityScript inst Player instance
+-- @treturn boolean
+function Utils.IsHUDFocused(inst)
+    return not Utils.ChainGet(inst, "HUD", "HasInputFocus", true)
+end
+
+--
 -- Chain
 --
 
