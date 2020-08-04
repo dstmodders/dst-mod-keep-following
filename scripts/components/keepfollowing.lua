@@ -483,23 +483,10 @@ function KeepFollowing:StartFollowingThread()
     end, function()
         return self.inst and self.inst:IsValid() and self:IsFollowing()
     end, function()
-        self.is_following = true
-        self.start_time = os.clock()
         if self.config.following_method == "default" then
             self:StartFollowingPathThread()
         end
-    end, function()
-        self.is_following = false
-        self.start_time = nil
-        self:ClearFollowingPathThread()
     end)
-end
-
---- Stops the following thread.
---
--- Stops the thread started earlier by `StartFollowingThread`.
-function KeepFollowing:ClearFollowingThread()
-    return Utils.ThreadClear(self.following_thread)
 end
 
 --- Starts the following path thread.
@@ -545,13 +532,6 @@ function KeepFollowing:StartFollowingPathThread()
     end)
 end
 
---- Stops the following path thread.
---
--- Stops the thread started earlier by `StartFollowingPathThread`.
-function KeepFollowing:ClearFollowingPathThread()
-    return Utils.ThreadClear(self.following_path_thread)
-end
-
 --- Starts following a leader.
 --
 -- Stores the movement prediction state and handles the behaviour accordingly on a non-master shard.
@@ -561,6 +541,11 @@ end
 -- @tparam EntityScript leader A leader to follow
 -- @treturn boolean
 function KeepFollowing:StartFollowing(leader)
+    if self.is_following then
+        self:DebugError("Already following")
+        return false
+    end
+
     if self.config.push_lag_compensation and not self.is_master_sim then
         local state = self.movement_prediction_state
         if state ~= nil then
@@ -571,7 +556,23 @@ function KeepFollowing:StartFollowing(leader)
 
     if self:SetLeader(leader) then
         self:DebugString("Started following...")
+
+        -- fields (general)
+        self.start_time = os.clock()
+
+        -- fields (pushing)
+        self.following_path_thread = nil
+        self.following_thread = nil
+        self.is_following = true
+        self.is_leader_near = false
+        self.leader_positions = {}
+
+        -- fields (debugging)
+        self.debug_rpc_counter = 0
+
+        -- start
         self:StartFollowingThread()
+
         return true
     end
 
@@ -581,28 +582,48 @@ end
 --- Stops following a leader.
 -- @treturn boolean
 function KeepFollowing:StopFollowing()
-    if self.leader then
-        self:DebugString(string.format(
-            "Stopped following %s. RPCs: %d. Time: %2.4f",
-            self.leader:GetDisplayName(),
-            self.debug_rpc_counter,
-            os.clock() - self.start_time
-        ))
-
-        self:ClearFollowingPathThread()
-        self:ClearFollowingThread()
-
-        self.debug_rpc_counter = 0
-        self.is_following = false
-        self.leader = nil
-        self.leader_positions = {}
-        self.start_time = nil
-
-        return true
-    else
-        self:DebugError("No leader")
+    if not self.is_following then
+        self:DebugError("Not following")
+        return false
     end
-    return false
+
+    if not self.leader then
+        self:DebugError("No leader")
+        return false
+    end
+
+    if not self.following_thread then
+        self:DebugError("No active thread")
+        return false
+    end
+
+    -- debugging
+    self:DebugString(string.format(
+        "Stopped following %s. RPCs: %d. Time: %2.4f",
+        self.leader:GetDisplayName(),
+        self.debug_rpc_counter,
+        os.clock() - self.start_time
+    ))
+
+    -- threads
+    Utils.ThreadClear(self.following_path_thread)
+    Utils.ThreadClear(self.following_thread)
+
+    -- fields (general)
+    self.leader = nil
+    self.start_time = nil
+
+    -- fields (following)
+    self.following_path_thread = nil
+    self.following_thread = nil
+    self.is_following = false
+    self.is_leader_near = false
+    self.leader_positions = {}
+
+    -- fields (debugging)
+    self.debug_rpc_counter = 0
+
+    return true
 end
 
 --
@@ -641,12 +662,6 @@ function KeepFollowing:StartPushingThread()
         Sleep(FRAMES)
     end, function()
         return self.inst and self.inst:IsValid() and self:IsPushing()
-    end, function()
-        self.is_pushing = true
-        self.start_time = os.clock()
-    end, function()
-        self.is_pushing = false
-        self.start_time = nil
     end)
 end
 
@@ -729,6 +744,7 @@ function KeepFollowing:DoInit(inst)
     self.is_client = false
     self.is_dst = false
     self.is_master_sim = TheWorld.ismastersim
+    self.is_paused = false
     self.leader = nil
     self.movement_prediction_state = nil
     self.name = "KeepFollowing"
@@ -740,7 +756,6 @@ function KeepFollowing:DoInit(inst)
     self.following_thread = nil
     self.is_following = false
     self.is_leader_near = false
-    self.is_paused = false
     self.leader_positions = {}
 
     -- pushing

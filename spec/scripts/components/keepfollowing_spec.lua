@@ -21,16 +21,38 @@ describe("KeepFollowing", function()
         _os = _G.os
 
         _G.ACTIONS = {
-            BLINK = {
-                code = 14,
-            },
-            LOOKAT = {
-                code = 78,
-            },
-            WALKTO = {
-                code = 163,
-            },
+            BLINK = { code = 14 },
+            LOOKAT = { code = 78 },
+            WALKTO = { code = 163 },
         }
+        _G.COLLISION = {
+            FLYERS = 2048,
+            SANITY = 4096,
+        }
+        _G.RPC = {
+            LeftClick = {},
+        }
+        _G.TEST = true
+    end)
+
+    teardown(function()
+        -- debug
+        DebugSpyTerm()
+
+        -- globals
+        _G.ACTIONS = nil
+        _G.AllPlayers = nil
+        _G.COLLISION = nil
+        _G.KillThreadsWithID = nil
+        _G.os = _os
+        _G.scheduler = nil
+        _G.SendRPCToServer = nil
+        _G.TEST = false
+        _G.TheWorld = nil
+    end)
+
+    before_each(function()
+        -- globals
         _G.AllPlayers = mock({
             {
                 GUID = 100000,
@@ -56,35 +78,13 @@ describe("KeepFollowing", function()
                 HasTag = ReturnValueFn(false),
             },
         })
-        _G.COLLISION = {
-            FLYERS = 2048,
-            SANITY = 4096,
-        }
+        _G.KillThreadsWithID = spy.new(Empty)
         _G.os = mock({
             clock = ReturnValueFn(2),
         })
-        _G.RPC = {
-            LeftClick = {},
-        }
-        _G.TEST = true
-    end)
-
-    teardown(function()
-        -- debug
-        DebugSpyTerm()
-
-        -- globals
-        _G.ACTIONS = nil
-        _G.AllPlayers = nil
-        _G.COLLISION = nil
-        _G.SendRPCToServer = nil
-        _G.os = _os
-        _G.TEST = false
-        _G.TheWorld = nil
-    end)
-
-    before_each(function()
-        -- globals
+        _G.scheduler = mock({
+            GetCurrentTask = ReturnValueFn(nil),
+        })
         _G.SendRPCToServer = spy.new(Empty)
         _G.TheWorld = mock({
             Map = {
@@ -142,21 +142,21 @@ describe("KeepFollowing", function()
 
         local function AssertDefaults(self)
             -- general
+            assert.is_equal(_G.TheWorld, self.world)
+            assert.is_equal(_G.TheWorld.ismastersim, self.is_master_sim)
             assert.is_equal(inst, self.inst)
             assert.is_false(self.is_client)
             assert.is_false(self.is_dst)
-            assert.is_equal(_G.TheWorld.ismastersim, self.is_master_sim)
+            assert.is_false(self.is_paused)
             assert.is_nil(self.leader)
             assert.is_nil(self.movement_prediction_state)
             assert.is_nil(self.start_time)
-            assert.is_equal(_G.TheWorld, self.world)
 
             -- following
             assert.is_nil(self.following_path_thread)
             assert.is_nil(self.following_thread)
             assert.is_false(self.is_following)
             assert.is_false(self.is_leader_near)
-            assert.is_false(self.is_paused)
             assert.is_same({}, self.leader_positions)
 
             -- pushing
@@ -1382,97 +1382,105 @@ describe("KeepFollowing", function()
 
         describe("StopFollowing", function()
             before_each(function()
-                keepfollowing.ClearFollowingPathThread = spy.new(Empty)
-                keepfollowing.ClearFollowingThread = spy.new(Empty)
-                keepfollowing.debug_rpc_counter = 1
-                keepfollowing.is_following = true
+                -- threads
+                keepfollowing.following_path_thread = {
+                    id = "following_path_thread",
+                    SetList = spy.new(Empty),
+                }
+
+                keepfollowing.following_thread = {
+                    id = "following_thread",
+                    SetList = spy.new(Empty),
+                }
+
+                -- fields (general)
                 keepfollowing.leader = leader
-                keepfollowing.leader_positions = { {} }
                 keepfollowing.start_time = 1
+
+                -- fields (following)
+                keepfollowing.is_following = true
+                keepfollowing.is_leader_near = false
+                keepfollowing.leader_positions = { {} }
+
+                -- fields (debugging)
+                keepfollowing.debug_rpc_counter = 1
             end)
 
-            describe("when the self.leader is set", function()
-                before_each(function()
-                    keepfollowing.leader = leader
-                end)
-
-                it("should debug string", function()
-                    DebugSpyClear("DebugString")
-                    keepfollowing:StopFollowing()
-                    DebugSpyAssertWasCalled(
-                        "DebugString",
-                        1,
-                        "Stopped following Wilson. RPCs: 1. Time: 1.0000"
-                    )
-                end)
-
-                it("should call self:ClearFollowingPathThread()", function()
-                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
-                    keepfollowing:StopFollowing()
-                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(1)
-                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called_with(
-                        match.is_ref(keepfollowing)
-                    )
-                end)
-
-                it("should call self:ClearFollowingThread()", function()
-                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
-                    keepfollowing:StopFollowing()
-                    assert.spy(keepfollowing.ClearFollowingThread).was_called(1)
-                    assert.spy(keepfollowing.ClearFollowingThread).was_called_with(
-                        match.is_ref(keepfollowing)
-                    )
-                end)
-
-                it("should reset fields", function()
-                    keepfollowing:StopFollowing()
-                    assert.is_equal(0, keepfollowing.debug_rpc_counter)
-                    assert.is_false(keepfollowing.is_following)
-                    assert.is_nil(keepfollowing.leader)
-                    assert.is_same({}, keepfollowing.leader_positions)
-                    assert.is_nil(keepfollowing.start_time)
-                end)
-
-                it("should return true", function()
-                    assert.is_true(keepfollowing:StopFollowing())
-                end)
-            end)
-
-            describe("when the self.leader is not set", function()
-                before_each(function()
-                    keepfollowing.leader = nil
-                end)
-
+            local function TestError(error)
                 it("should debug error", function()
                     DebugSpyClear("DebugError")
                     keepfollowing:StopFollowing()
-                    DebugSpyAssertWasCalled("DebugError", 1, "No leader")
-                end)
-
-                it("shouldn't call self:ClearFollowingPathThread()", function()
-                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
-                    keepfollowing:StopFollowing()
-                    assert.spy(keepfollowing.ClearFollowingPathThread).was_called(0)
-                end)
-
-                it("shouldn't call self:ClearFollowingThread()", function()
-                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
-                    keepfollowing:StopFollowing()
-                    assert.spy(keepfollowing.ClearFollowingThread).was_called(0)
-                end)
-
-                it("should reset fields", function()
-                    keepfollowing:StopFollowing()
-                    assert.is_equal(1, keepfollowing.debug_rpc_counter)
-                    assert.is_true(keepfollowing.is_following)
-                    assert.is_nil(keepfollowing.leader)
-                    assert.is_same({ {} }, keepfollowing.leader_positions)
-                    assert.is_equal(1, keepfollowing.start_time)
+                    DebugSpyAssertWasCalled("DebugError", 1, error)
                 end)
 
                 it("should return false", function()
                     assert.is_false(keepfollowing:StopFollowing())
                 end)
+            end
+
+            describe("when not following", function()
+                before_each(function()
+                    keepfollowing.is_following = false
+                end)
+
+                TestError("Not following")
+            end)
+
+            describe("when no leader", function()
+                before_each(function()
+                    keepfollowing.leader = nil
+                end)
+
+                TestError("No leader")
+            end)
+
+            describe("when no thread", function()
+                before_each(function()
+                    keepfollowing.following_thread = nil
+                end)
+
+                TestError("No active thread")
+            end)
+
+            it("should debug string", function()
+                DebugSpyClear("DebugString")
+                keepfollowing:StopFollowing()
+                DebugSpyAssertWasCalled(
+                    "DebugString",
+                    3,
+                    "Stopped following Wilson. RPCs: 1. Time: 1.0000"
+                )
+            end)
+
+            it("should call scheduler:GetCurrentTask()", function()
+                assert.spy(_G.scheduler.GetCurrentTask).was_called(0)
+                keepfollowing:StopFollowing()
+                assert.spy(_G.scheduler.GetCurrentTask).was_called(2)
+                assert.spy(_G.scheduler.GetCurrentTask).was_called_with(
+                    match.is_ref(_G.scheduler)
+                )
+            end)
+
+            it("should reset fields", function()
+                keepfollowing:StopFollowing()
+
+                -- general
+                assert.is_nil(keepfollowing.leader)
+                assert.is_nil(keepfollowing.start_time)
+
+                -- following
+                assert.is_nil(keepfollowing.following_path_thread)
+                assert.is_nil(keepfollowing.following_thread)
+                assert.is_false(keepfollowing.is_following)
+                assert.is_false(keepfollowing.is_leader_near)
+                assert.is_same({}, keepfollowing.leader_positions)
+
+                -- debugging
+                assert.is_equal(0, keepfollowing.debug_rpc_counter)
+            end)
+
+            it("should return true", function()
+                assert.is_true(keepfollowing:StopFollowing())
             end)
         end)
     end)
