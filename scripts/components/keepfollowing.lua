@@ -40,9 +40,8 @@ local KeepFollowing = Class(function(self, inst)
     self:DoInit(inst)
 end)
 
---
--- Helpers
---
+--- Helpers
+-- @section helpers
 
 local function IsOnPlatform(world, inst)
     if Utils.ChainValidate(world, "Map", "GetPlatformAtPoint")
@@ -117,9 +116,8 @@ local function WalkToPoint(self, pt)
     end
 end
 
---
--- General
---
+--- General
+-- @section general
 
 --- Checks if the player is on the platform.
 -- @treturn boolean
@@ -147,9 +145,8 @@ function KeepFollowing:Stop()
     return false
 end
 
---
--- Movement prediction
---
+--- Movement prediction
+-- @section movement-prediction
 
 local function MovementPrediction(inst, enable)
     if enable then
@@ -173,9 +170,8 @@ function KeepFollowing:MovementPrediction(enable)
     return is_enabled
 end
 
---
--- Leader
---
+--- Leader
+-- @section leader
 
 --- Gets the leader.
 -- @treturn EntityScript
@@ -286,9 +282,8 @@ function KeepFollowing:SetLeader(entity)
     return false
 end
 
---
--- Tent
---
+--- Tent
+-- @section tent
 
 local function FindClosestInvisiblePlayerInRange(x, y, z, range)
     local closest, dist_sq
@@ -330,9 +325,8 @@ function KeepFollowing:GetTentSleeper(entity)
     end
 end
 
---
--- Following
---
+--- Following
+-- @section following
 
 local function GetDefaultMethodNextPosition(self, target)
     local pos = self.leader_positions[1]
@@ -607,9 +601,8 @@ function KeepFollowing:StopFollowing()
     return true
 end
 
---
--- Pushing
---
+--- Pushing
+-- @section pushing
 
 --- Gets the pushing state.
 -- @treturn boolean
@@ -739,6 +732,9 @@ function KeepFollowing:StopPushing()
 
     return true
 end
+
+--- Initialization
+-- @section initialization
 
 --- Initializes.
 --

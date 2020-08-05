@@ -341,7 +341,7 @@ describe("Utils", function()
             end)
 
             describe("when the player controller is available", function()
-                describe("when the locomotor component is available", function()
+                describe("and the locomotor component is available", function()
                     it("should call player.components.playercontroller:DoAction()", function()
                         assert.spy(player.components.playercontroller.DoAction).was_called(0)
                         Utils.WalkToPoint(player, pt)
@@ -359,7 +359,7 @@ describe("Utils", function()
                     end)
                 end)
 
-                describe("when the locomotor component is not available", function()
+                describe("and the locomotor component is not available", function()
                     before_each(function()
                         player.components.playercontroller.locomotor = nil
                     end)

@@ -17,9 +17,8 @@ local Utils = {}
 -- base (to store original functions after overrides)
 local BaseGetModInfo
 
---
--- Helpers
---
+--- Helpers
+-- @section helpers
 
 local function DebugError(...)
     return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugError(...)
@@ -29,9 +28,8 @@ local function DebugString(...)
     return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugString(...)
 end
 
---
--- Debugging
---
+--- Debugging
+-- @section debugging
 
 --- Adds debug methods to the destination class.
 --
@@ -65,9 +63,8 @@ function Utils.AddDebugMethods(dest)
     end
 end
 
---
--- General
---
+--- General
+-- @section general
 
 --- Checks if HUD has an input focus.
 -- @tparam EntityScript inst Player instance
@@ -76,9 +73,8 @@ function Utils.IsHUDFocused(inst)
     return not Utils.ChainGet(inst, "HUD", "HasInputFocus", true)
 end
 
---
--- Chain
---
+--- Chain
+-- @section chain
 
 --- Gets chained field.
 --
@@ -169,9 +165,8 @@ function Utils.ChainValidate(src, ...)
     return Utils.ChainGet(src, ...) and true or false
 end
 
---
--- Locomotor
---
+--- Locomotor
+-- @section locomotor
 
 --- Checks if the locomotor is available.
 --
@@ -205,9 +200,8 @@ function Utils.WalkToPoint(inst, pt)
     end
 end
 
---
--- Modmain
---
+--- Modmain
+-- @section modmain
 
 --- Hide the modinfo changelog.
 --
@@ -245,9 +239,8 @@ function Utils.HideChangelog(modname, enable)
     return false
 end
 
---
--- Thread
---
+--- Thread
+-- @section thread
 
 --- Starts a new thread.
 --
@@ -289,7 +282,6 @@ function Utils.ThreadClear(thread)
         thread = thread ~= nil and thread or task
         KillThreadsWithID(thread.id)
         thread:SetList(nil)
-        thread = nil -- luacheck: only
     end
 end
 
