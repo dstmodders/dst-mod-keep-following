@@ -1390,36 +1390,9 @@ describe("KeepFollowing", function()
                 keepfollowing:StopFollowing()
                 DebugSpyAssertWasCalled(
                     "DebugString",
-                    3,
+                    1,
                     "Stopped following Wilson. RPCs: 1. Time: 1.0000"
                 )
-            end)
-
-            it("should call scheduler:GetCurrentTask()", function()
-                assert.spy(_G.scheduler.GetCurrentTask).was_called(0)
-                keepfollowing:StopFollowing()
-                assert.spy(_G.scheduler.GetCurrentTask).was_called(2)
-                assert.spy(_G.scheduler.GetCurrentTask).was_called_with(
-                    match.is_ref(_G.scheduler)
-                )
-            end)
-
-            it("should reset fields", function()
-                keepfollowing:StopFollowing()
-
-                -- general
-                assert.is_nil(keepfollowing.leader)
-                assert.is_nil(keepfollowing.start_time)
-
-                -- following
-                assert.is_nil(keepfollowing.following_path_thread)
-                assert.is_nil(keepfollowing.following_thread)
-                assert.is_false(keepfollowing.is_following)
-                assert.is_false(keepfollowing.is_leader_near)
-                assert.is_same({}, keepfollowing.leader_positions)
-
-                -- debugging
-                assert.is_equal(0, keepfollowing.debug_rpc_counter)
             end)
 
             it("should return true", function()
@@ -1733,33 +1706,9 @@ describe("KeepFollowing", function()
                 keepfollowing:StopPushing()
                 DebugSpyAssertWasCalled(
                     "DebugString",
-                    3,
+                    2,
                     "Stopped pushing Wilson. RPCs: 1. Time: 1.0000"
                 )
-            end)
-
-            it("should call scheduler:GetCurrentTask()", function()
-                assert.spy(_G.scheduler.GetCurrentTask).was_called(0)
-                keepfollowing:StopPushing()
-                assert.spy(_G.scheduler.GetCurrentTask).was_called(1)
-                assert.spy(_G.scheduler.GetCurrentTask).was_called_with(
-                    match.is_ref(_G.scheduler)
-                )
-            end)
-
-            it("should reset fields", function()
-                keepfollowing:StopPushing()
-
-                -- general
-                assert.is_nil(keepfollowing.leader)
-                assert.is_nil(keepfollowing.start_time)
-
-                -- pushing
-                assert.is_false(keepfollowing.is_pushing)
-                assert.is_nil(keepfollowing.pushing_thread)
-
-                -- debugging
-                assert.is_equal(0, keepfollowing.debug_rpc_counter)
             end)
 
             it("should return true", function()

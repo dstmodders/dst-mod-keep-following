@@ -376,6 +376,22 @@ local function GetClosestMethodNextPosition(self, target, is_leader_near)
     end
 end
 
+local function ResetFollowingFields(self)
+    -- general
+    self.leader = nil
+    self.start_time = nil
+
+    -- following
+    self.following_path_thread = nil
+    self.following_thread = nil
+    self.is_following = false
+    self.is_leader_near = false
+    self.leader_positions = {}
+
+    -- debugging
+    self.debug_rpc_counter = 0
+end
+
 --- Gets the following state.
 -- @treturn boolean
 function KeepFollowing:IsFollowing()
@@ -461,6 +477,8 @@ function KeepFollowing:StartFollowingThread()
         if self.config.following_method == "default" then
             self:StartFollowingPathThread()
         end
+    end, function()
+        ResetFollowingFields(self)
     end)
 end
 
@@ -572,7 +590,6 @@ function KeepFollowing:StopFollowing()
         return false
     end
 
-    -- debugging
     self:DebugString(string.format(
         "Stopped following %s. RPCs: %d. Time: %2.4f",
         self.leader:GetDisplayName(),
@@ -580,29 +597,26 @@ function KeepFollowing:StopFollowing()
         os.clock() - self.start_time
     ))
 
-    -- threads
-    Utils.ThreadClear(self.following_path_thread)
-    Utils.ThreadClear(self.following_thread)
-
-    -- fields (general)
-    self.leader = nil
-    self.start_time = nil
-
-    -- fields (following)
-    self.following_path_thread = nil
-    self.following_thread = nil
     self.is_following = false
-    self.is_leader_near = false
-    self.leader_positions = {}
-
-    -- fields (debugging)
-    self.debug_rpc_counter = 0
 
     return true
 end
 
 --- Pushing
 -- @section pushing
+
+local function ResetPushingFields(self)
+    -- general
+    self.leader = nil
+    self.start_time = nil
+
+    -- pushing
+    self.is_pushing = false
+    self.pushing_thread = nil
+
+    -- debugging
+    self.debug_rpc_counter = 0
+end
 
 --- Gets the pushing state.
 -- @treturn boolean
@@ -636,6 +650,8 @@ function KeepFollowing:StartPushingThread()
         Sleep(FRAMES)
     end, function()
         return self.inst and self.inst:IsValid() and self:IsPushing()
+    end, nil, function()
+        ResetPushingFields(self)
     end)
 end
 
@@ -708,7 +724,6 @@ function KeepFollowing:StopPushing()
         return false
     end
 
-    -- debugging
     self:DebugString(string.format(
         "Stopped pushing %s. RPCs: %d. Time: %2.4f",
         self.leader:GetDisplayName(),
@@ -716,19 +731,7 @@ function KeepFollowing:StopPushing()
         os.clock() - self.start_time
     ))
 
-    -- thread
-    Utils.ThreadClear(self.pushing_thread)
-
-    -- fields (general)
-    self.leader = nil
-    self.start_time = nil
-
-    -- fields (pushing)
     self.is_pushing = false
-    self.pushing_thread = nil
-
-    -- fields (debugging)
-    self.debug_rpc_counter = 0
 
     return true
 end
