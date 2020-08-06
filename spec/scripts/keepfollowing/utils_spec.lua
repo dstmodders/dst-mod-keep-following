@@ -14,6 +14,16 @@ describe("Utils", function()
         -- debug
         DebugSpyTerm()
         DebugSpyInit(spy)
+
+        -- globals
+        _G.ACTIONS = {
+            WALKTO = { code = 163 },
+        }
+        _G.RPC = {
+            DirectWalking = 16,
+            LeftClick = 26,
+            StopWalking = 46,
+        }
     end)
 
     teardown(function()
@@ -35,15 +45,7 @@ describe("Utils", function()
         DebugSpyClear()
 
         -- globals
-        _G.ACTIONS = {
-            WALKTO = { code = 163 },
-        }
         _G.BufferedAction = spy.new(ReturnValueFn({}))
-        _G.RPC = {
-            DirectWalking = 16,
-            LeftClick = 26,
-            StopWalking = 46,
-        }
         _G.SendRPCToServer = spy.new(Empty)
     end)
 
