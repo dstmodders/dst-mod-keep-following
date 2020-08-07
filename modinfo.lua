@@ -74,7 +74,7 @@ local key_list = CreateKeyList()
 
 local boolean = {
     { description = "Yes", data = true },
-    { description = "No", data = false }
+    { description = "No", data = false },
 }
 
 local following_methods = {
@@ -85,7 +85,7 @@ local following_methods = {
 local target_distances = {
     { description = "1.5m", data = 1.5 },
     { description = "2.5m", data = 2.5 },
-    { description = "3.5m", data = 3.5 }
+    { description = "3.5m", data = 3.5 },
 }
 
 local keep_target_distance = {
