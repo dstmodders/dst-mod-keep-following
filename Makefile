@@ -54,6 +54,7 @@ install:
 		--exclude 'busted.out' \
 		--exclude 'CHANGELOG.md' \
 		--exclude 'config.ld' \
+		--exclude 'CONTRIBUTING.md' \
 		--exclude 'description.txt*' \
 		--exclude 'doc/' \
 		--exclude 'lcov.info' \
