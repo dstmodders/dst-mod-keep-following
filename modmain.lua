@@ -13,9 +13,8 @@ local require = _G.require
 
 local Utils = require "keepfollowing/utils"
 
---
--- Globals
---
+--- Globals
+-- @section globals
 
 local ACTIONS = _G.ACTIONS
 local BufferedAction = _G.BufferedAction
@@ -29,9 +28,8 @@ local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
 
---
--- Debugging
---
+--- Debugging
+-- @section debugging
 
 local Debug
 
@@ -52,9 +50,8 @@ local function DebugInit(...)
     return Debug and Debug:DebugInit(...)
 end
 
---
--- Helpers
---
+--- Helpers
+-- @section helpers
 
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
@@ -83,17 +80,15 @@ local function IsOurAction(action)
         or action == ACTIONS.KEEP_FOLLOWING_TENT_PUSH
 end
 
---
--- Configurations
---
+--- Configurations
+-- @section configurations
 
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
 local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 
---
--- Actions
---
+--- Actions
+-- @section actions
 
 local function ActionFollow(act)
     if not act.doer or not act.target or not act.doer.components.keepfollowing then
@@ -160,9 +155,8 @@ AddAction(
     ActionTentPush
 )
 
---
--- Player
---
+--- Player
+-- @section player
 
 local function OnPlayerActivated(player, world)
     player:AddComponent("keepfollowing")
@@ -223,15 +217,9 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
 end
 
 local function PlayerActionPickerPostInit(_self, player)
-    if player ~= _G.ThePlayer then
-        return
-    end
-
     local OldDoGetMouseActions = _self.DoGetMouseActions
-
-    local function NewDoGetMouseActions(self, position, _target)
+    _self.DoGetMouseActions = function(self, position, _target)
         local lmb, rmb = OldDoGetMouseActions(self, position, _target)
-
         if TheInput:IsKeyDown(_KEY_ACTION) then
             local keepfollowing = player.components.keepfollowing
             local buffered = self.inst:GetBufferedAction()
@@ -289,20 +277,13 @@ local function PlayerActionPickerPostInit(_self, player)
                 end
             end
         end
-
         return lmb, rmb
     end
-
-    _self.DoGetMouseActions = NewDoGetMouseActions
 
     DebugInit("PlayerActionPickerPostInit")
 end
 
 local function PlayerControllerPostInit(_self, _player)
-    if _player ~= _G.ThePlayer then
-        return
-    end
-
     --
     -- Helpers
     --
@@ -356,8 +337,7 @@ local function PlayerControllerPostInit(_self, _player)
     --
 
     local OldOnControl = _self.OnControl
-
-    local function NewOnControl(self, control, down)
+    _self.OnControl = function(self, control, down)
         if IsMoveButton(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
@@ -366,20 +346,16 @@ local function PlayerControllerPostInit(_self, _player)
             if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
-
             OurMouseAction(self:GetLeftMouseAction())
         elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
             if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                 return OldOnControl(self, control, down)
             end
-
             OurMouseAction(self:GetRightMouseAction())
         end
 
         OldOnControl(self, control, down)
     end
-
-    _self.OnControl = NewOnControl
 
     DebugInit("PlayerControllerPostInit")
 end
@@ -388,9 +364,8 @@ AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
 AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 
---
--- KnownModIndex
---
+--- KnownModIndex
+-- @section knownmodindex
 
 if GetModConfigData("hide_changelog") then
     Utils.HideChangelog(modname, true)
