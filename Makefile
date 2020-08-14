@@ -77,9 +77,9 @@ lint:
 	@EXIT=0; \
 		printf "Luacheck:\n\n"; luacheck . --exclude-files="here/" || EXIT=$$?; \
 		printf "\nPrettier:\n\n"; prettier --check \
-			"./**/*.md" \
-			"./**/*.xml" \
-			"./**/*.yml" \
+			'./**/*.md' \
+			'./**/*.xml' \
+			'./**/*.yml' \
 		|| EXIT=$$?; \
 		exit $${EXIT}
 
