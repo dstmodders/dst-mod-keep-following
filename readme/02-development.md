@@ -84,7 +84,7 @@ The project uses the following tools to improve overall code quality and
 encourage following some of the best practices:
 
 - [Busted][]
-- [ds_mod_tools][]
+- [ds-mod-tools][]
 - [EditorConfig][]
 - [GNU Make][]
 - [ktools][]
@@ -113,7 +113,7 @@ $ sudo luarocks install luacov-reporter-lcov
 $ sudo luarocks install cluacov
 ```
 
-##### [ds_mod_tools][]
+##### [ds-mod-tools][]
 
 ```shell script
 $ sudo apt install premake4
@@ -346,7 +346,7 @@ Please use 'make <target>' where '<target>' is one of:
 [conventional commits]: https://www.conventionalcommits.org/
 [docker hub]: https://hub.docker.com/
 [docker]: https://www.docker.com/
-[ds_mod_tools]: https://github.com/kleientertainment/ds_mod_tools
+[ds-mod-tools]: https://github.com/kleientertainment/ds_mod_tools
 [editorconfig]: https://editorconfig.org/
 [github actions]: https://github.com/features/actions
 [github]: https://github.com/
