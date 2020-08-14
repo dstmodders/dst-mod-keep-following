@@ -30,7 +30,7 @@ To learn more, consider checking out the corresponding [Docker Hub][] image:
 $ git clone https://github.com/victorpopkov/dst-mod-keep-following
 $ cd ./dst-mod-keep-following/
 $ export DST_MODS="${HOME}/.steam/steam/steamapps/common/Don't Starve Together/mods/"
-$ docker run --rm -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
+$ docker run --rm -u dst-mod -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
 ```
 
 ### PowerShell (Windows)
@@ -39,7 +39,7 @@ $ docker run --rm -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-m
 PS C:\> git clone https://github.com/victorpopkov/dst-mod-keep-following
 PS C:\> cd .\dst-mod-keep-following\
 PS C:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\"
-PS C:\> docker run --rm -itv "${PWD}:/mod/" -v "$($Env:DST_MODS):/mods/" viktorpopkov/dst-mod
+PS C:\> docker run --rm -u dst-mod -itv "${PWD}:/mod/" -v "$($Env:DST_MODS):/mods/" viktorpopkov/dst-mod
 ```
 
 ## Environment
@@ -84,14 +84,15 @@ The project uses the following tools to improve overall code quality and
 encourage following some of the best practices:
 
 - [Busted][]
+- [ds_mod_tools][]
 - [EditorConfig][]
 - [GNU Make][]
+- [ktools][]
 - [LCOV][]
 - [LDoc][]
-- [LuaCov][]
 - [Luacheck][]
+- [LuaCov][]
 - [Prettier][]
-- [ktools][]
 
 I do RECOMMEND getting familiar with these tools and integrate them into your
 workflow when developing this project. Their usage is OPTIONAL but is strongly
@@ -110,6 +111,17 @@ $ sudo luarocks install luacov
 $ sudo luarocks install luacov-console
 $ sudo luarocks install luacov-reporter-lcov
 $ sudo luarocks install cluacov
+```
+
+##### [ds_mod_tools][]
+
+```shell script
+$ sudo apt install premake4
+$ git clone https://github.com/kleientertainment/ds_mod_tools
+$ cd ds_mod_tools/src/
+$ ./premake.sh
+$ cd ../build/proj/
+$ make
 ```
 
 ##### [LCOV][]
@@ -334,6 +346,7 @@ Please use 'make <target>' where '<target>' is one of:
 [conventional commits]: https://www.conventionalcommits.org/
 [docker hub]: https://hub.docker.com/
 [docker]: https://www.docker.com/
+[ds_mod_tools]: https://github.com/kleientertainment/ds_mod_tools
 [editorconfig]: https://editorconfig.org/
 [github actions]: https://github.com/features/actions
 [github]: https://github.com/
