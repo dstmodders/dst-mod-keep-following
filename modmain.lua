@@ -74,10 +74,10 @@ local function IsMoveButton(control)
 end
 
 local function IsOurAction(action)
-    return action == ACTIONS.KEEP_FOLLOWING_FOLLOW
-        or action == ACTIONS.KEEP_FOLLOWING_PUSH
-        or action == ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW
-        or action == ACTIONS.KEEP_FOLLOWING_TENT_PUSH
+    return action == ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_PUSH
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH
 end
 
 --- Configurations
@@ -91,66 +91,56 @@ local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 -- @section actions
 
 local function ActionFollow(act)
-    if not act.doer or not act.target or not act.doer.components.keepfollowing then
-        return false
+    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    if keepfollowing and act.doer and act.target then
+        keepfollowing:Stop()
+        keepfollowing:StartFollowing(act.target)
+        return true
     end
-
-    local keepfollowing = act.doer.components.keepfollowing
-    keepfollowing:Stop()
-    keepfollowing:StartFollowing(act.target)
-
-    return true
+    return false
 end
 
 local function ActionPush(act)
-    if not act.doer or not act.target or not act.doer.components.keepfollowing then
-        return false
+    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    if keepfollowing and act.doer and act.target then
+        keepfollowing:Stop()
+        keepfollowing:StartPushing(act.target)
+        return true
     end
-
-    local keepfollowing = act.doer.components.keepfollowing
-    keepfollowing:Stop()
-    keepfollowing:StartPushing(act.target)
-
-    return true
+    return false
 end
 
 local function ActionTentFollow(act)
-    if not act.doer or not act.target or not act.doer.components.keepfollowing then
-        return false
+    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    if keepfollowing and act.doer and act.target then
+        local leader = keepfollowing:GetTentSleeper(act.target)
+        if leader then
+            keepfollowing:Stop()
+            keepfollowing:StartFollowing(leader)
+            return true
+        end
     end
-
-    local keepfollowing = act.doer.components.keepfollowing
-    local leader = keepfollowing:GetTentSleeper(act.target)
-
-    if leader then
-        keepfollowing:Stop()
-        keepfollowing:StartFollowing(leader)
-    end
-
-    return true
+    return false
 end
 
 local function ActionTentPush(act)
-    if not act.doer or not act.target or not act.doer.components.keepfollowing then
-        return false
+    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    if keepfollowing and act.doer and act.target then
+        local leader = keepfollowing:GetTentSleeper(act.target)
+        if leader then
+            keepfollowing:Stop()
+            keepfollowing:StartPushing(leader)
+            return true
+        end
     end
-
-    local keepfollowing = act.doer.components.keepfollowing
-    local leader = keepfollowing:GetTentSleeper(act.target)
-
-    if leader then
-        keepfollowing:Stop()
-        keepfollowing:StartPushing(leader)
-    end
-
-    return true
+    return false
 end
 
-AddAction("KEEP_FOLLOWING_FOLLOW", "Follow", ActionFollow)
-AddAction("KEEP_FOLLOWING_PUSH", "Push", ActionPush)
-AddAction("KEEP_FOLLOWING_TENT_FOLLOW", "Follow player in", ActionTentFollow)
+AddAction("MOD_KEEP_FOLLOWING_FOLLOW", "Follow", ActionFollow)
+AddAction("MOD_KEEP_FOLLOWING_PUSH", "Push", ActionPush)
+AddAction("MOD_KEEP_FOLLOWING_TENT_FOLLOW", "Follow player in", ActionTentFollow)
 AddAction(
-    "KEEP_FOLLOWING_TENT_PUSH",
+    "MOD_KEEP_FOLLOWING_TENT_PUSH",
     _PUSH_WITH_RMB and "Push player" or "Push player in",
     ActionTentPush
 )
@@ -249,31 +239,31 @@ local function PlayerActionPickerPostInit(_self, player)
 
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_PUSH)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW)
                 end
             end
 
             if keepfollowing:CanBeLeader(target) then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
                 elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_PUSH)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_FOLLOW)
+                    lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
                 end
             end
 
             if _PUSH_WITH_RMB then
                 if target:HasTag("tent") and target:HasTag("hassleeper") then
-                    rmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_TENT_PUSH)
+                    rmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH)
                 end
 
                 if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
-                    rmb = BufferedAction(player, target, ACTIONS.KEEP_FOLLOWING_PUSH)
+                    rmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 end
             end
         end
