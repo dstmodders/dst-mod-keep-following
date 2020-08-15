@@ -26,11 +26,11 @@ local BaseGetModInfo
 -- @section helpers
 
 local function DebugError(...)
-    return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugError(...)
+    return _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug:DebugError(...)
 end
 
 local function DebugString(...)
-    return _G.KeepFollowingDebug and _G.KeepFollowingDebug:DebugString(...)
+    return _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug:DebugString(...)
 end
 
 --- Debugging
@@ -38,7 +38,7 @@ end
 
 --- Adds debug methods to the destination class.
 --
--- Checks the global environment if the `KeepFollowingDebug` (`Debug`) is available and adds the
+-- Checks the global environment if the `ModKeepFollowingDebug` (`Debug`) is available and adds the
 -- corresponding methods from there. Otherwise, adds all the corresponding functions as empty ones.
 --
 -- @tparam table dest Destination class
@@ -52,11 +52,11 @@ function Utils.AddDebugMethods(dest)
         "DebugTerm",
     }
 
-    if _G.KeepFollowingDebug then
+    if _G.ModKeepFollowingDebug then
         for _, v in pairs(methods) do
             dest[v] = function(_, ...)
-                if _G.KeepFollowingDebug and _G.KeepFollowingDebug[v] then
-                    return _G.KeepFollowingDebug[v](_G.KeepFollowingDebug, ...)
+                if _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug[v] then
+                    return _G.ModKeepFollowingDebug[v](_G.ModKeepFollowingDebug, ...)
                 end
             end
         end

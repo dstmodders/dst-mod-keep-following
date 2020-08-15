@@ -111,7 +111,7 @@ end
 
 local function WalkToPoint(self, pt)
     Utils.WalkToPoint(self.inst, pt)
-    if _G.KeepFollowingDebug then
+    if _G.ModKeepFollowingDebug then
         self.debug_rpc_counter = self.debug_rpc_counter + 1
     end
 end

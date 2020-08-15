@@ -55,10 +55,10 @@ function DebugSpyInit(spy)
         "DebugTerm",
     }
 
-    _G.KeepFollowingDebug = require "keepfollowing/debug"
+    _G.ModKeepFollowingDebug = require "keepfollowing/debug"
     for _, method in pairs(methods) do
         if not _DEBUG_SPY[method] then
-            _DEBUG_SPY[method] = spy.on(_G.KeepFollowingDebug, method)
+            _DEBUG_SPY[method] = spy.on(_G.ModKeepFollowingDebug, method)
         end
     end
 end
@@ -67,7 +67,7 @@ function DebugSpyTerm()
     for name, _ in pairs(_DEBUG_SPY) do
         _DEBUG_SPY[name] = nil
     end
-    _G.KeepFollowingDebug = nil
+    _G.ModKeepFollowingDebug = nil
 end
 
 function DebugSpyClear(name)
@@ -104,7 +104,7 @@ function DebugSpyAssertWasCalled(name, calls, args)
     args = type(args) == "string" and { args } or args
     DebugSpyAssert(name).was_called(calls)
     if calls > 0 then
-        DebugSpyAssert(name).was_called_with(match.is_ref(_G.KeepFollowingDebug), unpack(args))
+        DebugSpyAssert(name).was_called_with(match.is_ref(_G.ModKeepFollowingDebug), unpack(args))
     end
 end
 

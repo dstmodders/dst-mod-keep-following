@@ -40,7 +40,7 @@ if GetModConfigData("debug") then
     Debug:DebugModConfigs()
 end
 
-_G.KeepFollowingDebug = Debug
+_G.ModKeepFollowingDebug = Debug
 
 local function DebugString(...)
     return Debug and Debug:DebugString(...)
