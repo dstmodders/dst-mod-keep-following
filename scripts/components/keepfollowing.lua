@@ -119,13 +119,13 @@ end
 --- General
 -- @section general
 
---- Checks if the player is on the platform.
+--- Checks if player is on platform state.
 -- @treturn boolean
 function KeepFollowing:IsOnPlatform()
     return IsOnPlatform(self.world, self.inst)
 end
 
---- Stops following and pushing.
+--- Stops both following and pushing.
 --
 -- General wrapper to call `StopFollowing` and/or `StopPushing` based on the current state.
 --
@@ -161,7 +161,7 @@ local function MovementPrediction(inst, enable)
     end
 end
 
---- Enables/Disables the movement prediction.
+--- Enables/Disables movement prediction.
 -- @tparam boolean enable
 -- @treturn boolean
 function KeepFollowing:MovementPrediction(enable)
@@ -173,19 +173,19 @@ end
 --- Leader
 -- @section leader
 
---- Gets the leader.
+--- Gets leader.
 -- @treturn EntityScript
 function KeepFollowing:GetLeader()
     return self.leader
 end
 
---- Checks if a leader is on the platform.
+--- Checks if leader is on platform.
 -- @treturn boolean
 function KeepFollowing:IsLeaderOnPlatform()
     return IsOnPlatform(self.world, self.leader)
 end
 
---- Checks if a leader can be followed.
+--- Checks if an entity can be followed.
 --
 -- Checks whether an entity is valid and has either a `locomotor` or `balloon` tag.
 --
@@ -197,7 +197,7 @@ function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
         or false
 end
 
---- Checks if a leader can be pushed.
+--- Checks if an entity can be pushed.
 -- @tparam EntityScript entity An entity as a potential leader to push
 -- @treturn boolean
 function KeepFollowing:CanBePushed(entity)
@@ -257,26 +257,26 @@ function KeepFollowing:CanBeLeader(entity)
     return entity ~= self.inst and self:CanBeFollowed(entity) or false
 end
 
---- Sets an entity as a leader.
+--- Sets leader.
 --
--- Verifies if the passed entity can become a leader using the `CanBeLeader` and sets it.
+-- Verifies if the passed entity can become a leader using `CanBeLeader` and sets it.
 --
--- @tparam EntityScript entity An entity as a potential leader
+-- @tparam EntityScript leader An entity as a potential leader
 -- @treturn boolean
-function KeepFollowing:SetLeader(entity)
-    if self:CanBeLeader(entity) then
-        self.leader = entity
+function KeepFollowing:SetLeader(leader)
+    if self:CanBeLeader(leader) then
+        self.leader = leader
         self:DebugString(string.format(
             "New leader: %s. Distance: %0.2f",
-            entity:GetDisplayName(),
-            math.sqrt(self.inst:GetDistanceSqToPoint(entity:GetPosition()))
+            leader:GetDisplayName(),
+            math.sqrt(self.inst:GetDistanceSqToPoint(leader:GetPosition()))
         ))
         return true
-    elseif entity == self.inst then
+    elseif leader == self.inst then
         self:DebugError("You", "can't become a leader")
     else
-        local _entity = entity == self.inst and "You" or nil
-        _entity = _entity == nil and entity.GetDisplayName and entity:GetDisplayName() or "Entity"
+        local _entity = leader == self.inst and "You" or nil
+        _entity = _entity == nil and leader.GetDisplayName and leader:GetDisplayName() or "Entity"
         self:DebugError(_entity, "can't become a leader")
     end
     return false
@@ -301,11 +301,11 @@ local function FindClosestInvisiblePlayerInRange(x, y, z, range)
 end
 
 --- Gets a tent sleeper.
--- @tparam EntityScript entity A tent, Siesta Lean-to, etc.
+-- @tparam EntityScript tent A tent, Siesta Lean-to, etc.
 -- @treturn EntityScript A sleeper (a player)
-function KeepFollowing:GetTentSleeper(entity)
+function KeepFollowing:GetTentSleeper(tent)
     local player
-    local sleepingbag = Utils.ChainGet(entity, "components", "sleepingbag")
+    local sleepingbag = Utils.ChainGet(tent, "components", "sleepingbag")
     if sleepingbag then
         self:DebugString("Component sleepingbag is available")
         player = sleepingbag.sleeper
@@ -313,9 +313,9 @@ function KeepFollowing:GetTentSleeper(entity)
         self:DebugString("Component sleepingbag is not available")
     end
 
-    if not player and entity:HasTag("tent") and entity:HasTag("hassleeper") then
+    if not player and tent:HasTag("tent") and tent:HasTag("hassleeper") then
         self:DebugString("Looking for sleepers...")
-        local x, y, z = entity.Transform:GetWorldPosition()
+        local x, y, z = tent.Transform:GetWorldPosition()
         player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
     end
 
@@ -392,7 +392,7 @@ local function ResetFollowingFields(self)
     self.debug_rpc_counter = 0
 end
 
---- Gets the following state.
+--- Checks if following state.
 -- @treturn boolean
 function KeepFollowing:IsFollowing()
     return self.leader and self.is_following
@@ -572,7 +572,7 @@ function KeepFollowing:StartFollowing(leader)
     return false
 end
 
---- Stops following a leader.
+--- Stops following.
 -- @treturn boolean
 function KeepFollowing:StopFollowing()
     if not self.is_following then
@@ -618,7 +618,7 @@ local function ResetPushingFields(self)
     self.debug_rpc_counter = 0
 end
 
---- Gets the pushing state.
+--- Checks if pushing state.
 -- @treturn boolean
 function KeepFollowing:IsPushing()
     return self.leader and self.is_pushing
@@ -701,7 +701,7 @@ function KeepFollowing:StartPushing(leader)
     return false
 end
 
---- Stops pushing a leader.
+--- Stops pushing.
 -- @treturn boolean
 function KeepFollowing:StopPushing()
     if self.config.push_lag_compensation and not self.is_master_sim then
