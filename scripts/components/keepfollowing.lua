@@ -1,7 +1,7 @@
 ----
 -- Component `keepfollowing`.
 --
--- Includes following and pushing features/functionality.
+-- Includes functionality for following and pushing a leader.
 --
 -- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
@@ -36,6 +36,10 @@ local _PAUSE_ACTIONS = {
     { ACTIONS.USEITEM },
 }
 
+--- Constructor.
+-- @function _ctor
+-- @tparam EntityScript inst Player instance
+-- @usage ThePlayer:AddComponent("keepfollowing")
 local KeepFollowing = Class(function(self, inst)
     self:DoInit(inst)
 end)
