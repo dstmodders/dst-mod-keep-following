@@ -13,6 +13,7 @@ help:
 	@echo "   ldoc           to generate an LDoc documentation"
 	@echo "   lint           to run code linting"
 	@echo "   modicon        to pack modicon"
+	@echo "   reinstall      to uninstall and then install the mod"
 	@echo "   release        to update version"
 	@echo "   test           to run Busted tests"
 	@echo "   testclean      to clean up after tests"
@@ -86,6 +87,8 @@ lint:
 modicon:
 	@:$(call check_defined, DS_KTOOLS_KTECH)
 	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+
+reinstall: uninstall install
 
 release:
 	@:$(call check_defined, MOD_VERSION)
