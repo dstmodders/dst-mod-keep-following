@@ -30,7 +30,8 @@ To learn more, consider checking out the corresponding [Docker Hub][] image:
 $ git clone https://github.com/victorpopkov/dst-mod-keep-following
 $ cd ./dst-mod-keep-following/
 $ export DST_MODS="${HOME}/.steam/steam/steamapps/common/Don't Starve Together/mods/"
-$ docker run --rm -u dst-mod -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
+$ docker pull viktorpopkov/dst-mod
+$ docker run --rm -u 'dst-mod' -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
 ```
 
 ### PowerShell (Windows)
@@ -39,7 +40,8 @@ $ docker run --rm -u dst-mod -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorp
 PS C:\> git clone https://github.com/victorpopkov/dst-mod-keep-following
 PS C:\> cd .\dst-mod-keep-following\
 PS C:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\"
-PS C:\> docker run --rm -u dst-mod -itv "${PWD}:/mod/" -v "$($Env:DST_MODS):/mods/" viktorpopkov/dst-mod
+PS C:\> docker pull viktorpopkov/dst-mod
+PS C:\> docker run --rm -u 'dst-mod' -itv "${PWD}:/mod/" -v "$($Env:DST_MODS):/mods/" viktorpopkov/dst-mod
 ```
 
 ## Environment
@@ -170,7 +172,7 @@ from the mentioned guide:
 - Comments SHOULD neither have a capitalized first letter, nor a trailing dot (unless there are multiple sentences)
 - LDoc `@param`, `@tparam` and `@treturn` descriptions SHOULD have a first letter capitalized and no trailing dot
 - Use 4 spaces for indention (this is also more consistent between other languages)
-- Use PascalCase and camelCase for names of the functions and methods
+- Use PascalCase for classes/modules, functions and methods
 - Use snake_case for the class fields and variables
 
 If at some point the mentioned style guide suggests a different approach that
@@ -214,7 +216,7 @@ Each card SHOULD have at least one label:
 
 You SHOULD follow these rules:
 
-1.  Each card in the "In Progress" should have at least one member (except user story cards)
+1.  Each card (except user story cards) in the "In Progress" should have at least one member (when there are more than one member in the project)
 2.  Each card in the "Ready for QA", "QA" or "Done" should have at least one corresponding commit attached (except user story cards)
 3.  Each card name should use the present tense
 4.  Each card that doesn't have a member is free to take
@@ -329,6 +331,7 @@ Please use 'make <target>' where '<target>' is one of:
    ldoc           to generate an LDoc documentation
    lint           to run code linting
    modicon        to pack modicon
+   reinstall      to uninstall and then install the mod
    release        to update version
    test           to run Busted tests
    testclean      to clean up after tests
