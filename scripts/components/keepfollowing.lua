@@ -10,7 +10,7 @@
 -- @author Victor Popkov
 -- @copyright 2019
 -- @license MIT
--- @release 0.20.0-beta
+-- @release 0.20.0
 ----
 local Utils = require "keepfollowing/utils"
 
