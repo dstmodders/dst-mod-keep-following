@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+## [0.20.1][] - 2020-08-25
+
+### Fixed
+
+- Issue with `TEST` global
+
 ## [0.20.0][] - 2020-08-25
 
 ### Added
@@ -269,7 +275,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 First release.
 
-[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.20.0...HEAD
+[unreleased]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.20.1...HEAD
+[0.20.1]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/victorpopkov/dst-mod-keep-following/compare/v0.17.0...v0.18.0
