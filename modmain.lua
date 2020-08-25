@@ -8,7 +8,9 @@
 -- @license MIT
 -- @release 0.20.0
 ----
+
 local _G = GLOBAL
+_G.MOD_KEEP_FOLLOWING_TEST = false
 local require = _G.require
 
 local Utils = require "keepfollowing/utils"

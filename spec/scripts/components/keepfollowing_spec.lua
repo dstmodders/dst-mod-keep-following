@@ -32,7 +32,7 @@ describe("KeepFollowing", function()
         _G.RPC = {
             LeftClick = {},
         }
-        _G.TEST = true
+        _G.MOD_KEEP_FOLLOWING_TEST = true
     end)
 
     teardown(function()
@@ -47,7 +47,7 @@ describe("KeepFollowing", function()
         _G.os = _os
         _G.scheduler = nil
         _G.SendRPCToServer = nil
-        _G.TEST = false
+        _G.MOD_KEEP_FOLLOWING_TEST = false
         _G.TheWorld = nil
     end)
 

@@ -70,6 +70,7 @@ files["modmain.lua"] = {
 
   -- globals
   globals = {
+    "_G",
     "GLOBAL",
   },
   read_globals = {

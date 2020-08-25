@@ -790,7 +790,7 @@ function KeepFollowing:DoInit(inst)
     inst:StartUpdatingComponent(self)
 
     -- tests
-    if _G.TEST then
+    if _G.MOD_KEEP_FOLLOWING_TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
         self._GetPauseAction = GetPauseAction
         self._IsOnPlatform = IsOnPlatform
