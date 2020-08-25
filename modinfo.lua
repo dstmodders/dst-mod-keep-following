@@ -4,11 +4,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
     [[v]] .. version .. [[:]] .. "\n" ..
-    [[- Added support for the hide changelog configuration]] .. "\n" ..
-    [[- Added tests and documentation]] .. "\n" ..
-    [[- Changed configuration to be divided into sections]] .. "\n" ..
-    [[- Refactored most of the existing code]] .. "\n" ..
-    [[- Removed mobs configuration in favour of the "all" behaviour]]
+    [[- Fixed issue with TEST global]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""
