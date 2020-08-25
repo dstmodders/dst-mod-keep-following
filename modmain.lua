@@ -6,7 +6,7 @@
 -- @author Victor Popkov
 -- @copyright 2019
 -- @license MIT
--- @release 0.20.0
+-- @release 0.20.1
 ----
 
 local _G = GLOBAL

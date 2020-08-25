@@ -1,5 +1,5 @@
 name = "Keep Following"
-version = "0.20.0"
+version = "0.20.1"
 description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
