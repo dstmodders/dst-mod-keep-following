@@ -4,7 +4,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
     [[v]] .. version .. [[:]] .. "\n" ..
-    [[- Fixed issue with TEST global]]
+    [[- Improved interruptions behaviour]]
 author = "Demonblink"
 api_version = 10
 forumthread = ""

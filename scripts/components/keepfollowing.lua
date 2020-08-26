@@ -19,23 +19,6 @@ local _FOLLOWING_THREAD_ID = "following_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
--- A list of actions that will cause the following thread to pause. The first value represents an
--- action itself and the second (optional) is a sleep time (default: 1.25).
-local _PAUSE_ACTIONS = {
-    { ACTIONS.ADDFUEL, .5 },
-    { ACTIONS.ADDWETFUEL, .5 },
-    { ACTIONS.BLINK },
-    { ACTIONS.BUILD },
-    { ACTIONS.DROP, .5 },
-    { ACTIONS.EAT, 1 },
-    { ACTIONS.EQUIP, .25 },
-    { ACTIONS.HEAL },
-    { ACTIONS.LOOKAT, .25 },
-    { ACTIONS.READ, 2 },
-    { ACTIONS.TEACH },
-    { ACTIONS.USEITEM },
-}
-
 --- Constructor.
 -- @function _ctor
 -- @tparam EntityScript inst Player instance
@@ -69,50 +52,6 @@ local function GetClosestPosition(entity1, entity2)
     return entity1:GetPositionAdjacentTo(entity2, distance)
 end
 
-local function GetPauseAction(action)
-    for _, v in ipairs(_PAUSE_ACTIONS) do
-        if v[1] == action then
-            return v[1], v[2] or 1.25 -- 1.25 is the most optimal so far
-        end
-    end
-end
-
-local function ThreadInterruptOnPauseAction(self, buffered_previous)
-    local pause_action, pause_action_time
-    local buffered = self.inst:GetBufferedAction()
-    if buffered and buffered.action ~= ACTIONS.WALKTO then
-        if not buffered_previous or buffered ~= buffered_previous then
-            self:DebugString("Interrupted by action:", buffered.action.id)
-            buffered_previous = buffered
-            pause_action, pause_action_time = GetPauseAction(buffered.action)
-            if pause_action then
-                self.is_paused = true
-                self:DebugString(string.format("Pausing (%2.2f)...", pause_action_time))
-                Sleep(pause_action_time)
-            end
-        end
-    elseif not Utils.IsLocomotorAvailable(self.inst) then
-        local player_controller = Utils.ChainGet(self.inst, "components", "playercontroller")
-        if not self.inst:HasTag("ignorewalkableplatforms")
-            and (player_controller:IsBusy() or self.inst.replica.builder:IsBusy())
-            and not self.inst.replica.inventory:GetActiveItem()
-        then
-            self.is_paused = true
-            pause_action_time = 1.25 -- default
-            self:DebugString(string.format("Pausing (%2.2f)...", pause_action_time))
-            Sleep(pause_action_time)
-        end
-    end
-
-    if self.is_paused then
-        self:DebugString("Unpausing...")
-        self.is_paused = false
-        return buffered_previous, true
-    end
-
-    return buffered_previous, false
-end
-
 local function WalkToPoint(self, pt)
     Utils.WalkToPoint(self.inst, pt)
     if _G.ModKeepFollowingDebug then
@@ -122,6 +61,18 @@ end
 
 --- General
 -- @section general
+
+--- Checks if the player is idle.
+-- @treturn boolean
+function KeepFollowing:IsIdle()
+    if self.inst.sg then
+        return self.inst.sg:HasStateTag("idle")
+            or (self.inst:HasTag("idle") and self.inst:HasTag("nopredict"))
+    end
+    return self.inst.AnimState:IsCurrentAnimation("idle_pre")
+        or self.inst.AnimState:IsCurrentAnimation("idle_loop")
+        or self.inst.AnimState:IsCurrentAnimation("idle_pst")
+end
 
 --- Checks if player is on platform state.
 -- @treturn boolean
@@ -408,7 +359,7 @@ end
 -- "default" following method is used it starts the following path thread as well by calling the
 -- `StartFollowingPathThread` to gather path coordinates of a leader.
 function KeepFollowing:StartFollowingThread()
-    local buffered, buffered_prev, interrupted, pos, pos_prev, is_leader_near, stuck
+    local buffered, buffered_prev, pos, pos_prev, is_leader_near, stuck
 
     local stuck_frames = 0
     local radius_inst = self.inst.Physics:GetRadius()
@@ -429,45 +380,28 @@ function KeepFollowing:StartFollowingThread()
             -- default: player follows a leader step-by-step
             pos = GetDefaultMethodNextPosition(self, target)
             if pos then
-                buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-
-                if interrupted or (not buffered and Utils.IsLocomotorAvailable(self.inst)) then
-                    WalkToPoint(self, pos)
+                if self:IsIdle() or (not pos_prev or pos_prev ~= pos) then
                     pos_prev = pos
-                end
-
-                if not self.is_paused then
-                    if not pos_prev or pos ~= pos_prev then
-                        WalkToPoint(self, pos)
+                    stuck = false
+                    stuck_frames = 0
+                    WalkToPoint(self, pos)
+                elseif not stuck and pos_prev ~= pos then
+                    stuck_frames = stuck_frames + 1
+                    if stuck_frames * FRAMES > .5 then
                         pos_prev = pos
-                        stuck = false
-                        stuck_frames = 0
-                    elseif not stuck and pos == pos_prev then
-                        stuck_frames = stuck_frames + 1
-                        if stuck_frames * FRAMES > .5 then
-                            pos_prev = pos
-                            stuck = true
-                        end
-                    elseif stuck and pos == pos_prev and #self.leader_positions > 1 then
-                        table.remove(self.leader_positions, 1)
+                        stuck = true
                     end
+                elseif not self:IsIdle() and stuck and pos_prev == pos and #self.leader_positions > 1 then
+                    table.remove(self.leader_positions, 1)
                 end
             end
         elseif self.config.following_method == "closest" then
             -- closest: player goes to the closest target point from a leader
             pos = GetClosestMethodNextPosition(self, target, is_leader_near)
             if pos then
-                buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-
-                if interrupted then
-                    WalkToPoint(self, pos)
-                end
-
-                if not self.is_paused
-                    and (not pos_prev or pos:DistSq(pos_prev) > .1)
-                then
-                    WalkToPoint(self, pos)
+                if self:IsIdle() or (not pos_prev or pos:DistSq(pos_prev) > .1) then
                     pos_prev = pos
+                    WalkToPoint(self, pos)
                 end
             end
         end
@@ -632,7 +566,7 @@ end
 --
 -- Starts the thread to push the leader.
 function KeepFollowing:StartPushingThread()
-    local buffered, buffered_prev, interrupted, pos
+    local buffered, pos, pos_prev
 
     self.pushing_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
@@ -644,12 +578,10 @@ function KeepFollowing:StartPushingThread()
         buffered = self.inst:GetBufferedAction()
         pos = self.leader:GetPosition()
 
-        buffered_prev, interrupted = ThreadInterruptOnPauseAction(self, buffered_prev)
-        if interrupted or (not buffered and Utils.IsLocomotorAvailable(self.inst)) then
+        if self:IsIdle() or (not pos_prev or pos_prev ~= pos) then
+            pos_prev = pos
             WalkToPoint(self, pos)
         end
-
-        WalkToPoint(self, pos)
 
         Sleep(FRAMES)
     end, function()
@@ -756,7 +688,6 @@ function KeepFollowing:DoInit(inst)
     self.is_client = false
     self.is_dst = false
     self.is_master_sim = TheWorld.ismastersim
-    self.is_paused = false
     self.leader = nil
     self.movement_prediction_state = nil
     self.name = "KeepFollowing"
@@ -792,7 +723,6 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.MOD_KEEP_FOLLOWING_TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
-        self._GetPauseAction = GetPauseAction
         self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
