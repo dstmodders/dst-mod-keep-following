@@ -10,7 +10,7 @@
 -- @author Victor Popkov
 -- @copyright 2019
 -- @license MIT
--- @release 0.20.1
+-- @release 0.21.0-alpha
 ----
 require "class"
 
