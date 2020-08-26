@@ -569,7 +569,7 @@ end
 --
 -- Starts the thread to push the leader.
 function KeepFollowing:StartPushingThread()
-    local buffered, pos, pos_prev
+    local pos, pos_prev
 
     self.pushing_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
@@ -578,7 +578,6 @@ function KeepFollowing:StartPushingThread()
             return
         end
 
-        buffered = self.inst:GetBufferedAction()
         pos = self.leader:GetPosition()
 
         if self:IsIdle() or (not pos_prev or pos_prev ~= pos) then
