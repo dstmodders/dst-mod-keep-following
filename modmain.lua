@@ -312,16 +312,20 @@ local function PlayerControllerPostInit(_self, _player)
     local function OurMouseAction(act)
         if not act then
             KeepFollowingStop()
-            return
+            return false
         end
 
         local action = act.action
         if IsOurAction(action) then
             ClearActionQueueRebornEntities()
-            return action.fn(act)
+            if action.fn(act) then
+                return true
+            end
         else
             KeepFollowingStop()
         end
+
+        return false
     end
 
     --
@@ -333,20 +337,33 @@ local function PlayerControllerPostInit(_self, _player)
         if IsMoveButton(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
-
-        if control == CONTROL_PRIMARY and not down then
-            if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
-                return OldOnControl(self, control, down)
-            end
-            OurMouseAction(self:GetLeftMouseAction())
-        elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
-            if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
-                return OldOnControl(self, control, down)
-            end
-            OurMouseAction(self:GetRightMouseAction())
-        end
-
         OldOnControl(self, control, down)
+    end
+
+    local OldOnLeftClick = _self.OnLeftClick
+    _self.OnLeftClick = function(self, down)
+        if not down
+            and not self:IsAOETargeting()
+            and not TheInput:GetHUDEntityUnderMouse()
+            and OurMouseAction(self:GetLeftMouseAction())
+        then
+            return
+        end
+        OldOnLeftClick(self, down)
+    end
+
+    if _PUSH_WITH_RMB then
+        local OldOnRightClick = _self.OnRightClick
+        _self.OnRightClick = function(self, down)
+            if not down
+                and not self:IsAOETargeting()
+                and not TheInput:GetHUDEntityUnderMouse()
+                and OurMouseAction(self:GetRightMouseAction())
+            then
+                return
+            end
+            OldOnRightClick(self, down)
+        end
     end
 
     DebugInit("PlayerControllerPostInit")
