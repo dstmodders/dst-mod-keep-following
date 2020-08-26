@@ -6,6 +6,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[v]] .. version .. [[:]] .. "\n" ..
     [[- Changed following configurations]] .. "\n" ..
     [[- Improved interruptions behaviour]] .. "\n" ..
+    [[- Improved keybinds configurations]] .. "\n" ..
     [[- Improved mouse overrides]]
 author = "Demonblink"
 api_version = 10
@@ -44,24 +45,80 @@ local function AddSection(title)
 end
 
 local function CreateKeyList()
-    local keylist = {}
-    local string = ""
-    local keys = {
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-        "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
-        "LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift",
-        "Tab", "Capslock", "Space", "Minus", "Equals", "Backspace",
-        "Insert", "Home", "Delete", "End", "Pageup", "Pagedown", "Print", "Scrollock", "Pause",
-        "Period", "Slash", "Semicolon", "Leftbracket", "Rightbracket", "Backslash",
-        "Up", "Down", "Left", "Right",
-    }
-
-    keylist[1] = { description = "Disabled", data = false }
-    for i = 1, #keys do
-        keylist[i + 1] = { description = keys[i], data = "KEY_" .. string.upper(keys[i]) }
+    -- helpers
+    local function AddDisabled(t)
+        t[#t + 1] = { description = "Disabled", data = false }
     end
 
-    return keylist
+    local function AddKey(t, key)
+        t[#t + 1] = { description = key, data = "KEY_" .. key:gsub(" ", ""):upper() }
+    end
+
+    local function AddKeysByName(t, names)
+        for i = 1, #names do
+            AddKey(t, names[i])
+        end
+    end
+
+    local function AddAlphabetKeys(t)
+        local string = ""
+        for i = 1, 26 do
+            AddKey(t, string.char(64 + i))
+        end
+    end
+
+    local function AddTypewriterNumberKeys(t)
+        for i = 1, 10 do
+            AddKey(t, "" .. (i % 10))
+        end
+    end
+
+    local function AddTypewriterModifierKeys(t)
+        AddKeysByName(t, { "Alt", "Ctrl", "Shift" })
+    end
+
+    local function AddTypewriterKeys(t)
+        AddAlphabetKeys(t)
+        AddKeysByName(t, {
+            "Slash",
+            "Backslash",
+            "Period",
+            "Semicolon",
+            "Left Bracket",
+            "Right Bracket",
+        })
+        AddKeysByName(t, { "Space", "Tab", "Backspace", "Enter" })
+        AddTypewriterModifierKeys(t)
+        AddKeysByName(t, { "Tilde" })
+        AddTypewriterNumberKeys(t)
+        AddKeysByName(t, { "Minus", "Equals" })
+    end
+
+    local function AddFunctionKeys(t)
+        for i = 1, 12 do
+            AddKey(t, "F" .. i)
+        end
+    end
+
+    local function AddArrowKeys(t)
+        AddKeysByName(t, { "Up", "Down", "Left", "Right" })
+    end
+
+    local function AddNavigationKeys(t)
+        AddKeysByName(t, { "Insert", "Delete", "Home", "End", "Page Up", "Page Down" })
+    end
+
+    -- key list
+    local key_list = {}
+
+    AddDisabled(key_list)
+    AddArrowKeys(key_list)
+    AddFunctionKeys(key_list)
+    AddTypewriterKeys(key_list)
+    AddNavigationKeys(key_list)
+    AddKeysByName(key_list, { "Escape", "Pause", "Print" })
+
+    return key_list
 end
 
 --
@@ -103,8 +160,8 @@ local push_mass_checking = {
 
 configuration_options = {
     AddSection("Keybinds"),
-    AddConfig("Action key", "key_action", key_list, "KEY_LSHIFT", "Key used for both following and pushing"),
-    AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used in combination with an action key for pushing"),
+    AddConfig("Action key", "key_action", key_list, "KEY_SHIFT", "Key used for both following and pushing"),
+    AddConfig("Push key", "key_push", key_list, "KEY_CTRL", "Key used in combination with an action key for pushing"),
 
     AddSection("Following"),
     AddConfig("Follow method", "follow_method", follow_methods, "default", "Which follow method should be used?"),
