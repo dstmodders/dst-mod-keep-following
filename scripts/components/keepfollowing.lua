@@ -359,7 +359,7 @@ end
 -- "default" following method is used it starts the following path thread as well by calling the
 -- `StartFollowingPathThread` to gather path coordinates of a leader.
 function KeepFollowing:StartFollowingThread()
-    local buffered, buffered_prev, pos, pos_prev, is_leader_near, stuck
+    local pos, pos_prev, is_leader_near, stuck
 
     local stuck_frames = 0
     local radius_inst = self.inst.Physics:GetRadius()
@@ -373,7 +373,6 @@ function KeepFollowing:StartFollowingThread()
             return
         end
 
-        buffered = self.inst:GetBufferedAction()
         is_leader_near = self.inst:IsNear(self.leader, target)
 
         if self.config.follow_method == "default" then
@@ -391,7 +390,11 @@ function KeepFollowing:StartFollowingThread()
                         pos_prev = pos
                         stuck = true
                     end
-                elseif not self:IsIdle() and stuck and pos_prev == pos and #self.leader_positions > 1 then
+                elseif not self:IsIdle()
+                    and stuck
+                    and pos_prev == pos
+                    and #self.leader_positions > 1
+                then
                     table.remove(self.leader_positions, 1)
                 end
             end
