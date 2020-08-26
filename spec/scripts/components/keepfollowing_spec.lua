@@ -168,11 +168,11 @@ describe("KeepFollowing", function()
 
             -- config
             assert.is_table(self.config)
-            assert.is_equal("default", self.config.following_method)
-            assert.is_false(self.config.keep_target_distance)
+            assert.is_equal(2.5, self.config.follow_distance)
+            assert.is_false(self.config.follow_distance_keeping)
+            assert.is_equal("default", self.config.follow_method)
             assert.is_true(self.config.push_lag_compensation)
             assert.is_true(self.config.push_mass_checking)
-            assert.is_equal(2.5, self.config.target_distance)
         end
 
         describe("using the constructor", function()

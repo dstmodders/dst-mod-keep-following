@@ -348,7 +348,7 @@ local function GetDefaultMethodNextPosition(self, target)
 
         if not self.is_leader_near
             and is_leader_near
-            or (is_leader_near and self.config.keep_target_distance)
+            or (is_leader_near and self.config.follow_distance_keeping)
         then
             self.leader_positions = {}
             return self.inst:GetPositionAdjacentTo(self.leader, target)
@@ -365,7 +365,7 @@ local function GetDefaultMethodNextPosition(self, target)
 end
 
 local function GetClosestMethodNextPosition(self, target, is_leader_near)
-    if not is_leader_near or self.config.keep_target_distance then
+    if not is_leader_near or self.config.follow_distance_keeping then
         local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
 
         if IsPassable(self.world, pos) then
@@ -413,7 +413,7 @@ function KeepFollowing:StartFollowingThread()
     local stuck_frames = 0
     local radius_inst = self.inst.Physics:GetRadius()
     local radius_leader = self.leader.Physics:GetRadius()
-    local target = self.config.target_distance + radius_inst + radius_leader
+    local target = self.config.follow_distance + radius_inst + radius_leader
 
     self.following_thread = Utils.ThreadStart(_FOLLOWING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
@@ -425,7 +425,7 @@ function KeepFollowing:StartFollowingThread()
         buffered = self.inst:GetBufferedAction()
         is_leader_near = self.inst:IsNear(self.leader, target)
 
-        if self.config.following_method == "default" then
+        if self.config.follow_method == "default" then
             -- default: player follows a leader step-by-step
             pos = GetDefaultMethodNextPosition(self, target)
             if pos then
@@ -453,7 +453,7 @@ function KeepFollowing:StartFollowingThread()
                     end
                 end
             end
-        elseif self.config.following_method == "closest" then
+        elseif self.config.follow_method == "closest" then
             -- closest: player goes to the closest target point from a leader
             pos = GetClosestMethodNextPosition(self, target, is_leader_near)
             if pos then
@@ -478,7 +478,7 @@ function KeepFollowing:StartFollowingThread()
     end, function()
         return self.inst and self.inst:IsValid() and self:IsFollowing()
     end, function()
-        if self.config.following_method == "default" then
+        if self.config.follow_method == "default" then
             self:StartFollowingPathThread()
         end
     end, function()
@@ -779,11 +779,11 @@ function KeepFollowing:DoInit(inst)
 
     -- config
     self.config = {
-        following_method = "default",
-        keep_target_distance = false,
+        follow_distance = 2.5,
+        follow_distance_keeping = false,
+        follow_method = "default",
         push_lag_compensation = true,
         push_mass_checking = true,
-        target_distance = 2.5,
     }
 
     -- update
