@@ -162,11 +162,11 @@ local function OnPlayerActivated(player, world)
 
         -- GetModConfigData
         local configs = {
-            "following_method",
-            "keep_target_distance",
+            "follow_distance",
+            "follow_distance_keeping",
+            "follow_method",
             "push_lag_compensation",
             "push_mass_checking",
-            "target_distance",
         }
 
         for _, config in ipairs(configs) do

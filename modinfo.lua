@@ -4,6 +4,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
     [[v]] .. version .. [[:]] .. "\n" ..
+    [[- Changed following configurations]] .. "\n" ..
     [[- Improved interruptions behaviour]] .. "\n" ..
     [[- Improved mouse overrides]]
 author = "Demonblink"
@@ -74,20 +75,20 @@ local boolean = {
     { description = "No", data = false },
 }
 
-local following_methods = {
+local follow_methods = {
     { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
     { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
 }
 
-local target_distances = {
+local follow_distances = {
     { description = "1.5m", data = 1.5 },
     { description = "2.5m", data = 2.5 },
     { description = "3.5m", data = 3.5 },
 }
 
-local keep_target_distance = {
-    { description = "Yes", data = true, hover = "Yes: move away from a leader within the target distance" },
-    { description = "No", data = false, hover = "No: stay still within the target distance" },
+local follow_distance_keeping = {
+    { description = "Yes", data = true, hover = "Yes: move away from a leader within the follow distance" },
+    { description = "No", data = false, hover = "No: stay still within the follow distance" },
 }
 
 local push_with_rmb = {
@@ -106,9 +107,9 @@ configuration_options = {
     AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used in combination with an action key for pushing"),
 
     AddSection("Following"),
-    AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
-    AddConfig("Target distance", "target_distance", target_distances, 2.5, "How close can you approach the leader?\nIgnored when pushing"),
-    AddConfig("Keep target distance", "keep_target_distance", keep_target_distance, false, "Should the follower keep the distance from the leader?\nIgnored when pushing"),
+    AddConfig("Follow method", "follow_method", follow_methods, "default", "Which follow method should be used?"),
+    AddConfig("Follow distance", "follow_distance", follow_distances, 2.5, "How close can you approach the leader?"),
+    AddConfig("Follow distance keeping", "follow_distance_keeping", follow_distance_keeping, false, "Should the follower keep the distance from the leader?"),
 
     AddSection("Pushing"),
     AddConfig("Push with RMB", "push_with_rmb", push_with_rmb, false, "Should the  (RMB) in combination with an action key be used for pushing?"),
