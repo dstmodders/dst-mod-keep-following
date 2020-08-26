@@ -85,6 +85,7 @@ end
 --- Configurations
 -- @section configurations
 
+local _COMPATIBILITY = GetModConfigData("compatibility")
 local _KEY_ACTION = GetKeyFromConfig("key_action")
 local _KEY_PUSH = GetKeyFromConfig("key_push")
 local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
@@ -337,32 +338,49 @@ local function PlayerControllerPostInit(_self, _player)
         if IsMoveButton(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
+
+        if _COMPATIBILITY == "alternative" then
+            if control == CONTROL_PRIMARY and not down then
+                if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+                    return OldOnControl(self, control, down)
+                end
+                OurMouseAction(self:GetLeftMouseAction())
+            elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
+                if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
+                    return OldOnControl(self, control, down)
+                end
+                OurMouseAction(self:GetRightMouseAction())
+            end
+        end
+
         OldOnControl(self, control, down)
     end
 
-    local OldOnLeftClick = _self.OnLeftClick
-    _self.OnLeftClick = function(self, down)
-        if not down
-            and not self:IsAOETargeting()
-            and not TheInput:GetHUDEntityUnderMouse()
-            and OurMouseAction(self:GetLeftMouseAction())
-        then
-            return
-        end
-        OldOnLeftClick(self, down)
-    end
-
-    if _PUSH_WITH_RMB then
-        local OldOnRightClick = _self.OnRightClick
-        _self.OnRightClick = function(self, down)
+    if _COMPATIBILITY == "recommended" then
+        local OldOnLeftClick = _self.OnLeftClick
+        _self.OnLeftClick = function(self, down)
             if not down
                 and not self:IsAOETargeting()
                 and not TheInput:GetHUDEntityUnderMouse()
-                and OurMouseAction(self:GetRightMouseAction())
+                and OurMouseAction(self:GetLeftMouseAction())
             then
                 return
             end
-            OldOnRightClick(self, down)
+            OldOnLeftClick(self, down)
+        end
+
+        if _PUSH_WITH_RMB then
+            local OldOnRightClick = _self.OnRightClick
+            _self.OnRightClick = function(self, down)
+                if not down
+                    and not self:IsAOETargeting()
+                    and not TheInput:GetHUDEntityUnderMouse()
+                    and OurMouseAction(self:GetRightMouseAction())
+                then
+                    return
+                end
+                OldOnRightClick(self, down)
+            end
         end
     end
 

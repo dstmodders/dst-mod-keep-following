@@ -4,6 +4,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift + Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another player to keep following or pushing him.]] .. "\n\n" ..
     [[v]] .. version .. [[:]] .. "\n" ..
+    [[- Added compatibility configuration]] .. "\n" ..
     [[- Improved mouse overrides]]
 author = "Demonblink"
 api_version = 10
@@ -73,6 +74,11 @@ local boolean = {
     { description = "No", data = false },
 }
 
+local compatibilities = {
+    { description = "Recommended", data = "recommended", hover = "Recommended: overrides both on control and on left/right clicks" },
+    { description = "Alternative", data = "alternative", hover = "Alternative: overrides only on control" },
+}
+
 local following_methods = {
     { description = "Default", data = "default", hover = "Default: player follows a leader step-by-step" },
     { description = "Closest", data = "closest", hover = "Closest: player goes to the closest target point from a leader" },
@@ -103,6 +109,9 @@ configuration_options = {
     AddSection("Keybinds"),
     AddConfig("Action key", "key_action", key_list, "KEY_LSHIFT", "Key used for both following and pushing"),
     AddConfig("Push key", "key_push", key_list, "KEY_LCTRL", "Key used in combination with an action key for pushing"),
+
+    AddSection("General"),
+    AddConfig("Compatibility", "compatibility", compatibilities, "recommended", "Which compatibility mode should be used?\nMay fix some issues with other mods"),
 
     AddSection("Following"),
     AddConfig("Following method", "following_method", following_methods, "default", "Which following method should be used?\nIgnored when pushing"),
