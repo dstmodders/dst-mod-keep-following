@@ -209,9 +209,17 @@ local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
     DebugInit("AddPlayerPostInit")
 end
 
-local function PlayerActionPickerPostInit(_self, player)
-    local OldDoGetMouseActions = _self.DoGetMouseActions
-    _self.DoGetMouseActions = function(self, position, _target)
+local function PlayerActionPickerPostInit(playeractionpicker, player)
+    if player ~= _G.ThePlayer then
+        return
+    end
+
+    --
+    -- Overrides
+    --
+
+    local OldDoGetMouseActions = playeractionpicker.DoGetMouseActions
+    playeractionpicker.DoGetMouseActions = function(self, position, _target)
         local lmb, rmb = OldDoGetMouseActions(self, position, _target)
         if TheInput:IsKeyDown(_KEY_ACTION) then
             local keepfollowing = player.components.keepfollowing
@@ -276,13 +284,17 @@ local function PlayerActionPickerPostInit(_self, player)
     DebugInit("PlayerActionPickerPostInit")
 end
 
-local function PlayerControllerPostInit(_self, _player)
+local function PlayerControllerPostInit(playercontroller, player)
+    if player ~= _G.ThePlayer then
+        return
+    end
+
     --
     -- Helpers
     --
 
     local function KeepFollowingStop()
-        local keepfollowing = _player.components.keepfollowing
+        local keepfollowing = player.components.keepfollowing
         if keepfollowing then
             keepfollowing:Stop()
         end
@@ -296,7 +308,7 @@ local function PlayerControllerPostInit(_self, _player)
     -- either using the same approach or using the global input handler when ActionQueue(DST) mod is
     -- enabled. However, I don't see any valid reason to do that.
     local function ClearActionQueueRebornEntities()
-        local actionqueuer = _player.components.actionqueuer
+        local actionqueuer = player.components.actionqueuer
         if not actionqueuer
             or not actionqueuer.ClearActionThread
             or not actionqueuer.ClearSelectionThread
@@ -333,8 +345,8 @@ local function PlayerControllerPostInit(_self, _player)
     -- Overrides
     --
 
-    local OldOnControl = _self.OnControl
-    _self.OnControl = function(self, control, down)
+    local OldOnControl = playercontroller.OnControl
+    playercontroller.OnControl = function(self, control, down)
         if IsMoveButton(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
@@ -357,8 +369,8 @@ local function PlayerControllerPostInit(_self, _player)
     end
 
     if _COMPATIBILITY == "recommended" then
-        local OldOnLeftClick = _self.OnLeftClick
-        _self.OnLeftClick = function(self, down)
+        local OldOnLeftClick = playercontroller.OnLeftClick
+        playercontroller.OnLeftClick = function(self, down)
             if not down
                 and not self:IsAOETargeting()
                 and not TheInput:GetHUDEntityUnderMouse()
@@ -370,8 +382,8 @@ local function PlayerControllerPostInit(_self, _player)
         end
 
         if _PUSH_WITH_RMB then
-            local OldOnRightClick = _self.OnRightClick
-            _self.OnRightClick = function(self, down)
+            local OldOnRightClick = playercontroller.OnRightClick
+            playercontroller.OnRightClick = function(self, down)
                 if not down
                     and not self:IsAOETargeting()
                     and not TheInput:GetHUDEntityUnderMouse()
