@@ -8,10 +8,10 @@
 -- @license MIT
 -- @release 0.21.0
 ----
-
 local _G = GLOBAL
-_G.MOD_KEEP_FOLLOWING_TEST = false
 local require = _G.require
+
+_G.MOD_KEEP_FOLLOWING_TEST = false
 
 local Utils = require "keepfollowing/utils"
 
@@ -29,6 +29,22 @@ local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local TheInput = _G.TheInput
 local TheSim = _G.TheSim
+
+--- SDK
+-- @section sdk
+
+local SDK
+
+SDK = require "keepfollowing/sdk/sdk/sdk"
+SDK.Load(env, "scripts/keepfollowing/sdk", {
+    "Debug",
+    "Entity",
+    "Input",
+    "ModMain",
+    "Player",
+    "Thread",
+    "World",
+})
 
 --- Debugging
 -- @section debugging
