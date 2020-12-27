@@ -20,10 +20,11 @@ help:
 	@echo "   testcoverage   to print the tests coverage report"
 	@echo "   testlist       to list all existing tests"
 	@echo "   uninstall      to uninstall the mod"
-	@echo "   workshop       to prepare the Steam Workshop directory"
+	@echo "   workshop       to prepare the Steam Workshop directory + archive"
 
 citest:
 	@busted .; \
+		luacov-console .; \
 		cp luacov.report.out luacov.report.out.bak \
 			&& luacov -r lcov > /dev/null 2>&1 \
 			&& cp luacov.report.out lcov.info \
@@ -62,11 +63,11 @@ install:
 		--exclude 'luacov*' \
 		--exclude 'Makefile' \
 		--exclude 'modicon.png' \
-		--exclude 'preview.gif' \
+		--exclude 'preview.*' \
 		--exclude 'README.md' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
-		--exclude 'workshop/' \
+		--exclude 'workshop*' \
 		. \
 		"${DST_MODS}/dst-mod-keep-following/"
 
@@ -87,6 +88,7 @@ lint:
 modicon:
 	@:$(call check_defined, DS_KTOOLS_KTECH)
 	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+	@prettier --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 reinstall: uninstall install
 
@@ -103,7 +105,7 @@ test:
 	@busted .; luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
 
 testclean:
-	@rm -f lcov.info luacov*
+	@rm -f busted.out lcov.info luacov*
 
 testcoverage:
 	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
@@ -116,13 +118,16 @@ uninstall:
 	@rm -Rf "${DST_MODS}/dst-mod-keep-following/"
 
 workshop:
-	@rm -Rf ./workshop/
+	@rm -Rf ./workshop*
 	@mkdir -p ./workshop/
-	@cp -R ./LICENSE ./workshop/LICENSE
+	@cp -R ./LICENSE ./workshop/
 	@cp -R ./modicon.tex ./workshop/
 	@cp -R ./modicon.xml ./workshop/
 	@cp -R ./modinfo.lua ./workshop/
 	@cp -R ./modmain.lua ./workshop/
 	@cp -R ./scripts/ ./workshop/
+	@cp -R ./workshop/ ./workshop-1896055525/
+	@zip -r ./steam-workshop.zip ./workshop-1896055525/
+	@rm -R ./workshop-1896055525/
 
 .PHONY: ldoc modicon workshop
