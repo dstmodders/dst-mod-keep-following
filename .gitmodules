@@ -1,0 +1,3 @@
+[submodule "scripts/keepfollowing/sdk"]
+	path = scripts/keepfollowing/sdk
+	url = https://github.com/victorpopkov/dst-mod-sdk
