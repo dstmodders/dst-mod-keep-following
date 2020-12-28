@@ -114,42 +114,6 @@ describe("Utils", function()
             pt = Vector3(1, 0, 1)
         end)
 
-        describe("IsLocomotorAvailable", function()
-            local player
-
-            before_each(function()
-                player = {
-                    components = {
-                        locomotor = {},
-                    },
-                }
-            end)
-
-            describe("when some chain fields are missing", function()
-                it("should return false", function()
-                    AssertChainNil(function()
-                        assert.is_false(Utils.IsLocomotorAvailable(player))
-                    end, player, "components", "locomotor")
-                end)
-            end)
-
-            describe("when the locomotor component is available", function()
-                it("should return true", function()
-                    assert.is_true(Utils.IsLocomotorAvailable(player))
-                end)
-            end)
-
-            describe("when the locomotor component is not available", function()
-                before_each(function()
-                    player.components.locomotor = nil
-                end)
-
-                it("should return true", function()
-                    assert.is_false(Utils.IsLocomotorAvailable(player))
-                end)
-            end)
-        end)
-
         describe("WalkToPoint", function()
             local player
 

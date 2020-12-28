@@ -605,7 +605,7 @@ end
 function KeepFollowing:StartPushing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
         if self.movement_prediction_state == nil then
-            self.movement_prediction_state = Utils.IsLocomotorAvailable(self.inst)
+            self.movement_prediction_state = SDK.Player.HasMovementPrediction(self.inst)
         end
 
         if self.movement_prediction_state then

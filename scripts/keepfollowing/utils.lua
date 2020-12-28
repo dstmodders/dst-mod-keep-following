@@ -37,17 +37,6 @@ end
 --- Locomotor
 -- @section locomotor
 
---- Checks if the locomotor is available.
---
--- Can be used to check whether the movement prediction (lag compensation) is enabled or not as the
--- locomotor component is not available when it's disabled.
---
--- @tparam EntityScript inst Player instance
--- @treturn boolean
-function Utils.IsLocomotorAvailable(inst)
-    return SDK.Utils.Chain.Get(inst, "components", "locomotor") ~= nil
-end
-
 --- Walks to a certain point.
 --
 -- Prepares a `WALKTO` action for `PlayerController.DoAction` when the locomotor component is
