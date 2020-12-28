@@ -13,8 +13,6 @@ local require = _G.require
 
 _G.MOD_KEEP_FOLLOWING_TEST = false
 
-local Utils = require "keepfollowing/utils"
-
 --- Globals
 -- @section globals
 
@@ -373,5 +371,5 @@ AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 -- @section knownmodindex
 
 if GetModConfigData("hide_changelog") then
-    Utils.HideChangelog(modname, true)
+    SDK.ModMain.HideChangelog(true)
 end
