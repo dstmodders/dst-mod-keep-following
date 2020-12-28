@@ -12,13 +12,13 @@ describe("Utils", function()
         match = require "luassert.match"
 
         -- debug
-        DebugSpyTerm()
-        DebugSpyInit(spy)
+        DebugSpyInit()
 
         -- globals
         _G.ACTIONS = {
             WALKTO = { code = 163 },
         }
+
         _G.RPC = {
             DirectWalking = 16,
             LeftClick = 26,
@@ -38,15 +38,14 @@ describe("Utils", function()
     end)
 
     before_each(function()
-        -- initialization
-        Utils = require "keepfollowing/utils"
-
-        -- debug
-        DebugSpyClear()
-
         -- globals
         _G.BufferedAction = spy.new(ReturnValueFn({}))
         _G.SendRPCToServer = spy.new(Empty)
+
+        -- initialization
+        Utils = require "keepfollowing/utils"
+
+        DebugSpyClear()
     end)
 
     describe("general", function()
@@ -383,14 +382,6 @@ describe("Utils", function()
             describe("when the player controller is not available", function()
                 before_each(function()
                     player.components.playercontroller = nil
-                end)
-
-                it("should debug string", function()
-                    DebugSpyClear("DebugString")
-                    Utils.WalkToPoint(player, pt)
-                    DebugSpyAssertWasCalled("DebugError", 1, {
-                        "Player controller is not available",
-                    })
                 end)
             end)
         end)

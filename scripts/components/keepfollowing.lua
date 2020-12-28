@@ -12,6 +12,7 @@
 -- @license MIT
 -- @release 0.21.0
 ----
+local SDK = require "keepfollowing/sdk/sdk/sdk"
 local Utils = require "keepfollowing/utils"
 
 local _FOLLOWING_PATH_THREAD_ID = "following_path_thread"
@@ -54,7 +55,7 @@ end
 
 local function WalkToPoint(self, pt)
     Utils.WalkToPoint(self.inst, pt)
-    if _G.ModKeepFollowingDebug then
+    if SDK.Debug then
         self.debug_rpc_counter = self.debug_rpc_counter + 1
     end
 end
@@ -683,7 +684,7 @@ end
 --
 -- @tparam EntityScript inst Player instance
 function KeepFollowing:DoInit(inst)
-    Utils.AddDebugMethods(self)
+    SDK.Debug.AddMethods(self)
 
     -- general
     self.inst = inst

@@ -14,25 +14,28 @@ describe("KeepFollowing", function()
         match = require "luassert.match"
 
         -- debug
-        DebugSpyTerm()
-        DebugSpyInit(spy)
+        DebugSpyInit()
 
         -- globals
-        _os = _G.os
+        _G.MOD_KEEP_FOLLOWING_TEST = true
 
         _G.ACTIONS = {
             BLINK = { code = 14 },
             LOOKAT = { code = 78 },
             WALKTO = { code = 163 },
         }
+
         _G.COLLISION = {
             FLYERS = 2048,
             SANITY = 4096,
         }
+
         _G.RPC = {
             LeftClick = {},
         }
-        _G.MOD_KEEP_FOLLOWING_TEST = true
+
+        -- os
+        _os = _G.os
     end)
 
     teardown(function()
@@ -53,6 +56,9 @@ describe("KeepFollowing", function()
 
     before_each(function()
         -- globals
+        _G.KillThreadsWithID = spy.new(Empty)
+        _G.SendRPCToServer = spy.new(Empty)
+
         _G.AllPlayers = mock({
             {
                 GUID = 100000,
@@ -78,14 +84,15 @@ describe("KeepFollowing", function()
                 HasTag = ReturnValueFn(false),
             },
         })
-        _G.KillThreadsWithID = spy.new(Empty)
+
         _G.os = mock({
             clock = ReturnValueFn(2),
         })
+
         _G.scheduler = mock({
             GetCurrentTask = ReturnValueFn(nil),
         })
-        _G.SendRPCToServer = spy.new(Empty)
+
         _G.TheWorld = mock({
             Map = {
                 GetPlatformAtPoint = ReturnValueFn({}),
@@ -125,7 +132,6 @@ describe("KeepFollowing", function()
         KeepFollowing = require "components/keepfollowing"
         keepfollowing = KeepFollowing(inst)
 
-        -- debug
         DebugSpyClear()
     end)
 

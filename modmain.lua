@@ -50,20 +50,8 @@ SDK.Load(env, "keepfollowing/sdk", {
 --- Debugging
 -- @section debugging
 
-local Debug
-
-if GetModConfigData("debug") then
-    Debug = require "keepfollowing/debug"
-    Debug:DoInit(modname)
-    Debug:SetIsEnabled(true)
-    Debug:DebugModConfigs()
-end
-
-_G.ModKeepFollowingDebug = Debug
-
-local function DebugInit(...)
-    return Debug and Debug:DebugInit(...)
-end
+SDK.Debug.SetIsEnabled(GetModConfigData("debug") and true or false)
+SDK.Debug.ModConfigs()
 
 --- Helpers
 -- @section helpers
@@ -263,8 +251,6 @@ local function PlayerActionPickerPostInit(playeractionpicker, player)
         end
         return lmb, rmb
     end
-
-    DebugInit("PlayerActionPickerPostInit")
 end
 
 local function PlayerControllerPostInit(playercontroller, player)
@@ -378,8 +364,6 @@ local function PlayerControllerPostInit(playercontroller, player)
             end
         end
     end
-
-    DebugInit("PlayerControllerPostInit")
 end
 
 AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)

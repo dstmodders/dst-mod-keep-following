@@ -22,52 +22,6 @@ local Utils = {}
 -- base (to store original functions after overrides)
 local BaseGetModInfo
 
---- Helpers
--- @section helpers
-
-local function DebugError(...)
-    return _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug:DebugError(...)
-end
-
-local function DebugString(...)
-    return _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug:DebugString(...)
-end
-
---- Debugging
--- @section debugging
-
---- Adds debug methods to the destination class.
---
--- Checks the global environment if the `ModKeepFollowingDebug` (`Debug`) is available and adds the
--- corresponding methods from there. Otherwise, adds all the corresponding functions as empty ones.
---
--- @tparam table dest Destination class
-function Utils.AddDebugMethods(dest)
-    local methods = {
-        "DebugError",
-        "DebugInit",
-        "DebugString",
-        "DebugStringStart",
-        "DebugStringStop",
-        "DebugTerm",
-    }
-
-    if _G.ModKeepFollowingDebug then
-        for _, v in pairs(methods) do
-            dest[v] = function(_, ...)
-                if _G.ModKeepFollowingDebug and _G.ModKeepFollowingDebug[v] then
-                    return _G.ModKeepFollowingDebug[v](_G.ModKeepFollowingDebug, ...)
-                end
-            end
-        end
-    else
-        for _, v in pairs(methods) do
-            dest[v] = function()
-            end
-        end
-    end
-end
-
 --- General
 -- @section general
 
@@ -194,7 +148,7 @@ end
 function Utils.WalkToPoint(inst, pt)
     local player_controller = Utils.ChainGet(inst, "components", "playercontroller")
     if not player_controller then
-        DebugError("Player controller is not available")
+        --DebugError("Player controller is not available")
         return
     end
 
@@ -259,7 +213,7 @@ end
 -- @treturn table
 function Utils.ThreadStart(id, fn, whl, init, term)
     return StartThread(function()
-        DebugString("Thread started")
+        --DebugString("Thread started")
         if init then
             init()
         end
@@ -278,11 +232,11 @@ end
 function Utils.ThreadClear(thread)
     local task = scheduler:GetCurrentTask()
     if thread or task then
-        if thread and not task then
-            DebugString("[" .. thread.id .. "]", "Thread cleared")
-        else
-            DebugString("Thread cleared")
-        end
+        --if thread and not task then
+        --    DebugString("[" .. thread.id .. "]", "Thread cleared")
+        --else
+        --    DebugString("Thread cleared")
+        --end
 
         thread = thread ~= nil and thread or task
         KillThreadsWithID(thread.id)
