@@ -119,12 +119,6 @@ function KeepFollowing:GetLeader()
     return self.leader
 end
 
---- Checks if leader is on platform.
--- @treturn boolean
-function KeepFollowing:IsLeaderOnPlatform()
-    return SDK.Player.IsOnPlatform(self.leader)
-end
-
 --- Checks if an entity can be followed.
 --
 -- Checks whether an entity is valid and has either a `locomotor` or `balloon` tag.
@@ -308,7 +302,7 @@ local function GetClosestMethodNextPosition(self, target, is_leader_near)
             return pos
         end
 
-        if self:IsLeaderOnPlatform() ~= SDK.Player.IsOnPlatform(self.inst) then
+        if SDK.Player.IsOnPlatform(self.leader) ~= SDK.Player.IsOnPlatform(self.inst) then
             pos = GetClosestPosition(self.inst, self.leader)
         end
 
@@ -423,7 +417,7 @@ function KeepFollowing:StartFollowingPathThread()
 
         pos = self.leader:GetPosition()
 
-        if self:IsLeaderOnPlatform() ~= SDK.Player.IsOnPlatform(self.inst) then
+        if SDK.Player.IsOnPlatform(self.leader) ~= SDK.Player.IsOnPlatform(self.inst) then
             pos = GetClosestPosition(self.inst, self.leader)
         end
 
