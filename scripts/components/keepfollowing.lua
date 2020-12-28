@@ -66,31 +66,6 @@ function KeepFollowing:Stop()
     return false
 end
 
---- Movement prediction
--- @section movement-prediction
-
-local function MovementPrediction(inst, enable)
-    if enable then
-        local x, _, z = inst.Transform:GetWorldPosition()
-        SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, x, z)
-        inst:EnableMovementPrediction(true)
-        return true
-    elseif inst.components and inst.components.locomotor then
-        inst.components.locomotor:Stop()
-        inst:EnableMovementPrediction(false)
-        return false
-    end
-end
-
---- Enables/Disables movement prediction.
--- @tparam boolean enable
--- @treturn boolean
-function KeepFollowing:MovementPrediction(enable)
-    local is_enabled = MovementPrediction(self.inst, enable)
-    self:DebugString("Movement prediction:", is_enabled and "enabled" or "disabled")
-    return is_enabled
-end
-
 --- Leader
 -- @section leader
 
@@ -443,7 +418,7 @@ function KeepFollowing:StartFollowing(leader)
     if self.config.push_lag_compensation and not self.is_master_sim then
         local state = self.movement_prediction_state
         if state ~= nil then
-            self:MovementPrediction(state)
+            SDK.Player.SetMovementPrediction(state)
             self.movement_prediction_state = nil
         end
     end
@@ -568,7 +543,7 @@ function KeepFollowing:StartPushing(leader)
         end
 
         if self.movement_prediction_state then
-            self:MovementPrediction(false)
+            SDK.Player.SetMovementPrediction(false)
         end
     end
 
@@ -603,7 +578,7 @@ end
 -- @treturn boolean
 function KeepFollowing:StopPushing()
     if self.config.push_lag_compensation and not self.is_master_sim then
-        self:MovementPrediction(self.movement_prediction_state)
+        SDK.Player.SetMovementPrediction(self.movement_prediction_state)
         self.movement_prediction_state = nil
     end
 
@@ -685,7 +660,6 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.MOD_KEEP_FOLLOWING_TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
-        self._MovementPrediction = MovementPrediction
     end
 
     self:DebugInit(self.name)

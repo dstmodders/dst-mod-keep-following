@@ -201,140 +201,6 @@ describe("KeepFollowing", function()
         end)
     end)
 
-    describe("movement prediction", function()
-        local function TestMovementPrediction(enable_fn, disable_fn, inst_fn)
-            local _inst
-
-            before_each(function()
-                _inst = inst_fn()
-            end)
-
-            describe("when enabling", function()
-                it("should call SendRPCToServer()", function()
-                    assert.spy(_G.SendRPCToServer).was_called(0)
-                    enable_fn()
-                    assert.spy(_G.SendRPCToServer).was_called(1)
-                    assert.spy(_G.SendRPCToServer).was_called_with(
-                        match.is_ref(_G.RPC.LeftClick),
-                        _G.ACTIONS.WALKTO.code,
-                        1,
-                        -1
-                    )
-                end)
-
-                it("should call inst:EnableMovementPrediction() with true", function()
-                    assert.spy(_inst.EnableMovementPrediction).was_called(0)
-                    enable_fn()
-                    assert.spy(_inst.EnableMovementPrediction).was_called(1)
-                    assert.spy(_inst.EnableMovementPrediction).was_called_with(
-                        match.is_ref(_inst),
-                        true
-                    )
-                end)
-
-                it("should return true", function()
-                    assert.is_true(enable_fn())
-                end)
-            end)
-
-            describe("when disabling", function()
-                it("shouldn't call SendRPCToServer()", function()
-                    assert.spy(_G.SendRPCToServer).was_called(0)
-                    disable_fn()
-                    assert.spy(_G.SendRPCToServer).was_called(0)
-                end)
-
-                it("should call locomotor:Stop()", function()
-                    assert.spy(_inst.components.locomotor.Stop).was_called(0)
-                    disable_fn()
-                    assert.spy(_inst.components.locomotor.Stop).was_called(1)
-                    assert.spy(_inst.components.locomotor.Stop).was_called_with(
-                        match.is_ref(_inst.components.locomotor)
-                    )
-                end)
-
-                it("should call inst:EnableMovementPrediction() with false", function()
-                    assert.spy(_inst.EnableMovementPrediction).was_called(0)
-                    disable_fn()
-                    assert.spy(_inst.EnableMovementPrediction).was_called(1)
-                    assert.spy(_inst.EnableMovementPrediction).was_called_with(
-                        match.is_ref(_inst),
-                        false
-                    )
-                end)
-
-                it("should return false", function()
-                    assert.is_false(disable_fn())
-                end)
-            end)
-        end
-
-        describe("local", function()
-            local _inst
-
-            before_each(function()
-                _inst = mock({
-                    components = {
-                        locomotor = {
-                            Stop = Empty,
-                        },
-                    },
-                    EnableMovementPrediction = ReturnValueFn(Empty),
-                    Transform = {
-                        GetWorldPosition = ReturnValuesFn(1, 0, -1),
-                    },
-                })
-            end)
-
-            describe("MovementPrediction", function()
-                local enable_fn = function()
-                    return keepfollowing._MovementPrediction(_inst, true)
-                end
-
-                local disable_fn = function()
-                    return keepfollowing._MovementPrediction(_inst, false)
-                end
-
-                TestMovementPrediction(enable_fn, disable_fn, function()
-                    return _inst
-                end)
-            end)
-        end)
-
-        describe("MovementPrediction", function()
-            local enable_fn = function()
-                return keepfollowing:MovementPrediction(true)
-            end
-
-            local disable_fn = function()
-                return keepfollowing:MovementPrediction(false)
-            end
-
-            TestMovementPrediction(enable_fn, disable_fn, function()
-                return keepfollowing.inst
-            end)
-
-            describe("when enabling", function()
-                it("should debug string", function()
-                    DebugSpyClear("DebugString")
-                    enable_fn()
-                    DebugSpyAssertWasCalled("DebugString", 1, { "Movement prediction:", "enabled" })
-                end)
-            end)
-
-            describe("when disabling", function()
-                it("should debug string", function()
-                    DebugSpyClear("DebugString")
-                    disable_fn()
-                    DebugSpyAssertWasCalled("DebugString", 1, {
-                        "Movement prediction:",
-                        "disabled"
-                    })
-                end)
-            end)
-        end)
-    end)
-
     describe("leader", function()
         local entity
 
@@ -843,8 +709,8 @@ describe("KeepFollowing", function()
     describe("following", function()
         describe("StartFollowing", function()
             before_each(function()
+                _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                 keepfollowing.config = {}
-                keepfollowing.MovementPrediction = spy.new(Empty)
                 keepfollowing.StartFollowingThread = spy.new(Empty)
             end)
 
@@ -854,9 +720,9 @@ describe("KeepFollowing", function()
                 end)
 
                 it("shouldn't call self:StartFollowing()", function()
-                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                    assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                     keepfollowing:StartFollowing(leader)
-                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                    assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                 end)
             end
 
@@ -912,13 +778,10 @@ describe("KeepFollowing", function()
                         end)
 
                         it("should call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartFollowing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                                match.is_ref(keepfollowing),
-                                true
-                            )
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(1)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called_with(true)
                         end)
 
                         it("should return false", function()
@@ -938,13 +801,10 @@ describe("KeepFollowing", function()
                         end)
 
                         it("should call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartFollowing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                                match.is_ref(keepfollowing),
-                                false
-                            )
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(1)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called_with(false)
                         end)
 
                         it("should return false", function()
@@ -966,8 +826,8 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = true
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         TestNoPushLagCompensation(true)
@@ -979,8 +839,8 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = false
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         TestNoPushLagCompensation(false)
@@ -998,8 +858,8 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = true
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         TestNoPushLagCompensation(true)
@@ -1011,8 +871,8 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = false
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         TestNoPushLagCompensation(false)
@@ -1154,8 +1014,8 @@ describe("KeepFollowing", function()
     describe("pushing", function()
         describe("StartFollowing", function()
             before_each(function()
+                _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                 keepfollowing.config = {}
-                keepfollowing.MovementPrediction = spy.new(Empty)
                 keepfollowing.StartPushingThread = spy.new(Empty)
             end)
 
@@ -1165,9 +1025,9 @@ describe("KeepFollowing", function()
                 end)
 
                 it("shouldn't call self:StartPushing()", function()
-                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                    assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                     keepfollowing:StartPushing(leader)
-                    assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                    assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                 end)
             end
 
@@ -1223,13 +1083,10 @@ describe("KeepFollowing", function()
                         end)
 
                         it("should call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(1)
-                            assert.spy(keepfollowing.MovementPrediction).was_called_with(
-                                match.is_ref(keepfollowing),
-                                false
-                            )
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(1)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called_with(false)
                         end)
 
                         it("should return false", function()
@@ -1249,9 +1106,9 @@ describe("KeepFollowing", function()
                         end)
 
                         it("shouldn't call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                         end)
 
                         it("should return false", function()
@@ -1273,14 +1130,14 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = true
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         it("shouldn't call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                         end)
 
                         it("should return false", function()
@@ -1290,14 +1147,14 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = false
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         it("shouldn't call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                         end)
 
                         it("should return false", function()
@@ -1313,14 +1170,14 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is true", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = true
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         it("shouldn't call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                         end)
 
                         it("should return false", function()
@@ -1330,14 +1187,14 @@ describe("KeepFollowing", function()
 
                     describe("when the previous movement prediction state is false", function()
                         before_each(function()
+                            _G.SDK.Player.SetMovementPrediction = spy.new(Empty)
                             keepfollowing.movement_prediction_state = false
-                            keepfollowing.MovementPrediction = spy.new(Empty)
                         end)
 
                         it("shouldn't call self:MovementPrediction()", function()
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                             keepfollowing:StartPushing(leader)
-                            assert.spy(keepfollowing.MovementPrediction).was_called(0)
+                            assert.spy(_G.SDK.Player.SetMovementPrediction).was_called(0)
                         end)
 
                         it("should return false", function()
@@ -1456,7 +1313,7 @@ describe("KeepFollowing", function()
                 keepfollowing:StopPushing()
                 DebugSpyAssertWasCalled(
                     "DebugString",
-                    2,
+                    1,
                     "Stopped pushing Wilson. RPCs: 1. Time: 1.0000"
                 )
             end)
