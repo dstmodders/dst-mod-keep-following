@@ -17,6 +17,8 @@
 -- @license MIT
 -- @release 0.21.0
 ----
+local SDK = require "keepfollowing/sdk/sdk/sdk"
+
 local Utils = {}
 
 -- base (to store original functions after overrides)
@@ -29,99 +31,7 @@ local BaseGetModInfo
 -- @tparam EntityScript inst Player instance
 -- @treturn boolean
 function Utils.IsHUDFocused(inst)
-    return not Utils.ChainGet(inst, "HUD", "HasInputFocus", true)
-end
-
---- Chain
--- @section chain
-
---- Gets chained field.
---
--- Simplifies the last chained field retrieval like:
---
---    return TheWorld
---        and TheWorld.net
---        and TheWorld.net.components
---        and TheWorld.net.components.shardstate
---        and TheWorld.net.components.shardstate.GetMasterSessionId
---        and TheWorld.net.components.shardstate:GetMasterSessionId
---
--- Or it's value:
---
---    return TheWorld
---        and TheWorld.net
---        and TheWorld.net.components
---        and TheWorld.net.components.shardstate
---        and TheWorld.net.components.shardstate.GetMasterSessionId
---        and TheWorld.net.components.shardstate:GetMasterSessionId()
---
--- It also supports net variables and tables acting as functions.
---
--- @usage Utils.ChainGet(TheWorld, "net", "components", "shardstate", "GetMasterSessionId") -- (function) 0x564445367790
--- @usage Utils.ChainGet(TheWorld, "net", "components", "shardstate", "GetMasterSessionId", true) -- (string) D000000000000000
--- @tparam table src
--- @tparam string|boolean ...
--- @treturn function|userdata|table
-function Utils.ChainGet(src, ...)
-    if src and (type(src) == "table" or type(src) == "userdata") then
-        local args = { ... }
-        local execute = false
-
-        if args[#args] == true then
-            table.remove(args, #args)
-            execute = true
-        end
-
-        local previous = src
-        for i = 1, #args do
-            if src[args[i]] then
-                previous = src
-                src = src[args[i]]
-            else
-                return
-            end
-        end
-
-        if execute and previous then
-            if type(src) == "function" then
-                return src(previous)
-            elseif type(src) == "userdata" or type(src) == "table" then
-                if type(src.value) == "function" then
-                    -- netvar
-                    return src:value()
-                elseif getmetatable(src.value) and getmetatable(src.value).__call then
-                    -- netvar (for testing)
-                    return src.value(src)
-                elseif getmetatable(src) and getmetatable(src).__call then
-                    -- table acting as a function
-                    return src(previous)
-                end
-            end
-            return
-        end
-
-        return src
-    end
-end
-
---- Validates chained fields.
---
--- Simplifies the chained fields checking like below:
---
---    return TheWorld
---        and TheWorld.net
---        and TheWorld.net.components
---        and TheWorld.net.components.shardstate
---        and TheWorld.net.components.shardstate.GetMasterSessionId
---        and true
---        or false
---
--- @usage Utils.ChainValidate(TheWorld, "net", "components", "shardstate", "GetMasterSessionId") -- (boolean) true
--- @tparam table src
--- @tparam string|boolean ...
--- @treturn boolean
-function Utils.ChainValidate(src, ...)
-    return Utils.ChainGet(src, ...) and true or false
+    return not SDK.Utils.Chain.Get(inst, "HUD", "HasInputFocus", true)
 end
 
 --- Locomotor
@@ -135,7 +45,7 @@ end
 -- @tparam EntityScript inst Player instance
 -- @treturn boolean
 function Utils.IsLocomotorAvailable(inst)
-    return Utils.ChainGet(inst, "components", "locomotor") ~= nil
+    return SDK.Utils.Chain.Get(inst, "components", "locomotor") ~= nil
 end
 
 --- Walks to a certain point.
@@ -146,7 +56,7 @@ end
 -- @tparam EntityScript inst Player instance
 -- @tparam Vector3 pt Destination point
 function Utils.WalkToPoint(inst, pt)
-    local player_controller = Utils.ChainGet(inst, "components", "playercontroller")
+    local player_controller = SDK.Utils.Chain.Get(inst, "components", "playercontroller")
     if not player_controller then
         --DebugError("Player controller is not available")
         return

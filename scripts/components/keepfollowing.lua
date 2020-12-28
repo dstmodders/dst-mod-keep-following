@@ -32,18 +32,18 @@ end)
 -- @section helpers
 
 local function IsOnPlatform(world, inst)
-    if Utils.ChainValidate(world, "Map", "GetPlatformAtPoint")
-        and Utils.ChainValidate(inst, "GetPosition")
+    if SDK.Utils.Chain.Validate(world, "Map", "GetPlatformAtPoint")
+        and SDK.Utils.Chain.Validate(inst, "GetPosition")
     then
-        return world.Map:GetPlatformAtPoint(Utils.ChainGet(inst:GetPosition(), "Get", true))
+        return world.Map:GetPlatformAtPoint(SDK.Utils.Chain.Get(inst:GetPosition(), "Get", true))
             and true
             or false
     end
 end
 
 local function IsPassable(world, pos)
-    return Utils.ChainValidate(world, "Map", "IsPassableAtPoint")
-        and Utils.ChainValidate(pos, "Get")
+    return SDK.Utils.Chain.Validate(world, "Map", "IsPassableAtPoint")
+        and SDK.Utils.Chain.Validate(pos, "Get")
         and world.Map:IsPassableAtPoint(pos:Get())
         or false
 end
@@ -148,7 +148,7 @@ end
 -- @tparam EntityScript entity An entity as a potential leader to follow
 -- @treturn boolean
 function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
-    return Utils.ChainGet(entity, "entity", "IsValid", true)
+    return SDK.Utils.Chain.Get(entity, "entity", "IsValid", true)
         and (entity:HasTag("locomotor") or entity:HasTag("balloon"))
         or false
 end
@@ -167,7 +167,7 @@ function KeepFollowing:CanBePushed(entity)
         return true
     end
 
-    local collision_group = Utils.ChainGet(entity, "Physics", "GetCollisionGroup", true)
+    local collision_group = SDK.Utils.Chain.Get(entity, "Physics", "GetCollisionGroup", true)
     if collision_group == COLLISION.FLYERS -- different flyers don't collide with characters
         or collision_group == COLLISION.SANITY -- Shadow Creatures also don't collide
         or entity:HasTag("bird") -- so does birds
@@ -261,7 +261,7 @@ end
 -- @treturn EntityScript A sleeper (a player)
 function KeepFollowing:GetTentSleeper(tent)
     local player
-    local sleepingbag = Utils.ChainGet(tent, "components", "sleepingbag")
+    local sleepingbag = SDK.Utils.Chain.Get(tent, "components", "sleepingbag")
     if sleepingbag then
         self:DebugString("Component sleepingbag is available")
         player = sleepingbag.sleeper

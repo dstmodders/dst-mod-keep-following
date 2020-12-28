@@ -95,7 +95,7 @@ local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
 -- @section actions
 
 local function ActionFollow(act)
-    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         keepfollowing:Stop()
         keepfollowing:StartFollowing(act.target)
@@ -105,7 +105,7 @@ local function ActionFollow(act)
 end
 
 local function ActionPush(act)
-    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         keepfollowing:Stop()
         keepfollowing:StartPushing(act.target)
@@ -115,7 +115,7 @@ local function ActionPush(act)
 end
 
 local function ActionTentFollow(act)
-    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         local leader = keepfollowing:GetTentSleeper(act.target)
         if leader then
@@ -128,7 +128,7 @@ local function ActionTentFollow(act)
 end
 
 local function ActionTentPush(act)
-    local keepfollowing = Utils.ChainGet(act, "doer", "components", "keepfollowing")
+    local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         local leader = keepfollowing:GetTentSleeper(act.target)
         if leader then
