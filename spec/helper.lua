@@ -5,6 +5,26 @@
 require "spec/vector3"
 
 local preloads = {
+    ["sdk/config"] = "scripts/keepfollowing/sdk/sdk/config",
+    ["sdk/console"] = "scripts/keepfollowing/sdk/sdk/console",
+    ["sdk/constant"] = "scripts/keepfollowing/sdk/sdk/constant",
+    ["sdk/debug"] = "scripts/keepfollowing/sdk/sdk/debug",
+    ["sdk/debugupvalue"] = "scripts/keepfollowing/sdk/sdk/debugupvalue",
+    ["sdk/dump"] = "scripts/keepfollowing/sdk/sdk/dump",
+    ["sdk/entity"] = "scripts/keepfollowing/sdk/sdk/entity",
+    ["sdk/input"] = "scripts/keepfollowing/sdk/sdk/input",
+    ["sdk/inventory"] = "scripts/keepfollowing/sdk/sdk/inventory",
+    ["sdk/modmain"] = "scripts/keepfollowing/sdk/sdk/modmain",
+    ["sdk/persistentdata"] = "scripts/keepfollowing/sdk/sdk/persistentdata",
+    ["sdk/player"] = "scripts/keepfollowing/sdk/sdk/player",
+    ["sdk/rpc"] = "scripts/keepfollowing/sdk/sdk/rpc",
+    ["sdk/thread"] = "scripts/keepfollowing/sdk/sdk/thread",
+    ["sdk/utils"] = "scripts/keepfollowing/sdk/sdk/utils",
+    ["sdk/utils/chain"] = "scripts/keepfollowing/sdk/sdk/utils/chain",
+    ["sdk/utils/methods"] = "scripts/keepfollowing/sdk/sdk/utils/methods",
+    ["sdk/utils/string"] = "scripts/keepfollowing/sdk/sdk/utils/string",
+    ["sdk/utils/table"] = "scripts/keepfollowing/sdk/sdk/utils/table",
+    ["sdk/world"] = "scripts/keepfollowing/sdk/sdk/world",
     class = "spec/class",
 }
 
@@ -14,6 +34,35 @@ for k, v in pairs(preloads) do
         return require(v)
     end
 end
+
+--
+-- SDK
+--
+
+_G.MODS_ROOT = "./"
+
+function softresolvefilepath(filepath)
+    return _G.MODS_ROOT .. filepath
+end
+
+local SDK
+
+SDK = require "keepfollowing/sdk/sdk/sdk"
+SDK.SetIsSilent(true).Load({
+    modname = "dst-mod-dev-tools",
+    AddPrefabPostInit = function() end
+}, "keepfollowing/sdk", {
+    "Debug",
+    "DebugUpvalue",
+    "Entity",
+    "Input",
+    "ModMain",
+    "Player",
+    "Thread",
+    "World",
+})
+
+_G.SDK = SDK
 
 --
 -- General

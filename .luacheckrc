@@ -132,6 +132,7 @@ files["spec/**/*.lua"] = {
         "Class",
         "ClassRegistry",
         "package",
+        "softresolvefilepath",
         "ToVector3",
         "Vector3",
 
