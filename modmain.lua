@@ -36,7 +36,7 @@ local TheSim = _G.TheSim
 local SDK
 
 SDK = require "keepfollowing/sdk/sdk/sdk"
-SDK.Load(env, "scripts/keepfollowing/sdk", {
+SDK.Load(env, "keepfollowing/sdk", {
     "Debug",
     "Entity",
     "Input",
