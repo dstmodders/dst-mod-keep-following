@@ -38,6 +38,7 @@ local SDK
 SDK = require "keepfollowing/sdk/sdk/sdk"
 SDK.Load(env, "keepfollowing/sdk", {
     "Debug",
+    "DebugUpvalue",
     "Entity",
     "Input",
     "ModMain",
