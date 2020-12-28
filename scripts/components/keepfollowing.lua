@@ -367,7 +367,7 @@ function KeepFollowing:StartFollowingThread()
     local radius_leader = self.leader.Physics:GetRadius()
     local target = self.config.follow_distance + radius_inst + radius_leader
 
-    self.following_thread = Utils.ThreadStart(_FOLLOWING_THREAD_ID, function()
+    self.following_thread = SDK.Thread.Start(_FOLLOWING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
             self:DebugError("Leader doesn't exist anymore")
             self:StopFollowing()
@@ -430,7 +430,7 @@ end
 function KeepFollowing:StartFollowingPathThread()
     local pos, pos_prev
 
-    self.following_path_thread = Utils.ThreadStart(_FOLLOWING_PATH_THREAD_ID, function()
+    self.following_path_thread = SDK.Thread.Start(_FOLLOWING_PATH_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
             self:DebugError("Leader doesn't exist anymore")
             self:StopFollowing()
@@ -572,7 +572,7 @@ end
 function KeepFollowing:StartPushingThread()
     local pos, pos_prev
 
-    self.pushing_thread = Utils.ThreadStart(_PUSHING_THREAD_ID, function()
+    self.pushing_thread = SDK.Thread.Start(_PUSHING_THREAD_ID, function()
         if not self.leader or not self.leader.entity:IsValid() then
             self:DebugError("Leader doesn't exist anymore")
             self:StopPushing()
