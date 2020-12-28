@@ -60,10 +60,6 @@ end
 
 _G.ModKeepFollowingDebug = Debug
 
-local function DebugString(...)
-    return Debug and Debug:DebugString(...)
-end
-
 local function DebugInit(...)
     return Debug and Debug:DebugInit(...)
 end
@@ -167,9 +163,8 @@ AddAction(
 --- Player
 -- @section player
 
-local function OnPlayerActivated(player, world)
+SDK.OnPlayerActivated(function(world, player)
     player:AddComponent("keepfollowing")
-
     local keepfollowing = player.components.keepfollowing
     if keepfollowing then
         keepfollowing.is_client = IsClient()
@@ -190,40 +185,11 @@ local function OnPlayerActivated(player, world)
             keepfollowing.config[config] = GetModConfigData(config)
         end
     end
+end)
 
-    DebugString("Player", player:GetDisplayName(), "activated")
-end
-
-local function OnPlayerDeactivated(player)
+SDK.OnPlayerDeactivated(function(_, player)
     player:RemoveComponent("keepfollowing")
-    DebugString("Player", player:GetDisplayName(), "deactivated")
-end
-
-local function AddPlayerPostInit(onActivatedFn, onDeactivatedFn)
-    DebugString("Game ID -", TheSim:GetGameID())
-
-    if IsDST() then
-        env.AddPrefabPostInit("world", function(_world)
-            _world:ListenForEvent("playeractivated", function(world, player)
-                if player == _G.ThePlayer then
-                    onActivatedFn(player, world)
-                end
-            end)
-
-            _world:ListenForEvent("playerdeactivated", function(_, player)
-                if player == _G.ThePlayer then
-                    onDeactivatedFn(player)
-                end
-            end)
-        end)
-    else
-        env.AddPlayerPostInit(function(player)
-            onActivatedFn(player)
-        end)
-    end
-
-    DebugInit("AddPlayerPostInit")
-end
+end)
 
 local function PlayerActionPickerPostInit(playeractionpicker, player)
     if player ~= _G.ThePlayer then
@@ -415,7 +381,6 @@ local function PlayerControllerPostInit(playercontroller, player)
     DebugInit("PlayerControllerPostInit")
 end
 
-AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
 AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
 
