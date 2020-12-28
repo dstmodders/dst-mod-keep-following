@@ -115,7 +115,7 @@ end
 local function ActionTentFollow(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
-        local leader = keepfollowing:GetTentSleeper(act.target)
+        local leader = SDK.Entity.GetTentSleeper(act.target)
         if leader then
             keepfollowing:Stop()
             keepfollowing:StartFollowing(leader)
@@ -128,7 +128,7 @@ end
 local function ActionTentPush(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
-        local leader = keepfollowing:GetTentSleeper(act.target)
+        local leader = SDK.Entity.GetTentSleeper(act.target)
         if leader then
             keepfollowing:Stop()
             keepfollowing:StartPushing(leader)

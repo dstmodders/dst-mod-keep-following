@@ -18,7 +18,6 @@ local Utils = require "keepfollowing/utils"
 local _FOLLOWING_PATH_THREAD_ID = "following_path_thread"
 local _FOLLOWING_THREAD_ID = "following_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
-local _TENT_FIND_INVISIBLE_PLAYER_RANGE = 50
 
 --- Constructor.
 -- @function _ctor
@@ -170,49 +169,6 @@ function KeepFollowing:SetLeader(leader)
         self:DebugError(_entity, "can't become a leader")
     end
     return false
-end
-
---- Tent
--- @section tent
-
-local function FindClosestInvisiblePlayerInRange(x, y, z, range)
-    local closest, dist_sq
-    local range_sq = range * range
-    for _, v in ipairs(AllPlayers) do
-        if not v.entity:IsVisible() then
-            dist_sq = v:GetDistanceSqToPoint(x, y, z)
-            if dist_sq < range_sq then
-                range_sq = dist_sq
-                closest = v
-            end
-        end
-    end
-    return closest, closest ~= nil and range_sq or nil
-end
-
---- Gets a tent sleeper.
--- @tparam EntityScript tent A tent, Siesta Lean-to, etc.
--- @treturn EntityScript A sleeper (a player)
-function KeepFollowing:GetTentSleeper(tent)
-    local player
-    local sleepingbag = SDK.Utils.Chain.Get(tent, "components", "sleepingbag")
-    if sleepingbag then
-        self:DebugString("Component sleepingbag is available")
-        player = sleepingbag.sleeper
-    else
-        self:DebugString("Component sleepingbag is not available")
-    end
-
-    if not player and tent:HasTag("tent") and tent:HasTag("hassleeper") then
-        self:DebugString("Looking for sleepers...")
-        local x, y, z = tent.Transform:GetWorldPosition()
-        player = FindClosestInvisiblePlayerInRange(x, y, z, _TENT_FIND_INVISIBLE_PLAYER_RANGE)
-    end
-
-    if player and player:HasTag("sleeping") then
-        self:DebugString("Found sleeper:", player:GetDisplayName())
-        return player
-    end
 end
 
 --- Following
@@ -656,11 +612,6 @@ function KeepFollowing:DoInit(inst)
 
     -- update
     inst:StartUpdatingComponent(self)
-
-    -- tests
-    if _G.MOD_KEEP_FOLLOWING_TEST then
-        self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
-    end
 
     self:DebugInit(self.name)
 end
