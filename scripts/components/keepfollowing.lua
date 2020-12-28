@@ -46,18 +46,6 @@ end
 --- General
 -- @section general
 
---- Checks if the player is idle.
--- @treturn boolean
-function KeepFollowing:IsIdle()
-    if self.inst.sg then
-        return self.inst.sg:HasStateTag("idle")
-            or (self.inst:HasTag("idle") and self.inst:HasTag("nopredict"))
-    end
-    return self.inst.AnimState:IsCurrentAnimation("idle_pre")
-        or self.inst.AnimState:IsCurrentAnimation("idle_loop")
-        or self.inst.AnimState:IsCurrentAnimation("idle_pst")
-end
-
 --- Stops both following and pushing.
 --
 -- General wrapper to call `StopFollowing` and/or `StopPushing` based on the current state.
@@ -351,7 +339,7 @@ function KeepFollowing:StartFollowingThread()
             -- default: player follows a leader step-by-step
             pos = GetDefaultMethodNextPosition(self, target)
             if pos then
-                if self:IsIdle() or (not pos_prev or pos_prev ~= pos) then
+                if SDK.Player.IsIdle(self.inst) or (not pos_prev or pos_prev ~= pos) then
                     pos_prev = pos
                     stuck = false
                     stuck_frames = 0
@@ -362,7 +350,7 @@ function KeepFollowing:StartFollowingThread()
                         pos_prev = pos
                         stuck = true
                     end
-                elseif not self:IsIdle()
+                elseif not SDK.Player.IsIdle(self.inst)
                     and stuck
                     and pos_prev == pos
                     and #self.leader_positions > 1
@@ -374,7 +362,7 @@ function KeepFollowing:StartFollowingThread()
             -- closest: player goes to the closest target point from a leader
             pos = GetClosestMethodNextPosition(self, target, is_leader_near)
             if pos then
-                if self:IsIdle() or (not pos_prev or pos:DistSq(pos_prev) > .1) then
+                if SDK.Player.IsIdle(self.inst) or (not pos_prev or pos:DistSq(pos_prev) > .1) then
                     pos_prev = pos
                     WalkToPoint(self, pos)
                 end
@@ -552,7 +540,7 @@ function KeepFollowing:StartPushingThread()
 
         pos = self.leader:GetPosition()
 
-        if self:IsIdle() or (not pos_prev or pos_prev ~= pos) then
+        if SDK.Player.IsIdle(self.inst) or (not pos_prev or pos_prev ~= pos) then
             pos_prev = pos
             WalkToPoint(self, pos)
         end
