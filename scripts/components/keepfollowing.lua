@@ -31,16 +31,6 @@ end)
 --- Helpers
 -- @section helpers
 
-local function IsOnPlatform(world, inst)
-    if SDK.Utils.Chain.Validate(world, "Map", "GetPlatformAtPoint")
-        and SDK.Utils.Chain.Validate(inst, "GetPosition")
-    then
-        return world.Map:GetPlatformAtPoint(SDK.Utils.Chain.Get(inst:GetPosition(), "Get", true))
-            and true
-            or false
-    end
-end
-
 local function IsPassable(world, pos)
     return SDK.Utils.Chain.Validate(world, "Map", "IsPassableAtPoint")
         and SDK.Utils.Chain.Validate(pos, "Get")
@@ -73,12 +63,6 @@ function KeepFollowing:IsIdle()
     return self.inst.AnimState:IsCurrentAnimation("idle_pre")
         or self.inst.AnimState:IsCurrentAnimation("idle_loop")
         or self.inst.AnimState:IsCurrentAnimation("idle_pst")
-end
-
---- Checks if player is on platform state.
--- @treturn boolean
-function KeepFollowing:IsOnPlatform()
-    return IsOnPlatform(self.world, self.inst)
 end
 
 --- Stops both following and pushing.
@@ -138,7 +122,7 @@ end
 --- Checks if leader is on platform.
 -- @treturn boolean
 function KeepFollowing:IsLeaderOnPlatform()
-    return IsOnPlatform(self.world, self.leader)
+    return SDK.Player.IsOnPlatform(self.leader)
 end
 
 --- Checks if an entity can be followed.
@@ -324,7 +308,7 @@ local function GetClosestMethodNextPosition(self, target, is_leader_near)
             return pos
         end
 
-        if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+        if self:IsLeaderOnPlatform() ~= SDK.Player.IsOnPlatform(self.inst) then
             pos = GetClosestPosition(self.inst, self.leader)
         end
 
@@ -439,7 +423,7 @@ function KeepFollowing:StartFollowingPathThread()
 
         pos = self.leader:GetPosition()
 
-        if self:IsLeaderOnPlatform() ~= self:IsOnPlatform() then
+        if self:IsLeaderOnPlatform() ~= SDK.Player.IsOnPlatform(self.inst) then
             pos = GetClosestPosition(self.inst, self.leader)
         end
 
@@ -726,7 +710,6 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.MOD_KEEP_FOLLOWING_TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
-        self._IsOnPlatform = IsOnPlatform
         self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
     end
