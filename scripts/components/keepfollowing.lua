@@ -31,13 +31,6 @@ end)
 --- Helpers
 -- @section helpers
 
-local function IsPassable(world, pos)
-    return SDK.Utils.Chain.Validate(world, "Map", "IsPassableAtPoint")
-        and SDK.Utils.Chain.Validate(pos, "Get")
-        and world.Map:IsPassableAtPoint(pos:Get())
-        or false
-end
-
 local function GetClosestPosition(entity1, entity2)
     local distance = entity1.Physics:GetRadius() + entity2.Physics:GetRadius()
     return entity1:GetPositionAdjacentTo(entity2, distance)
@@ -298,7 +291,7 @@ local function GetClosestMethodNextPosition(self, target, is_leader_near)
     if not is_leader_near or self.config.follow_distance_keeping then
         local pos = self.inst:GetPositionAdjacentTo(self.leader, target)
 
-        if IsPassable(self.world, pos) then
+        if SDK.World.IsPointPassable(pos) then
             return pos
         end
 
@@ -426,7 +419,7 @@ function KeepFollowing:StartFollowingPathThread()
             pos_prev = pos
         end
 
-        if IsPassable(self.world, pos) == IsPassable(self.world, pos_prev) then
+        if SDK.World.IsPointPassable(pos)== SDK.World.IsPointPassable(pos_prev) then
             -- 1 is the most optimal value so far
             if pos:DistSq(pos_prev) > 1
                 and pos ~= pos_prev
@@ -704,7 +697,6 @@ function KeepFollowing:DoInit(inst)
     -- tests
     if _G.MOD_KEEP_FOLLOWING_TEST then
         self._FindClosestInvisiblePlayerInRange = FindClosestInvisiblePlayerInRange
-        self._IsPassable = IsPassable
         self._MovementPrediction = MovementPrediction
     end
 

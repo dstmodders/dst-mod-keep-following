@@ -201,63 +201,6 @@ describe("KeepFollowing", function()
         end)
     end)
 
-    describe("helper", function()
-        describe("IsPassable", function()
-            local world, pos
-
-            before_each(function()
-                world = {
-                    Map = {
-                        IsPassableAtPoint = spy.new(ReturnValueFn(true)),
-                    },
-                }
-
-                pos = {
-                    Get = spy.new(ReturnValuesFn(1, 0, -1)),
-                }
-            end)
-
-            describe("when some passed world fields are missing", function()
-                it("should return false", function()
-                    AssertChainNil(function()
-                        assert.is_false(keepfollowing._IsPassable(world, pos))
-                    end, world, "Map", "IsPassableAtPoint")
-                end)
-            end)
-
-            describe("when some passed pos fields are missing", function()
-                it("should return false", function()
-                    AssertChainNil(function()
-                        assert.is_false(keepfollowing._IsPassable(world, pos))
-                    end, pos, "Get")
-                end)
-            end)
-
-            it("should call pos:Get()", function()
-                assert.spy(pos.Get).was_called(0)
-                keepfollowing._IsPassable(world, pos)
-                assert.spy(pos.Get).was_called(1)
-                assert.spy(pos.Get).was_called_with(match.is_ref(pos))
-            end)
-
-            it("should call world.Map:IsPassableAtPoint()", function()
-                assert.spy(world.Map.IsPassableAtPoint).was_called(0)
-                keepfollowing._IsPassable(world, pos)
-                assert.spy(world.Map.IsPassableAtPoint).was_called(1)
-                assert.spy(world.Map.IsPassableAtPoint).was_called_with(
-                    match.is_ref(world.Map),
-                    1,
-                    0,
-                    -1
-                )
-            end)
-
-            it("should return true", function()
-                assert.is_true(keepfollowing._IsPassable(world, pos))
-            end)
-        end)
-    end)
-
     describe("movement prediction", function()
         local function TestMovementPrediction(enable_fn, disable_fn, inst_fn)
             local _inst
