@@ -371,7 +371,7 @@ function KeepFollowing:StartFollowing(leader)
         return false
     end
 
-    if self.config.push_lag_compensation and not self.is_master_sim then
+    if self.config.push_lag_compensation and not SDK.World.IsMasterSim() then
         local state = self.movement_prediction_state
         if state ~= nil then
             SDK.Player.SetMovementPrediction(state)
@@ -493,7 +493,7 @@ end
 -- @tparam EntityScript leader A leader to push
 -- @treturn boolean
 function KeepFollowing:StartPushing(leader)
-    if self.config.push_lag_compensation and not self.is_master_sim then
+    if self.config.push_lag_compensation and not SDK.World.IsMasterSim() then
         if self.movement_prediction_state == nil then
             self.movement_prediction_state = SDK.Player.HasMovementPrediction(self.inst)
         end
@@ -533,7 +533,7 @@ end
 --- Stops pushing.
 -- @treturn boolean
 function KeepFollowing:StopPushing()
-    if self.config.push_lag_compensation and not self.is_master_sim then
+    if self.config.push_lag_compensation and not SDK.World.IsMasterSim() then
         SDK.Player.SetMovementPrediction(self.movement_prediction_state)
         self.movement_prediction_state = nil
     end
@@ -578,14 +578,10 @@ function KeepFollowing:DoInit(inst)
 
     -- general
     self.inst = inst
-    self.is_client = false
-    self.is_dst = false
-    self.is_master_sim = TheWorld.ismastersim
     self.leader = nil
     self.movement_prediction_state = nil
     self.name = "KeepFollowing"
     self.start_time = nil
-    self.world = TheWorld
 
     -- following
     self.following_path_thread = nil

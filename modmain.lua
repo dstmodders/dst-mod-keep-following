@@ -26,7 +26,6 @@ local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local TheInput = _G.TheInput
-local TheSim = _G.TheSim
 
 --- SDK
 -- @section sdk
@@ -57,14 +56,6 @@ SDK.Debug.ModConfigs()
 local function GetKeyFromConfig(config)
     local key = GetModConfigData(config)
     return key and (type(key) == "number" and key or _G[key]) or -1
-end
-
-local function IsDST()
-    return TheSim:GetGameID() == "DST"
-end
-
-local function IsClient()
-    return IsDST() and _G.TheNet:GetIsClient()
 end
 
 local function IsMoveButton(control)
@@ -154,8 +145,6 @@ SDK.OnPlayerActivated(function(world, player)
     player:AddComponent("keepfollowing")
     local keepfollowing = player.components.keepfollowing
     if keepfollowing then
-        keepfollowing.is_client = IsClient()
-        keepfollowing.is_dst = IsDST()
         keepfollowing.is_master_sim = world.ismastersim
         keepfollowing.world = world
 

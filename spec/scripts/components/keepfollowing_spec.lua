@@ -148,11 +148,7 @@ describe("KeepFollowing", function()
 
         local function AssertDefaults(self)
             -- general
-            assert.is_equal(_G.TheWorld, self.world)
-            assert.is_equal(_G.TheWorld.ismastersim, self.is_master_sim)
             assert.is_equal(inst, self.inst)
-            assert.is_false(self.is_client)
-            assert.is_false(self.is_dst)
             assert.is_nil(self.leader)
             assert.is_nil(self.movement_prediction_state)
             assert.is_nil(self.start_time)
@@ -619,7 +615,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = true
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(true))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -649,7 +645,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = false
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(false))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -707,7 +703,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = true
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(true))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -739,7 +735,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = false
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(false))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -924,7 +920,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = true
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(true))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -954,7 +950,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = false
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(false))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -1011,7 +1007,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = true
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(true))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
@@ -1051,7 +1047,7 @@ describe("KeepFollowing", function()
 
                 describe("and is a not master simulation", function()
                     before_each(function()
-                        keepfollowing.is_master_sim = false
+                        _G.SDK.World.IsMasterSim = spy.new(ReturnValueFn(false))
                     end)
 
                     describe("when the previous movement prediction state is true", function()
