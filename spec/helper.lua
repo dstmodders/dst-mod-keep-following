@@ -52,6 +52,7 @@ SDK.SetIsSilent(true).Load({
     modname = "dst-mod-dev-tools",
     AddPrefabPostInit = function() end
 }, "keepfollowing/sdk", {
+    "Config",
     "Debug",
     "DebugUpvalue",
     "Entity",

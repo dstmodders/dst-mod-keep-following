@@ -19,10 +19,6 @@ _G.MOD_KEEP_FOLLOWING_TEST = false
 local ACTIONS = _G.ACTIONS
 local BufferedAction = _G.BufferedAction
 local CONTROL_ACTION = _G.CONTROL_ACTION
-local CONTROL_MOVE_DOWN = _G.CONTROL_MOVE_DOWN
-local CONTROL_MOVE_LEFT = _G.CONTROL_MOVE_LEFT
-local CONTROL_MOVE_RIGHT = _G.CONTROL_MOVE_RIGHT
-local CONTROL_MOVE_UP = _G.CONTROL_MOVE_UP
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 local CONTROL_SECONDARY = _G.CONTROL_SECONDARY
 local TheInput = _G.TheInput
@@ -34,6 +30,7 @@ local SDK
 
 SDK = require "keepfollowing/sdk/sdk/sdk"
 SDK.Load(env, "keepfollowing/sdk", {
+    "Config",
     "Debug",
     "DebugUpvalue",
     "Entity",
@@ -50,40 +47,12 @@ SDK.Load(env, "keepfollowing/sdk", {
 SDK.Debug.SetIsEnabled(GetModConfigData("debug") and true or false)
 SDK.Debug.ModConfigs()
 
---- Helpers
--- @section helpers
-
-local function GetKeyFromConfig(config)
-    local key = GetModConfigData(config)
-    return key and (type(key) == "number" and key or _G[key]) or -1
-end
-
-local function IsMoveButton(control)
-    return control == CONTROL_MOVE_UP
-        or control == CONTROL_MOVE_DOWN
-        or control == CONTROL_MOVE_LEFT
-        or control == CONTROL_MOVE_RIGHT
-end
-
-local function IsOurAction(action)
-    return action == ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW
-        or action == ACTIONS.MOD_KEEP_FOLLOWING_PUSH
-        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW
-        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH
-end
-
---- Configurations
--- @section configurations
-
-local _COMPATIBILITY = GetModConfigData("compatibility")
-local _KEY_ACTION = GetKeyFromConfig("key_action")
-local _KEY_PUSH = GetKeyFromConfig("key_push")
-local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
-
 --- Actions
 -- @section actions
 
-local function ActionFollow(act)
+local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
+
+AddAction("MOD_KEEP_FOLLOWING_FOLLOW", "Follow", function(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         keepfollowing:Stop()
@@ -91,9 +60,9 @@ local function ActionFollow(act)
         return true
     end
     return false
-end
+end)
 
-local function ActionPush(act)
+AddAction("MOD_KEEP_FOLLOWING_PUSH", "Push", function(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         keepfollowing:Stop()
@@ -101,9 +70,9 @@ local function ActionPush(act)
         return true
     end
     return false
-end
+end)
 
-local function ActionTentFollow(act)
+AddAction("MOD_KEEP_FOLLOWING_TENT_FOLLOW", "Follow player in", function(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
     if keepfollowing and act.doer and act.target then
         local leader = SDK.Entity.GetTentSleeper(act.target)
@@ -114,28 +83,23 @@ local function ActionTentFollow(act)
         end
     end
     return false
-end
+end)
 
-local function ActionTentPush(act)
-    local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
-    if keepfollowing and act.doer and act.target then
-        local leader = SDK.Entity.GetTentSleeper(act.target)
-        if leader then
-            keepfollowing:Stop()
-            keepfollowing:StartPushing(leader)
-            return true
-        end
-    end
-    return false
-end
-
-AddAction("MOD_KEEP_FOLLOWING_FOLLOW", "Follow", ActionFollow)
-AddAction("MOD_KEEP_FOLLOWING_PUSH", "Push", ActionPush)
-AddAction("MOD_KEEP_FOLLOWING_TENT_FOLLOW", "Follow player in", ActionTentFollow)
 AddAction(
     "MOD_KEEP_FOLLOWING_TENT_PUSH",
     _PUSH_WITH_RMB and "Push player" or "Push player in",
-    ActionTentPush
+    function(act)
+        local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
+        if keepfollowing and act.doer and act.target then
+            local leader = SDK.Entity.GetTentSleeper(act.target)
+            if leader then
+                keepfollowing:Stop()
+                keepfollowing:StartPushing(leader)
+                return true
+            end
+        end
+        return false
+    end
 )
 
 --- Player
@@ -167,38 +131,50 @@ SDK.OnPlayerDeactivated(function(_, player)
     player:RemoveComponent("keepfollowing")
 end)
 
-local function PlayerActionPickerPostInit(playeractionpicker, player)
+--- Components
+-- @section components
+
+local function IsOurAction(action)
+    return action == ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_PUSH
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW
+        or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH
+end
+
+SDK.OnLoadComponent("playeractionpicker", function(_self, player)
     if player ~= _G.ThePlayer then
         return
     end
+
+    local _KEY_ACTION = SDK.Config.GetModKeyConfigData("key_action")
+    local _KEY_PUSH = SDK.Config.GetModKeyConfigData("key_push")
 
     --
     -- Overrides
     --
 
-    local OldDoGetMouseActions = playeractionpicker.DoGetMouseActions
-    playeractionpicker.DoGetMouseActions = function(self, position, _target)
-        local lmb, rmb = OldDoGetMouseActions(self, position, _target)
+    SDK.OverrideMethod(_self, "DoGetMouseActions", function(original_fn, self, position, _target)
+        local lmb, rmb = original_fn(self, position, _target)
         if TheInput:IsKeyDown(_KEY_ACTION) then
             local keepfollowing = player.components.keepfollowing
             local buffered = self.inst:GetBufferedAction()
 
-            -- We could have used lmb.target. However, the PlayerActionPicker has leftclickoverride
-            -- and rightclickoverride so we can't trust that. A good example is Woodie's Weregoose
-            -- form which overrides mouse actions.
+            -- We could have used lmb.target. However, the PlayerActionPicker has
+            -- leftclickoverride and rightclickoverride so we can't trust that. A good example
+            -- is Woodie's Weregoose form which overrides mouse actions.
             local target = TheInput:GetWorldEntityUnderMouse()
             if not target then
                 return lmb, rmb
             end
 
-            -- You are probably wondering why we need this check? Isn't it better to just show our
-            -- actions without the buffered action check?
+            -- You are probably wondering why we need this check? Isn't it better to just show
+            -- our actions without the buffered action check?
             --
             -- There are so many mods out there "in the wild" which also do different in-game
             -- actions and don't bother checking for interruptions in their scheduler tasks
-            -- (threads). For example, ActionQueue Reborn will always try to force their action if
-            -- entities have already been selected. We can adapt our mod for such cases to improve
-            -- compatibility but this is the only bulletproof way to cover the most.
+            -- (threads). For example, ActionQueue Reborn will always try to force their action
+            -- if entities have already been selected. We can adapt our mod for such cases to
+            -- improve compatibility but this is the only bulletproof way to cover the most.
             if buffered
                 and not IsOurAction(buffered.action)
                 and buffered.action ~= ACTIONS.WALKTO
@@ -237,13 +213,15 @@ local function PlayerActionPickerPostInit(playeractionpicker, player)
             end
         end
         return lmb, rmb
-    end
-end
+    end, SDK.OVERRIDE.ORIGINAL_NONE)
+end)
 
-local function PlayerControllerPostInit(playercontroller, player)
+SDK.OnLoadComponent("playercontroller", function(_self, player)
     if player ~= _G.ThePlayer then
         return
     end
+
+    local _COMPATIBILITY = GetModConfigData("compatibility")
 
     --
     -- Helpers
@@ -301,32 +279,30 @@ local function PlayerControllerPostInit(playercontroller, player)
     -- Overrides
     --
 
-    local OldOnControl = playercontroller.OnControl
-    playercontroller.OnControl = function(self, control, down)
-        if IsMoveButton(control) or control == CONTROL_ACTION then
+    SDK.OverrideMethod(_self, "OnControl", function(original_fn, self, control, down)
+        if SDK.Input.IsControlMove(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
 
         if _COMPATIBILITY == "alternative" then
             if control == CONTROL_PRIMARY and not down then
                 if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
-                    return OldOnControl(self, control, down)
+                    return original_fn(self, control, down)
                 end
                 OurMouseAction(self:GetLeftMouseAction())
             elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
                 if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
-                    return OldOnControl(self, control, down)
+                    return original_fn(self, control, down)
                 end
                 OurMouseAction(self:GetRightMouseAction())
             end
         end
 
-        OldOnControl(self, control, down)
-    end
+        original_fn(self, control, down)
+    end, SDK.OVERRIDE.ORIGINAL_NONE)
 
     if _COMPATIBILITY == "recommended" then
-        local OldOnLeftClick = playercontroller.OnLeftClick
-        playercontroller.OnLeftClick = function(self, down)
+        SDK.OverrideMethod(_self, "OnLeftClick", function(original_fn, self, down)
             if not down
                 and not self:IsAOETargeting()
                 and not TheInput:GetHUDEntityUnderMouse()
@@ -334,12 +310,11 @@ local function PlayerControllerPostInit(playercontroller, player)
             then
                 return
             end
-            OldOnLeftClick(self, down)
-        end
+            original_fn(self, down)
+        end, SDK.OVERRIDE.ORIGINAL_NONE)
 
         if _PUSH_WITH_RMB then
-            local OldOnRightClick = playercontroller.OnRightClick
-            playercontroller.OnRightClick = function(self, down)
+            SDK.OverrideMethod(_self, "OldOnRightClick", function(original_fn, self, down)
                 if not down
                     and not self:IsAOETargeting()
                     and not TheInput:GetHUDEntityUnderMouse()
@@ -347,14 +322,11 @@ local function PlayerControllerPostInit(playercontroller, player)
                 then
                     return
                 end
-                OldOnRightClick(self, down)
-            end
+                original_fn(self, down)
+            end, SDK.OVERRIDE.ORIGINAL_NONE)
         end
     end
-end
-
-AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
-AddComponentPostInit("playercontroller", PlayerControllerPostInit)
+end)
 
 --- KnownModIndex
 -- @section knownmodindex
