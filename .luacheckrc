@@ -38,7 +38,6 @@ std = {
 files["modinfo.lua"] = {
     max_code_line_length = 250,
     max_comment_line_length = 100,
-    max_line_length = 100,
     max_string_line_length = 250,
 
     -- globals
@@ -63,98 +62,36 @@ files["modinfo.lua"] = {
     },
 }
 
-files["modmain.lua"] = {
-    max_code_line_length = 100,
+files["**/*.lua"] = {
     max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
 
     -- globals
     globals = {
         "_G",
         "GLOBAL",
-    },
-    read_globals = {
-        "AddAction",
-        "AddComponentPostInit",
-        "GetModConfigData",
-        "modname",
-    },
-}
-
-files["scripts/**/*.lua"] = {
-    max_code_line_length = 100,
-    max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
-
-    -- globals
-    globals = {
-        -- general
-        "_G",
-        "Networking_Say",
-        "SendRPCToServer",
-        "TheWorld",
-
-        -- project
-        "Debug",
-    },
-    read_globals = {
-        -- general
-        "AllPlayers",
-        "BufferedAction",
-        "KnownModIndex",
-
-        -- constants
-        "ACTIONS",
-        "COLLISION",
-        "FRAMES",
-        "RPC",
-
-        -- threads
-        "KillThreadsWithID",
-        "scheduler",
-        "Sleep",
-        "StartThread",
-    },
-}
-
-files["spec/**/*.lua"] = {
-    max_code_line_length = 100,
-    max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
-
-    -- globals
-    globals = {
-        -- general
-        "_G",
-        "Class",
-        "ClassRegistry",
         "package",
-        "softresolvefilepath",
-        "ToVector3",
-        "Vector3",
-
-        -- project
+    },
+    read_globals = {
+        "_G",
+        "ACTIONS",
+        "AddAction",
         "AssertChainNil",
-        "AssertGetter",
-        "AssertMethodExists",
-        "AssertMethodIsMissing",
-        "AssertSetter",
-        "DebugSpy",
-        "DebugSpyAssert",
-        "DebugSpyAssertWasCalled",
+        "AssertClassGetter",
+        "AssertDebugSpyWasCalled",
+        "BufferedAction",
+        "COLLISION",
         "DebugSpyClear",
         "DebugSpyInit",
         "DebugSpyTerm",
         "Empty",
+        "FRAMES",
+        "GetModConfigData",
+        "package",
         "ReturnValueFn",
-        "ReturnValues",
         "ReturnValuesFn",
-    },
-    read_globals = {
-        "rawget",
-        "setmetatable",
+        "RPC",
+        "SendRPCToServer",
+        "Sleep",
+        "Vector3",
     },
 }
