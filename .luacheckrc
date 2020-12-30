@@ -36,11 +36,6 @@ std = {
 }
 
 files["modinfo.lua"] = {
-    max_code_line_length = 250,
-    max_comment_line_length = 100,
-    max_string_line_length = 250,
-
-    -- globals
     globals = {
         "all_clients_require_mod",
         "api_version",
@@ -52,8 +47,8 @@ files["modinfo.lua"] = {
         "dst_compatible",
         "folder_name",
         "forumthread",
-        "icon_atlas",
         "icon",
+        "icon_atlas",
         "name",
         "priority",
         "reign_of_giants_compatible",
