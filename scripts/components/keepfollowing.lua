@@ -13,7 +13,6 @@
 -- @release 0.21.0
 ----
 local SDK = require "keepfollowing/sdk/sdk/sdk"
-local Utils = require "keepfollowing/utils"
 
 local _FOLLOWING_PATH_THREAD_ID = "following_path_thread"
 local _FOLLOWING_THREAD_ID = "following_thread"
@@ -31,7 +30,10 @@ end)
 -- @section helpers
 
 local function WalkToPoint(self, pt)
-    Utils.WalkToPoint(self.inst, pt)
+    if not SDK.Player.WalkToPoint(pt, self.inst) then
+        SDK.RPC.WalkToPoint(pt)
+    end
+
     if SDK.Debug then
         self.debug_rpc_counter = self.debug_rpc_counter + 1
     end

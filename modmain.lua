@@ -37,6 +37,7 @@ SDK.Load(env, "keepfollowing/sdk", {
     "Input",
     "ModMain",
     "Player",
+    "RPC",
     "Thread",
     "World",
 })
