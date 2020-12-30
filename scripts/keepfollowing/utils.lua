@@ -21,16 +21,6 @@ local SDK = require "keepfollowing/sdk/sdk/sdk"
 
 local Utils = {}
 
---- General
--- @section general
-
---- Checks if HUD has an input focus.
--- @tparam EntityScript inst Player instance
--- @treturn boolean
-function Utils.IsHUDFocused(inst)
-    return not SDK.Utils.Chain.Get(inst, "HUD", "HasInputFocus", true)
-end
-
 --- Locomotor
 -- @section locomotor
 
