@@ -37,6 +37,7 @@ local KeepFollowing = Class(function(self, inst)
     SDK.Debug.AddMethods(self)
     SDK.Method
         .SetClass(self)
+        .AddToString("KeepFollowing")
         .AddGetters({
             is_following = "IsFollowing",
             is_pushing = "IsPushing",
@@ -47,7 +48,6 @@ local KeepFollowing = Class(function(self, inst)
     self.inst = inst
     self.leader = nil
     self.movement_prediction_state = nil
-    self.name = "KeepFollowing"
     self.start_time = nil
 
     -- following
@@ -76,7 +76,7 @@ local KeepFollowing = Class(function(self, inst)
     -- update
     inst:StartUpdatingComponent(self)
 
-    self:DebugInit(self.name)
+    self:DebugInit(tostring(self))
 end)
 
 --- Helpers
