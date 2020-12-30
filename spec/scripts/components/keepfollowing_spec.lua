@@ -185,16 +185,6 @@ describe("KeepFollowing", function()
                 AssertDefaults(keepfollowing)
             end)
         end)
-
-        describe("using DoInit()", function()
-            before_each(function()
-                KeepFollowing:DoInit(inst)
-            end)
-
-            it("should have the default fields", function()
-                AssertDefaults(KeepFollowing)
-            end)
-        end)
     end)
 
     describe("leader", function()

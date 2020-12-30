@@ -35,6 +35,7 @@ SDK.Load(env, "keepfollowing/sdk", {
     "DebugUpvalue",
     "Entity",
     "Input",
+    "Method",
     "ModMain",
     "Player",
     "RPC",

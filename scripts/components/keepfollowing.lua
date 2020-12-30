@@ -3,6 +3,14 @@
 --
 -- Includes functionality for following and pushing a leader.
 --
+-- _Below is the list of some self-explanatory methods which have been added using SDK._
+--
+-- **Getters:**
+--
+--   - `GetLeader`
+--   - `IsFollowing`
+--   - `IsPushing`
+--
 -- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
 -- @classmod KeepFollowing
@@ -18,12 +26,57 @@ local _FOLLOWING_PATH_THREAD_ID = "following_path_thread"
 local _FOLLOWING_THREAD_ID = "following_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 
+--- Lifecycle
+-- @section lifecycle
+
 --- Constructor.
 -- @function _ctor
 -- @tparam EntityScript inst Player instance
 -- @usage ThePlayer:AddComponent("keepfollowing")
 local KeepFollowing = Class(function(self, inst)
-    self:DoInit(inst)
+    SDK.Debug.AddMethods(self)
+    SDK.Method
+        .SetClass(self)
+        .AddGetters({
+            is_following = "IsFollowing",
+            is_pushing = "IsPushing",
+            leader = "GetLeader",
+        })
+
+    -- general
+    self.inst = inst
+    self.leader = nil
+    self.movement_prediction_state = nil
+    self.name = "KeepFollowing"
+    self.start_time = nil
+
+    -- following
+    self.following_path_thread = nil
+    self.following_thread = nil
+    self.is_following = false
+    self.is_leader_near = false
+    self.leader_positions = {}
+
+    -- pushing
+    self.is_pushing = false
+    self.pushing_thread = nil
+
+    -- debugging
+    self.debug_rpc_counter = 0
+
+    -- config
+    self.config = {
+        follow_distance = 2.5,
+        follow_distance_keeping = false,
+        follow_method = "default",
+        push_lag_compensation = true,
+        push_mass_checking = true,
+    }
+
+    -- update
+    inst:StartUpdatingComponent(self)
+
+    self:DebugInit(self.name)
 end)
 
 --- Helpers
@@ -64,12 +117,6 @@ end
 
 --- Leader
 -- @section leader
-
---- Gets leader.
--- @treturn EntityScript
-function KeepFollowing:GetLeader()
-    return self.leader
-end
 
 --- Checks if an entity can be followed.
 --
@@ -235,12 +282,6 @@ local function ResetFollowingFields(self)
     self.debug_rpc_counter = 0
 end
 
---- Checks if following state.
--- @treturn boolean
-function KeepFollowing:IsFollowing()
-    return self.leader and self.is_following
-end
-
 --- Starts the following thread.
 --
 -- Starts the thread to follow the leader based on the chosen method in the configurations. When the
@@ -335,7 +376,7 @@ function KeepFollowing:StartFollowingPathThread()
             pos_prev = pos
         end
 
-        if SDK.World.IsPointPassable(pos)== SDK.World.IsPointPassable(pos_prev) then
+        if SDK.World.IsPointPassable(pos) == SDK.World.IsPointPassable(pos_prev) then
             -- 1 is the most optimal value so far
             if pos:DistSq(pos_prev) > 1
                 and pos ~= pos_prev
@@ -447,12 +488,6 @@ local function ResetPushingFields(self)
     self.debug_rpc_counter = 0
 end
 
---- Checks if pushing state.
--- @treturn boolean
-function KeepFollowing:IsPushing()
-    return self.leader and self.is_pushing
-end
-
 --- Starts the pushing thread.
 --
 -- Starts the thread to push the leader.
@@ -560,53 +595,6 @@ function KeepFollowing:StopPushing()
     self.is_pushing = false
 
     return true
-end
-
---- Initialization
--- @section initialization
-
---- Initializes.
---
--- Sets default fields, adds debug methods and starts the component.
---
--- @tparam EntityScript inst Player instance
-function KeepFollowing:DoInit(inst)
-    SDK.Debug.AddMethods(self)
-
-    -- general
-    self.inst = inst
-    self.leader = nil
-    self.movement_prediction_state = nil
-    self.name = "KeepFollowing"
-    self.start_time = nil
-
-    -- following
-    self.following_path_thread = nil
-    self.following_thread = nil
-    self.is_following = false
-    self.is_leader_near = false
-    self.leader_positions = {}
-
-    -- pushing
-    self.is_pushing = false
-    self.pushing_thread = nil
-
-    -- debugging
-    self.debug_rpc_counter = 0
-
-    -- config
-    self.config = {
-        follow_distance = 2.5,
-        follow_distance_keeping = false,
-        follow_method = "default",
-        push_lag_compensation = true,
-        push_mass_checking = true,
-    }
-
-    -- update
-    inst:StartUpdatingComponent(self)
-
-    self:DebugInit(self.name)
 end
 
 return KeepFollowing
