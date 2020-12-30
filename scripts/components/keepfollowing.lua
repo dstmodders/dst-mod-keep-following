@@ -30,11 +30,6 @@ end)
 --- Helpers
 -- @section helpers
 
-local function GetClosestPosition(entity1, entity2)
-    local distance = entity1.Physics:GetRadius() + entity2.Physics:GetRadius()
-    return entity1:GetPositionAdjacentTo(entity2, distance)
-end
-
 local function WalkToPoint(self, pt)
     Utils.WalkToPoint(self.inst, pt)
     if SDK.Debug then
@@ -215,7 +210,7 @@ local function GetClosestMethodNextPosition(self, target, is_leader_near)
         end
 
         if SDK.Player.IsOnPlatform(self.leader) ~= SDK.Player.IsOnPlatform(self.inst) then
-            pos = GetClosestPosition(self.inst, self.leader)
+            pos = SDK.Entity.GetPositionNearEntities(self.inst, self.leader)
         end
 
         return pos
@@ -330,7 +325,7 @@ function KeepFollowing:StartFollowingPathThread()
         pos = self.leader:GetPosition()
 
         if SDK.Player.IsOnPlatform(self.leader) ~= SDK.Player.IsOnPlatform(self.inst) then
-            pos = GetClosestPosition(self.inst, self.leader)
+            pos = SDK.Entity.GetPositionNearEntities(self.inst, self.leader)
         end
 
         if not pos_prev then
