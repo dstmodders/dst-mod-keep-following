@@ -14,7 +14,6 @@ file = {
 
 dir = "doc"
 format = "markdown"
-readme = "readme"
 sort_modules = true
 style = "./doc/ldoc/"
 use_markdown_titles = true
