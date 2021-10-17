@@ -12,8 +12,8 @@ file = {
     },
 }
 
-dir = "doc"
+dir = "docs"
 format = "markdown"
 sort_modules = true
-style = "./doc/ldoc/"
+style = "./docs/ldoc/"
 use_markdown_titles = true
