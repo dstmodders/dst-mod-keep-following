@@ -1,8 +1,8 @@
 # dst-mod-keep-following
 
-[![GitHub Workflow CI Status][]](https://github.com/dstmodders/dst-mod-keep-following/actions?query=workflow%3ACI)
-[![GitHub Workflow Documentation Status][]](https://github.com/dstmodders/dst-mod-keep-following/actions?query=workflow%3ADocumentation)
-[![Codecov][]](https://codecov.io/gh/dstmodders/dst-mod-keep-following)
+[![CI](https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/CI?label=ci)](https://github.com/dstmodders/dst-mod-keep-following/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/Deploy?label=deploy)](https://github.com/dstmodders/dst-mod-keep-following/actions/workflows/deploy.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/dstmodders/dst-mod-keep-following.svg)](https://codecov.io/gh/dstmodders/dst-mod-keep-following)
 
 [![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
 
@@ -44,27 +44,12 @@ needs:
 
 The [LDoc][] documentation generator has been used for generating documentation,
 and the most recent version can be found here:
-http://github.victorpopkov.com/dst-mod-keep-following/
-
-- [Installation][]
-- [Development][]
-
-## Roadmap
-
-You can always find and track the current states of the upcoming features/fixes
-on the following [Trello][] board:
-https://trello.com/b/De8QnsZd/dst-mod-keep-following
+https://docs.dstmodders.com/keep-following/
 
 ## License
 
 Released under the [MIT License](https://opensource.org/licenses/MIT).
 
-[codecov]: https://img.shields.io/codecov/c/github/dstmodders/dst-mod-keep-following.svg
-[development]: readme/02-development.md
 [don't starve together]: https://www.klei.com/games/dont-starve-together
-[github workflow ci status]: https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/CI?label=CI
-[github workflow documentation status]: https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/Documentation?label=Documentation
-[installation]: readme/01-installation.md
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
-[trello]: https://trello.com/
