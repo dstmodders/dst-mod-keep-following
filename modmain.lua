@@ -6,7 +6,7 @@
 -- @author [Depressed DST Modders](https://github.com/dstmodders)
 -- @copyright 2019
 -- @license MIT
--- @release 0.21.0
+-- @release 0.22.0-alpha
 ----
 local _G = GLOBAL
 local require = _G.require

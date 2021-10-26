@@ -1,5 +1,5 @@
 name = "Keep Following"
-version = "0.21.0"
+version = "0.22.0-alpha"
 description = [[Version: ]] .. version .. "\n\n" ..
 
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]] ..
