@@ -329,10 +329,3 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
         end
     end
 end)
-
---- KnownModIndex
--- @section knownmodindex
-
-if GetModConfigData("hide_changelog") then
-    SDK.ModMain.HideChangelog(true)
-end
