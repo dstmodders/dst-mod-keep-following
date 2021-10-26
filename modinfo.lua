@@ -5,14 +5,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]] ..
     [[+ Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
     [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another ]] ..
-    [[player to keep following or pushing him.]] .. "\n\n" ..
-
-    [[v]] .. version .. [[:]] .. "\n" ..
-    [[- Added compatibility configuration]] .. "\n" ..
-    [[- Changed following configurations]] .. "\n" ..
-    [[- Improved interruptions behaviour]] .. "\n" ..
-    [[- Improved keybinds configurations]] .. "\n" ..
-    [[- Improved mouse overrides]]
+    [[player to keep following or pushing him.]]
 author = "Depressed DST Modders"
 api_version = 10
 forumthread = ""
@@ -263,13 +256,6 @@ configuration_options = {
     --
 
     AddSection("Other"),
-
-    AddBooleanConfig(
-        "hide_changelog",
-        "Hide changelog",
-        [[When enabled, hides the changelog in the mod description.]] .. "\n" ..
-            [[Mods should be reloaded to take effect]]
-    ),
 
     AddBooleanConfig(
         "debug",
