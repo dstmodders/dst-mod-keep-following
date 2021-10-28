@@ -101,7 +101,7 @@ end
 --
 -- @treturn boolean
 function KeepFollowing:Stop()
-    if SDK.Player.IsHUDHasInputFocus(self.inst) then
+    if not SDK.Player.IsHUDHasInputFocus(self.inst) then
         if self:IsFollowing() then
             self:StopFollowing()
             return true
