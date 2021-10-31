@@ -1,8 +1,8 @@
-# dst-mod-keep-following
+# mod-keep-following
 
-[![CI](https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/CI?label=ci)](https://github.com/dstmodders/dst-mod-keep-following/actions/workflows/ci.yml)
-[![Deploy](https://img.shields.io/github/workflow/status/dstmodders/dst-mod-keep-following/Deploy?label=deploy)](https://github.com/dstmodders/dst-mod-keep-following/actions/workflows/deploy.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/dstmodders/dst-mod-keep-following.svg)](https://codecov.io/gh/dstmodders/dst-mod-keep-following)
+[![CI](https://img.shields.io/github/workflow/status/dstmodders/mod-keep-following/CI?label=ci)](https://github.com/dstmodders/mod-keep-following/actions/workflows/ci.yml)
+[![Deploy](https://img.shields.io/github/workflow/status/dstmodders/mod-keep-following/Deploy?label=deploy)](https://github.com/dstmodders/mod-keep-following/actions/workflows/deploy.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/dstmodders/mod-keep-following.svg)](https://codecov.io/gh/dstmodders/mod-keep-following)
 
 [![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
 
