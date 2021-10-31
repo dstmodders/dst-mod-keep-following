@@ -2,5 +2,5 @@ exclude = {
     "modinfo",
     "scripts/keepfollowing/sdk",
     "scripts/keepfollowing/sdk%/.+$",
-    "spec",
+    "spec%/.+$",
 }
