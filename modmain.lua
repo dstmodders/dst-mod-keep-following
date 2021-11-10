@@ -53,6 +53,7 @@ SDK.Debug.ModConfigs()
 -- @section actions
 
 local _PUSH_WITH_RMB = GetModConfigData("push_with_rmb")
+local _REVERSE_BUTTONS = GetModConfigData("reverse_buttons")
 
 AddAction("MOD_KEEP_FOLLOWING_FOLLOW", "Follow", function(act)
     local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
@@ -89,7 +90,7 @@ end)
 
 AddAction(
     "MOD_KEEP_FOLLOWING_TENT_PUSH",
-    _PUSH_WITH_RMB and "Push player" or "Push player in",
+    _PUSH_WITH_RMB ~= _REVERSE_BUTTONS and "Push player" or "Push player in",
     function(act)
         local keepfollowing = SDK.Utils.Chain.Get(act, "doer", "components", "keepfollowing")
         if keepfollowing and act.doer and act.target then
@@ -185,6 +186,10 @@ SDK.OnLoadComponent("playeractionpicker", function(_self, player)
                 return lmb, rmb
             end
 
+            if _REVERSE_BUTTONS then -- To avoid ACTIONS.WALKTO becoming rmb
+                lmb, rmb = rmb, lmb
+            end
+
             if target:HasTag("tent") and target:HasTag("hassleeper") then
                 if _PUSH_WITH_RMB then
                     lmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_TENT_FOLLOW)
@@ -213,6 +218,10 @@ SDK.OnLoadComponent("playeractionpicker", function(_self, player)
                 if keepfollowing:CanBeLeader(target) and keepfollowing:CanBePushed(target) then
                     rmb = BufferedAction(player, target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 end
+            end
+
+            if _REVERSE_BUTTONS then
+                lmb, rmb = rmb, lmb
             end
         end
         return lmb, rmb
