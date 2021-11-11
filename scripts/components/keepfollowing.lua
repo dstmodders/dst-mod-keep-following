@@ -82,6 +82,25 @@ end)
 --- Helpers
 -- @section helpers
 
+local function HidePlayer(inst)
+    inst = inst or ThePlayer
+    local body = SDK.Player.Inventory.GetEquippedBodyItem(inst)
+    if body and body:HasTag("shell") then
+        SendRPCToServer(RPC.UseItemFromInvTile, ACTIONS.USEITEM.code, body)
+    else
+        local head = SDK.Player.Inventory.GetEquippedHeadItem(inst)
+        if head and head:HasTag("hide") then
+            SendRPCToServer(RPC.UseItemFromInvTile, ACTIONS.USEITEM.code, head)
+        else
+            return
+        end
+    end
+end
+
+local function IsHiding(inst)
+    return inst and (inst.sg and inst.sg:HasStateTag("hiding") or inst.HasTag and inst:HasTag("hiding"))
+end
+
 local function WalkToPoint(self, pt)
     if not SDK.Player.WalkToPoint(pt, self.inst) then
         SDK.RPC.WalkToPoint(pt)
@@ -326,6 +345,8 @@ function KeepFollowing:StartFollowingThread()
                 then
                     table.remove(self.leader_positions, 1)
                 end
+            elseif SDK.Player.IsIdle(self.inst) and not IsHiding(self.inst) then
+                HidePlayer(self.inst)
             end
         elseif self.config.follow_method == "closest" then
             -- closest: player goes to the closest target point from a leader
@@ -335,6 +356,8 @@ function KeepFollowing:StartFollowingThread()
                     pos_prev = pos
                     WalkToPoint(self, pos)
                 end
+            elseif SDK.Player.IsIdle(self.inst) and not IsHiding(self.inst) then
+                HidePlayer(self.inst)
             end
         end
 

@@ -87,6 +87,7 @@ files["**/*.lua"] = {
         "RPC",
         "SendRPCToServer",
         "Sleep",
+        "ThePlayer",
         "Vector3",
     },
 }
