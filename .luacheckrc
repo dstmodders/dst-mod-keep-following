@@ -70,6 +70,7 @@ files["**/*.lua"] = {
         "_G",
         "ACTIONS",
         "AddAction",
+        "AllPlayers",
         "AssertChainNil",
         "AssertClassGetter",
         "AssertDebugSpyWasCalled",
@@ -88,6 +89,8 @@ files["**/*.lua"] = {
         "SendRPCToServer",
         "Sleep",
         "ThePlayer",
+        "ThePlayer",
+        "TheSim",
         "Vector3",
     },
 }
