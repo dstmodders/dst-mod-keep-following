@@ -390,6 +390,10 @@ function KeepFollowing:StartWormholeTravelThread()
                 )
                 JumpThroughWormhole(self, wormhole)
                 Sleep(1)
+            elseif wormhole and not wormhole.entity:IsValid() then
+                self:DebugError("Wormhole not valid anymore")
+                self:StopWormholeTravel()
+                return
             end
 
             pos = self.leader_positions[#self.leader_positions]
