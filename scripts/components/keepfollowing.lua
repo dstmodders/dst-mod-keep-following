@@ -308,6 +308,9 @@ local function JumpThroughWormhole(self, wormhole)
                 wormhole
             )
         end
+        if SDK.Debug then
+            self.debug_rpc_counter = self.debug_rpc_counter + 1
+        end
     end
 end
 
