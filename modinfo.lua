@@ -1,11 +1,13 @@
 name = "Keep Following"
 version = "0.22.0-alpha"
-description = [[Version: ]] .. version .. "\n\n" ..
-
-    [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]] ..
-    [[+ Ctrl +  (LMB) to keep pushing.]] .. "\n\n" ..
-    [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another ]] ..
-    [[player to keep following or pushing him.]]
+description = [[Version: ]]
+    .. version
+    .. "\n\n"
+    .. [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]]
+    .. [[+ Ctrl +  (LMB) to keep pushing.]]
+    .. "\n\n"
+    .. [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another ]]
+    .. [[player to keep following or pushing him.]]
 author = "Depressed DST Modders"
 api_version = 10
 forumthread = ""
@@ -187,36 +189,24 @@ configuration_options = {
 
     AddSection("Following"),
 
-    AddConfig(
-        "follow_method",
-        "Follow method",
-        "Which follow method should be used?",
+    AddConfig("follow_method", "Follow method", "Which follow method should be used?", {
         {
-            {
-                description = "Default",
-                hover = "Default: player follows a leader step-by-step",
-                data = "default",
-            },
-            {
-                description = "Closest",
-                hover = "Closest: player goes to the closest target point from a leader",
-                data = "closest",
-            },
+            description = "Default",
+            hover = "Default: player follows a leader step-by-step",
+            data = "default",
         },
-        "default"
-    ),
+        {
+            description = "Closest",
+            hover = "Closest: player goes to the closest target point from a leader",
+            data = "closest",
+        },
+    }, "default"),
 
-    AddConfig(
-        "follow_distance",
-        "Follow distance",
-        "How close can a follower approach a leader?",
-        {
-            { description = "1.5m", data = 1.5 },
-            { description = "2.5m", data = 2.5 },
-            { description = "3.5m", data = 3.5 },
-        },
-        2.5
-    ),
+    AddConfig("follow_distance", "Follow distance", "How close can a follower approach a leader?", {
+        { description = "1.5m", data = 1.5 },
+        { description = "2.5m", data = 2.5 },
+        { description = "3.5m", data = 3.5 },
+    }, 2.5),
 
     AddBooleanConfig(
         "follow_distance_keeping",
@@ -241,8 +231,9 @@ configuration_options = {
     AddBooleanConfig(
         "push_mass_checking",
         "Push mass checking",
-        [[When enabled, disables pushing entities with very high mass.]] .. "\n" ..
-            [[Ignored when pushing players as a ghost]]
+        [[When enabled, disables pushing entities with very high mass.]]
+            .. "\n"
+            .. [[Ignored when pushing players as a ghost]]
     ),
 
     AddBooleanConfig(

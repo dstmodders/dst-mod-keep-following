@@ -28,7 +28,7 @@ local TheInput = _G.TheInput
 
 local SDK
 
-SDK = require "keepfollowing/sdk/sdk/sdk"
+SDK = require("keepfollowing/sdk/sdk/sdk")
 SDK.Load(env, "keepfollowing/sdk", {
     "Config",
     "Debug",
@@ -177,7 +177,8 @@ SDK.OnLoadComponent("playeractionpicker", function(_self, player)
             -- (threads). For example, ActionQueue Reborn will always try to force their action
             -- if entities have already been selected. We can adapt our mod for such cases to
             -- improve compatibility but this is the only bulletproof way to cover the most.
-            if buffered
+            if
+                buffered
                 and not IsOurAction(buffered.action)
                 and buffered.action ~= ACTIONS.WALKTO
             then
@@ -245,7 +246,8 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
     -- enabled. However, I don't see any valid reason to do that.
     local function ClearActionQueueRebornEntities()
         local actionqueuer = player.components.actionqueuer
-        if not actionqueuer
+        if
+            not actionqueuer
             or not actionqueuer.ClearActionThread
             or not actionqueuer.ClearSelectionThread
             or not actionqueuer.ClearSelectedEntities
@@ -305,7 +307,8 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
 
     if _COMPATIBILITY == "recommended" then
         SDK.OverrideMethod(_self, "OnLeftClick", function(original_fn, self, down)
-            if not down
+            if
+                not down
                 and not self:IsAOETargeting()
                 and not TheInput:GetHUDEntityUnderMouse()
                 and OurMouseAction(self:GetLeftMouseAction())
@@ -317,7 +320,8 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
 
         if _PUSH_WITH_RMB then
             SDK.OverrideMethod(_self, "OldOnRightClick", function(original_fn, self, down)
-                if not down
+                if
+                    not down
                     and not self:IsAOETargeting()
                     and not TheInput:GetHUDEntityUnderMouse()
                     and OurMouseAction(self:GetRightMouseAction())
