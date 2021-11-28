@@ -1,4 +1,4 @@
-require "busted.runner"()
+require("busted.runner")()
 
 describe("KeepFollowing", function()
     -- setup
@@ -11,7 +11,7 @@ describe("KeepFollowing", function()
 
     setup(function()
         -- match
-        match = require "luassert.match"
+        match = require("luassert.match")
 
         -- debug
         DebugSpyInit()
@@ -129,7 +129,7 @@ describe("KeepFollowing", function()
             }),
         })
 
-        KeepFollowing = require "components/keepfollowing"
+        KeepFollowing = require("components/keepfollowing")
         keepfollowing = KeepFollowing(inst)
 
         DebugSpyClear()
@@ -142,7 +142,7 @@ describe("KeepFollowing", function()
                 StartUpdatingComponent = spy.new(Empty),
             }
 
-            KeepFollowing = require "components/keepfollowing"
+            KeepFollowing = require("components/keepfollowing")
             keepfollowing = KeepFollowing(inst)
         end)
 
@@ -287,9 +287,7 @@ describe("KeepFollowing", function()
 
                 describe("and the passed entity has a " .. name .. " collision group", function()
                     before_each(function()
-                        entity.Physics.GetCollisionGroup = spy.new(
-                            ReturnValueFn(group)
-                        )
+                        entity.Physics.GetCollisionGroup = spy.new(ReturnValueFn(group))
                     end)
 
                     it("should call entity.Physics:GetCollisionGroup()", function()
@@ -392,7 +390,7 @@ describe("KeepFollowing", function()
                 end)
             end)
 
-            describe('when the mass difference is <= 925', function()
+            describe("when the mass difference is <= 925", function()
                 before_each(function()
                     entity.Physics.GetMass = spy.new(ReturnValueFn(1000))
                     keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(75))
@@ -403,7 +401,7 @@ describe("KeepFollowing", function()
                 end)
             end)
 
-            describe('when the mass difference is > 925', function()
+            describe("when the mass difference is > 925", function()
                 before_each(function()
                     entity.Physics.GetMass = spy.new(ReturnValueFn(9999))
                     keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(75))
@@ -414,12 +412,12 @@ describe("KeepFollowing", function()
                 end)
             end)
 
-            describe('when self.inst mass is 1 (player is a ghost)', function()
+            describe("when self.inst mass is 1 (player is a ghost)", function()
                 before_each(function()
                     keepfollowing.inst.Physics.GetMass = spy.new(ReturnValueFn(1))
                 end)
 
-                describe('and the mass difference is <= 10', function()
+                describe("and the mass difference is <= 10", function()
                     before_each(function()
                         entity.Physics.GetMass = spy.new(ReturnValueFn(10))
                     end)
@@ -429,7 +427,7 @@ describe("KeepFollowing", function()
                     end)
                 end)
 
-                describe('and the mass difference is > 10', function()
+                describe("and the mass difference is > 10", function()
                     before_each(function()
                         entity.Physics.GetMass = spy.new(ReturnValueFn(75))
                     end)
@@ -443,7 +441,7 @@ describe("KeepFollowing", function()
 
         describe("CanBeLeader", function()
             local function TestEntityAndInstAreSame()
-                describe('and self.inst is the same as the passed entity', function()
+                describe("and self.inst is the same as the passed entity", function()
                     before_each(function()
                         keepfollowing.inst = entity
                     end)
@@ -472,7 +470,7 @@ describe("KeepFollowing", function()
                 end)
             end
 
-            describe('when self:CanBeFollowed() returns true', function()
+            describe("when self:CanBeFollowed() returns true", function()
                 before_each(function()
                     keepfollowing.CanBeFollowed = spy.new(ReturnValueFn(true))
                 end)
@@ -485,7 +483,7 @@ describe("KeepFollowing", function()
                 end)
             end)
 
-            describe('when self:CanBeFollowed() returns false', function()
+            describe("when self:CanBeFollowed() returns false", function()
                 before_each(function()
                     keepfollowing.CanBeFollowed = spy.new(ReturnValueFn(false))
                 end)
@@ -547,7 +545,10 @@ describe("KeepFollowing", function()
             describe("when the player sets himself/herself", function()
                 TestNotValidLeader(function()
                     return keepfollowing:SetLeader(keepfollowing.inst)
-                end, { "You", "can't become a leader" })
+                end, {
+                    "You",
+                    "can't become a leader",
+                })
             end)
 
             describe("when an entity can't become a leader", function()
@@ -562,7 +563,10 @@ describe("KeepFollowing", function()
 
                     TestNotValidLeader(function()
                         return keepfollowing:SetLeader(entity)
-                    end, { "Wilson", "can't become a leader" })
+                    end, {
+                        "Wilson",
+                        "can't become a leader",
+                    })
                 end)
 
                 describe("and doesn't have a GetDisplayName()", function()
@@ -572,7 +576,10 @@ describe("KeepFollowing", function()
 
                     TestNotValidLeader(function()
                         return keepfollowing:SetLeader(entity)
-                    end, { "Entity", "can't become a leader" })
+                    end, {
+                        "Entity",
+                        "can't become a leader",
+                    })
                 end)
             end)
         end)
