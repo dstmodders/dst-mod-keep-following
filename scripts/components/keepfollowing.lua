@@ -27,37 +27,6 @@ local _FOLLOWING_THREAD_ID = "following_thread"
 local _PUSHING_THREAD_ID = "pushing_thread"
 local _WORMHOLE_TRAVEL_THREAD_ID = "wormhole_travel_thread"
 
--- Helpers
-
-local function OnWormholeTravelDirty(inst)
-    local leader = inst._parent
-    local player = ThePlayer
-    if leader and player then
-        local keepfollowing = player.components.keepfollowing
-        if keepfollowing then
-            keepfollowing:OnPlayerJumpThroughWormhole(leader)
-        end
-    end
-end
-
-local function StartListenForWormholeTravel(inst)
-    if inst then
-        local classified = inst.player_classified
-        if classified then
-            classified:ListenForEvent("wormholetraveldirty", OnWormholeTravelDirty)
-        end
-    end
-end
-
-local function StopListenForWormholeTravel(inst)
-    if inst then
-        local classified = inst.player_classified
-        if classified then
-            classified:RemoveEventCallback("wormholetraveldirty", OnWormholeTravelDirty)
-        end
-    end
-end
-
 --- Lifecycle
 -- @section lifecycle
 
@@ -85,7 +54,6 @@ local KeepFollowing = Class(function(self, inst)
     self.is_wormhole_travel_successful = false
     self.last_leader_pos = nil
     self.leader_id = nil
-    self.leader_used_wormhole = false
     self.wormhole_travel_thread = nil
 
     -- following
@@ -111,8 +79,6 @@ local KeepFollowing = Class(function(self, inst)
         push_mass_checking = true,
     }
 
-    -- listener
-    StartListenForWormholeTravel(self.inst)
     -- update
     inst:StartUpdatingComponent(self)
 
@@ -162,8 +128,6 @@ end
 -- @treturn boolean
 function KeepFollowing:Stop()
     if not SDK.Player.IsHUDHasInputFocus(self.inst) then
-        StopListenForWormholeTravel(self.leader)
-
         if self:IsFollowing() then
             self:StopFollowing()
             return true
@@ -276,7 +240,6 @@ function KeepFollowing:SetLeader(leader)
                 math.sqrt(self.inst:GetDistanceSqToPoint(leader:GetPosition()))
             )
         )
-        StartListenForWormholeTravel(self.leader)
         return true
     elseif leader == self.inst then
         self:DebugError("You", "can't become a leader")
@@ -291,15 +254,50 @@ end
 --- Wormhole
 -- @section wormhole
 
+local function IsWormholeJumping(player)
+    -- We check for player visibility as jumping in has the same
+    -- animation as jumping out. As players are invisible while
+    -- leaving the wormhole, it could be used to know if the player
+    -- is leaving a wormhole.
+    if
+        player
+        and player.entity:IsValid()
+        and player.entity:IsVisible()
+        and (player.sg or player.AnimState)
+    then
+        if player.sg and player.sg.HasStateTag and player.sg:HasStateTag("jumpin") then
+            return true
+        end
+
+        if player.AnimState and not player.AnimState.IsCurrentAnimation then
+            return nil
+        end
+
+        return player.AnimState:IsCurrentAnimation("dissipate")
+            or player.AnimState:IsCurrentAnimation("heavy_jump")
+            or player.AnimState:IsCurrentAnimation("jump")
+    end
+    return nil
+end
+
 local function JumpThroughWormhole(self, wormhole)
     local player = self.inst
     if player and wormhole then
         local action = BufferedAction(player, wormhole, ACTIONS.JUMPIN)
         local playercontroller = player.components.playercontroller
+        local wormhole_pos = wormhole:GetPosition()
+        action.preview_cb = function()
+            SendRPCToServer(
+                RPC.LeftClick,
+                ACTIONS.JUMPIN.code,
+                wormhole_pos.x,
+                wormhole_pos.z,
+                wormhole
+            )
+        end
         if playercontroller and playercontroller.locomotor then
             playercontroller:DoAction(action)
         else
-            local wormhole_pos = wormhole:GetPosition()
             SendRPCToServer(
                 RPC.LeftClick,
                 ACTIONS.JUMPIN.code,
@@ -345,19 +343,7 @@ local function ResetWormholeFields(self)
     self.is_wormhole_travel_successful = false
     self.last_leader_pos = nil
     self.leader_id = nil
-    self.leader_used_wormhole = false
     self.wormhole_travel_thread = nil
-end
-
---- Triggers when jumping though wormhole.
--- @tparam EntityScript player An entity as a potential leader
-function KeepFollowing:OnPlayerJumpThroughWormhole(player)
-    if player == self.inst then
-        self.is_wormhole_travel_successful = true
-    elseif player == self.leader then
-        self.leader_used_wormhole = true
-        self.last_leader_pos = self.leader:GetPosition()
-    end
 end
 
 --- Starts the wormhole travel thread.
@@ -365,7 +351,7 @@ end
 -- Starts the thread to travel through the wormhole in which a leader has jumped into and resumes
 -- following.
 function KeepFollowing:StartWormholeTravelThread()
-    local wormhole, pos, is_correct_side
+    local wormhole, pos, is_correct_side, was_jumping, player_pos
     self.is_wormhole_travelling = true
     self.wormhole_travel_thread = SDK.Thread.Start(
         _WORMHOLE_TRAVEL_THREAD_ID,
@@ -376,14 +362,39 @@ function KeepFollowing:StartWormholeTravelThread()
                 return
             end
 
+            if
+                was_jumping
+                and (
+                    not self.inst.entity:IsVisible()
+                    or self.inst:GetDistanceSqToPoint(player_pos) > 3 * 3
+                )
+            then
+                -- We use "3" as the distance because that is the MAX_JUMPIN_DIST variable provided
+                -- in SGwilson.lua at the "jumpin" state.
+                self:DebugString("Detected user jumped through the wormhole")
+                self.is_wormhole_travel_successful = true
+            end
+
+            was_jumping = IsWormholeJumping(self.inst)
+            player_pos = self.inst:GetPosition()
             if self.is_wormhole_travel_successful then
-                Sleep(1)
                 self:DebugString(string.format("Locating player by id: %s", self.leader_id))
                 local player = LocatePlayerByID(self.leader_id)
                 if player then
-                    self.leader = player
+                    local player_name = player.GetDisplayName and player:GetDisplayName()
+                    self:DebugString(string.format("Found player: %s", player_name))
+                    self:SetLeader(player)
+                else
+                    self:DebugError(
+                        string.format("Unable to locate player with id: %s", self.leader_id)
+                    )
                 end
                 self:StopWormholeTravel()
+                return
+            end
+
+            if was_jumping then
+                Sleep(FRAMES)
                 return
             end
 
@@ -399,8 +410,8 @@ function KeepFollowing:StartWormholeTravelThread()
                 return
             end
 
-            pos = self.leader_positions[#self.leader_positions]
-            if pos and SDK.Player.IsIdle(self.inst) and not is_correct_side then
+            pos = self.leader_positions[#self.leader_positions - 1]
+            if pos and not is_correct_side then
                 WalkToPoint(self, pos)
                 if self.inst:GetDistanceSqToPoint(pos) < 0.5 * 0.5 then
                     is_correct_side = true
@@ -409,14 +420,14 @@ function KeepFollowing:StartWormholeTravelThread()
                 is_correct_side = true
             end
 
-            if self.last_leader_pos then
+            if self.last_leader_pos and not wormhole then
                 wormhole = LocateNearbyWormhole(self.last_leader_pos)
-                if not wormhole and not self.is_wormhole_travel_successful then
+                if not wormhole then
                     self:DebugError("Could not locate wormhole at last position")
                     self:StopWormholeTravel()
                     return
                 end
-            else
+            elseif not self.last_leader_pos then
                 self:DebugError("No known last position for leader")
                 self:StopWormholeTravel()
                 return
@@ -437,11 +448,6 @@ end
 --- Stops wormhole travelling.
 -- @treturn boolean
 function KeepFollowing:StopWormholeTravel()
-    if not self.leader_id then
-        self:DebugError("No leader ID")
-        return false
-    end
-
     if not self.wormhole_travel_thread then
         self:DebugError("No active thread")
         return false
@@ -450,7 +456,7 @@ function KeepFollowing:StopWormholeTravel()
     self:DebugString(
         string.format(
             "Stopped wormhole travel for leader ID %s. RPCs: %d.",
-            self.leader_id,
+            tostring(self.leader_id),
             self.debug_rpc_counter
         )
     )
@@ -537,7 +543,7 @@ end
 -- "default" following method is used it starts the following path thread as well by calling the
 -- `StartFollowingPathThread` to gather path coordinates of a leader.
 function KeepFollowing:StartFollowingThread()
-    local pos, pos_prev, is_leader_near, stuck
+    local pos, pos_prev, is_leader_near, stuck, was_jumping, leader_pos
 
     local stuck_frames = 0
     local radius_inst = self.inst.Physics:GetRadius()
@@ -545,19 +551,37 @@ function KeepFollowing:StartFollowingThread()
     local target = self.config.follow_distance + radius_inst + radius_leader
 
     self.following_thread = SDK.Thread.Start(_FOLLOWING_THREAD_ID, function()
-        if not self.leader or not self.leader.entity:IsValid() then
-            if self.leader_used_wormhole then
-                if not self:IsWormholeTravelling() then
-                    self:StartWormholeTravelThread()
-                end
-                Sleep(FRAMES)
-            else
-                self:DebugError("Leader doesn't exist anymore")
-                self:StopFollowing()
-            end
+        if self:IsWormholeTravelling() then
+            Sleep(FRAMES)
+            return
+        elseif
+            was_jumping
+            and self.leader
+            and (
+                not self.leader.entity:IsValid()
+                or not self.leader.entity:IsVisible()
+                or not self.leader.entity:IsAwake()
+                or self.leader:GetDistanceSqToPoint(leader_pos) > 3 * 3
+            )
+        then
+            self:DebugString("Detected leader jumping through wormhole")
+            self.last_leader_pos = leader_pos
+            self.leader_id = self.leader.userid
+            self:StartWormholeTravelThread()
+            was_jumping = nil
+            leader_pos = nil
             return
         end
 
+        if not self.leader or not self.leader.entity:IsValid() then
+            self:DebugError("Leader doesn't exist anymore")
+            self:StopFollowing()
+            return
+        end
+
+        was_jumping = IsWormholeJumping(self.leader)
+        leader_pos = self.leader and self.leader.entity:IsValid() and self.leader:GetPosition()
+            or nil
         is_leader_near = self.inst:IsNear(self.leader, target)
 
         if self.config.follow_method == "default" then
@@ -617,21 +641,26 @@ end
 --
 -- Starts the thread to follow the leader based on the following method in the configurations.
 function KeepFollowing:StartFollowingPathThread()
-    local pos, pos_prev
+    local pos, pos_prev, was_jumping
 
     self.following_path_thread = SDK.Thread.Start(_FOLLOWING_PATH_THREAD_ID, function()
-        if not self.leader or not self.leader.entity:IsValid() then
-            if self.leader_used_wormhole then
-                if not self:IsWormholeTravelling() then
-                    self:StartWormholeTravelThread()
-                end
-                Sleep(FRAMES)
-            else
-                self:DebugError("Leader doesn't exist anymore")
-                self:StopFollowing()
-            end
+        if self:IsWormholeTravelling() then
+            was_jumping = nil
+            Sleep(FRAMES)
             return
         end
+
+        if not self.leader or not self.leader.entity:IsValid() then
+            if was_jumping then
+                Sleep(1)
+                was_jumping = nil
+                return
+            end
+            self:DebugError("Leader doesn't exist anymore")
+            self:StopFollowing()
+            return
+        end
+        was_jumping = IsWormholeJumping(self.leader)
 
         pos = self.leader:GetPosition()
 
