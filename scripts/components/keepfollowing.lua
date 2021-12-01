@@ -265,7 +265,7 @@ local function IsWormholeJumping(player)
         and player.entity:IsVisible()
         and (player.sg or player.AnimState)
     then
-        if player.sg and player.sg.HasStateTag and player.sg:HasStateTag("jumpin") then
+        if player.sg and player.sg.currentstate and player.sg.currentstate.name == "jumpin" then
             return true
         end
 
