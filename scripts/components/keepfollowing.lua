@@ -254,32 +254,6 @@ end
 --- Wormhole
 -- @section wormhole
 
-local function IsWormholeJumping(player)
-    -- We check for player visibility as jumping in has the same
-    -- animation as jumping out. As players are invisible while
-    -- leaving the wormhole, it could be used to know if the player
-    -- is leaving a wormhole.
-    if
-        player
-        and player.entity:IsValid()
-        and player.entity:IsVisible()
-        and (player.sg or player.AnimState)
-    then
-        if player.sg and player.sg.currentstate and player.sg.currentstate.name == "jumpin" then
-            return true
-        end
-
-        if player.AnimState and not player.AnimState.IsCurrentAnimation then
-            return nil
-        end
-
-        return player.AnimState:IsCurrentAnimation("dissipate")
-            or player.AnimState:IsCurrentAnimation("heavy_jump")
-            or player.AnimState:IsCurrentAnimation("jump")
-    end
-    return nil
-end
-
 local function JumpThroughWormhole(self, wormhole)
     local player = self.inst
     if player and wormhole then
@@ -375,7 +349,7 @@ function KeepFollowing:StartWormholeTravelThread()
                 self.is_wormhole_travel_successful = true
             end
 
-            was_jumping = IsWormholeJumping(self.inst)
+            was_jumping = SDK.Player.IsWormholeJumping(self.inst)
             player_pos = self.inst:GetPosition()
             if self.is_wormhole_travel_successful then
                 self:DebugString(string.format("Locating player by id: %s", self.leader_id))
@@ -579,7 +553,7 @@ function KeepFollowing:StartFollowingThread()
             return
         end
 
-        was_jumping = IsWormholeJumping(self.leader)
+        was_jumping = SDK.Player.IsWormholeJumping(self.leader)
         leader_pos = self.leader and self.leader.entity:IsValid() and self.leader:GetPosition()
             or nil
         is_leader_near = self.inst:IsNear(self.leader, target)
@@ -660,7 +634,7 @@ function KeepFollowing:StartFollowingPathThread()
             self:StopFollowing()
             return
         end
-        was_jumping = IsWormholeJumping(self.leader)
+        was_jumping = SDK.Player.IsWormholeJumping(self.leader)
 
         pos = self.leader:GetPosition()
 
