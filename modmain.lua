@@ -303,7 +303,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
                     return original_fn(self, control, down)
                 end
                 OurMouseAction(self:GetLeftMouseAction())
-            elseif _PUSH_WITH_RMB and control == CONTROL_SECONDARY and not down then
+            elseif control == CONTROL_SECONDARY and not down then
                 if TheInput:GetHUDEntityUnderMouse() or self:IsAOETargeting() then
                     return original_fn(self, control, down)
                 end
@@ -327,19 +327,17 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
             original_fn(self, down)
         end, SDK.OVERRIDE.ORIGINAL_NONE)
 
-        if _PUSH_WITH_RMB then
-            SDK.OverrideMethod(_self, "OnRightClick", function(original_fn, self, down)
-                if
-                    not down
-                    and not self:IsAOETargeting()
-                    and not TheInput:GetHUDEntityUnderMouse()
-                    and OurMouseAction(self:GetRightMouseAction())
-                then
-                    return
-                end
-                original_fn(self, down)
-            end, SDK.OVERRIDE.ORIGINAL_NONE)
-        end
+        SDK.OverrideMethod(_self, "OnRightClick", function(original_fn, self, down)
+            if
+                not down
+                and not self:IsAOETargeting()
+                and not TheInput:GetHUDEntityUnderMouse()
+                and OurMouseAction(self:GetRightMouseAction())
+            then
+                return
+            end
+            original_fn(self, down)
+        end, SDK.OVERRIDE.ORIGINAL_NONE)
     end
 end)
 
