@@ -319,7 +319,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
         end, SDK.OVERRIDE.ORIGINAL_NONE)
 
         if _PUSH_WITH_RMB then
-            SDK.OverrideMethod(_self, "OldOnRightClick", function(original_fn, self, down)
+            SDK.OverrideMethod(_self, "OnRightClick", function(original_fn, self, down)
                 if
                     not down
                     and not self:IsAOETargeting()
