@@ -333,3 +333,74 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
         end
     end
 end)
+
+SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
+    local _TARGET_INDICATOR_USAGE = SDK.Config.GetModConfigData("target_indicator_usage")
+
+    if _TARGET_INDICATOR_USAGE ~= "binded" then
+        return
+    end
+
+    local _KEY_ACTION = SDK.Config.GetModKeyConfigData("key_action")
+    local _KEY_PUSH = SDK.Config.GetModKeyConfigData("key_push")
+
+    --
+    -- Helpers
+    --
+
+    local function GetBufferedModAction(player, _target)
+        local keepfollowing = player.components.keepfollowing
+        local action
+        if TheInput:IsKeyDown(_KEY_ACTION) then
+            if keepfollowing:CanBeLeader(_target) then
+                if _PUSH_WITH_RMB then
+                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
+                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+                elseif not TheInput:IsKeyDown(_KEY_PUSH) then
+                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                end
+            end
+        end
+        return action
+    end
+
+    --
+    -- Overrides
+    --
+
+    SDK.OverrideMethod(_self, "OnMouseButton", function(original_fn, self, button, down, x, y)
+        local action
+        if down and button == _G.MOUSEBUTTON_LEFT then
+            action = GetBufferedModAction(owner, target)
+        end
+        if _PUSH_WITH_RMB and down and button == _G.MOUSEBUTTON_RIGHT then
+            action = BufferedAction(owner, target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+        end
+        if action then
+            action:Do()
+        end
+        original_fn(self, button, down, x, y)
+    end, SDK.OVERRIDE.ORIGINAL_NONE)
+
+    SDK.OverrideMethod(_self, "OnRawKey", function(original_fn, self, key, down)
+        local player_name = self.name
+        local new_text = player_name
+        local action = GetBufferedModAction(owner, target)
+        if action then
+            if _PUSH_WITH_RMB then
+                new_text = string.format(
+                    " %s %s\n %s %s",
+                    action.action.str,
+                    player_name,
+                    ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
+                    player_name
+                )
+            else
+                new_text = string.format(" %s %s", action.action.str, player_name)
+            end
+        end
+        self.name_label:SetString(new_text)
+        original_fn(self, key, down)
+    end, SDK.OVERRIDE.ORIGINAL_NONE)
+end)

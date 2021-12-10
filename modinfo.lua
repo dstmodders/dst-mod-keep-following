@@ -183,6 +183,25 @@ configuration_options = {
         "recommended"
     ),
 
+    AddConfig(
+        "target_indicator_usage",
+        "Target indicator usage",
+        "How should the target indicator interact with the action key?",
+        {
+            {
+                description = "None",
+                hover = "None: Target indicator does not interact with the action key",
+                data = "none",
+            },
+            {
+                description = "Binded",
+                hover = "Binded: Target indicator can be used to follow/push",
+                data = "binded",
+            },
+        },
+        "binded"
+    ),
+
     --
     -- Following
     --
