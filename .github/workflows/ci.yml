@@ -24,8 +24,9 @@ jobs:
         with:
           submodules: true
       - name: Lint
-        uses: dstmodders/github-action@main
+        uses: dstmodders/action@main
         with:
+          ignore-set-output: true
           luacheck: true
           prettier: true
           slack: true
@@ -39,9 +40,10 @@ jobs:
         with:
           submodules: true
       - name: Test
-        uses: dstmodders/github-action@main
+        uses: dstmodders/action@main
         with:
           busted: true
+          ignore-set-output: true
           slack: true
       - name: Upload coverage to Codecov
         if: ${{ !env.ACT && success() }}
