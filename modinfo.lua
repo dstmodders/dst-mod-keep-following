@@ -1,9 +1,6 @@
 name = "Keep Following"
 version = "0.22.0-alpha"
-description = [[Version: ]]
-    .. version
-    .. "\n\n"
-    .. [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]]
+description = [[By default, Shift +  (LMB) on the player or supported entities to keep following. Shift ]]
     .. [[+ Ctrl +  (LMB) to keep pushing.]]
     .. "\n\n"
     .. [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another ]]
@@ -30,6 +27,7 @@ shipwrecked_compatible = false
 folder_name = folder_name or "mod-keep-following"
 if not folder_name:find("workshop-") then
     name = name .. " (dev)"
+    description = [[Version: ]] .. version .. "\n\n" .. description
 end
 
 --
