@@ -12,12 +12,12 @@ Mod for the game [Don't Starve Together][] which is available through the
 [Steam Workshop][] and allows players to follow/push others or one of the
 supported entities.
 
-| Default Keys             | Actions                                        |
-| ------------------------ | ---------------------------------------------- |
-| `Shift` + `LMB`          | to keep following                              |
-| `Shift` + `Ctrl` + `LMB` | to keep pushing and ignore the target distance |
+| Default Keys                                        | Actions                                        |
+| --------------------------------------------------- | ---------------------------------------------- |
+| <kbd>Shift</kbd> + <kbd>LMB</kbd>                   | to keep following                              |
+| <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>LMB</kbd> | to keep pushing and ignore the target distance |
 
-To stop following use `WASD` movement keys, `SPACEBAR` action key or click `LMB`.
+To stop following use <kbd>WASD</kbd> movement keys, <kbd>SPACEBAR</kbd> action key or click `LMB`.
 
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
@@ -27,18 +27,19 @@ another player to keep following or pushing him.
 Don't like the default behaviour? Choose your own configuration to match your
 needs:
 
-| Configuration             | Default   | Description                                                           |
-| ------------------------- | --------- | --------------------------------------------------------------------- |
-| **Action key**            | _LShift_  | Key used for both following and pushing                               |
-| **Push key**              | _LCtrl_   | Key used in combination with an action key for pushing                |
-| **Following method**      | _Default_ | Which following method should be used?                                |
-| **Target distance**       | _2.5m_    | How close can you approach the leader?                                |
-| **Keep target distance**  | _No_      | Should the follower keep the distance from the leader?                |
-| **Push with RMB**         | _No_      | Should the RMB in combination with an action key be used for pushing? |
-| **Push mass checking**    | _Yes_     | Should the mass difference checking be enabled?                       |
-| **Push lag compensation** | _Yes_     | Should the lag compensation be automatically disabled while pushing?  |
-| **Hide changelog**        | _Yes_     | Should the changelog in the mod description be hidden?                |
-| **Debug**                 | _No_      | Should the debug mode be enabled?                                     |
+| Configuration               | Default       | Description                                                                  |
+| --------------------------- | ------------- | ---------------------------------------------------------------------------- |
+| **Action key**              | _Shift_       | Key used for both following and pushing                                      |
+| **Push key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
+| **Compatibility**           | _Recommended_ | Which compatibility mode should be used?                                     |
+| **Target indicator usage**  | _Binded_      | How should the target indicator interact with the action key?                |
+| **Follow method**           | _Default_     | Which follow method should be used?                                          |
+| **Follow distance**         | _2.5m_        | How close can a follower approach a leader?                                  |
+| **Follow distance keeping** | _Disabled_    | When enabled, a follower moves away from a leader within the follow distance |
+| **Push with RMB**           | _Disabled_    | When enabled, (RMB) + action key is used for pushing                         |
+| **Push mass checking**      | _Enabled_     | When enabled, disables pushing entities with very high mass.                 |
+| **Push lag compensation**   | _Enabled_     | When enabled, automatically disables the lag compensation during pushing     |
+| **Debug**                   | _Disabled_    | When enabled, displays debug data in the console.                            |
 
 ## Documentation
 
