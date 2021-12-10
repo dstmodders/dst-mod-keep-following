@@ -17,7 +17,8 @@ supported entities.
 | <kbd>Shift</kbd> + <kbd>LMB</kbd>                   | to keep following                              |
 | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>LMB</kbd> | to keep pushing and ignore the target distance |
 
-To stop following use <kbd>WASD</kbd> movement keys, <kbd>SPACEBAR</kbd> action key or click `LMB`.
+To stop following use <kbd>WASD</kbd> movement keys, <kbd>Space</kbd> (in-game
+action key) or click <kbd>LMB</kbd>.
 
 You can also use the above key combinations on a Tent/Siesta Lean-to used by
 another player to keep following or pushing him.
