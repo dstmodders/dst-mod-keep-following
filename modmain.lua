@@ -381,16 +381,17 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
         end
         return lmb, rmb
     end
+
     --
     -- Overrides
     --
 
     SDK.OverrideMethod(_self, "OnMouseButton", function(original_fn, self, button, down, x, y)
         local lmb, rmb = GetOurMouseActions(owner, target)
-        if lmb and IsOurAction(lmb.action) and down and button == _G.MOUSEBUTTON_LEFT then
+        if lmb and down and button == _G.MOUSEBUTTON_LEFT then
             lmb:Do()
         end
-        if rmb and IsOurAction(rmb.action) and down and button == _G.MOUSEBUTTON_RIGHT then
+        if rmb and down and button == _G.MOUSEBUTTON_RIGHT then
             rmb:Do()
         end
         original_fn(self, button, down, x, y)
@@ -400,7 +401,7 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
         local player_name = self.name
         local new_text = player_name
         local lmb, rmb = GetOurMouseActions(owner, target)
-        if lmb and rmb and IsOurAction(lmb.action) and IsOurAction(rmb.action) then
+        if lmb and rmb then
             new_text = string.format(
                 " %s %s\n %s %s",
                 lmb.action.str,
@@ -408,9 +409,9 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
                 rmb.action.str,
                 player_name
             )
-        elseif lmb and IsOurAction(lmb.action) then
+        elseif lmb then
             new_text = string.format(" %s %s", lmb.action.str, player_name)
-        elseif rmb and IsOurAction(rmb.action) then
+        elseif rmb then
             new_text = string.format(" %s %s", rmb.action.str, player_name)
         end
         self.name_label:SetString(new_text)
