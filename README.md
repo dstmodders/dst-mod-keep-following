@@ -32,6 +32,7 @@ needs:
 | --------------------------- | ------------- | ---------------------------------------------------------------------------- |
 | **Action key**              | _Shift_       | Key used for both following and pushing                                      |
 | **Push key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
+| **Reverse buttons**         | _Disabled_    | When enabled, (LMB) and (RMB) will be swapped                                |
 | **Compatibility**           | _Recommended_ | Which compatibility mode should be used?                                     |
 | **Target indicator usage**  | _Binded_      | How should the target indicator interact with the action key?                |
 | **Follow method**           | _Default_     | Which follow method should be used?                                          |
