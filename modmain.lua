@@ -378,6 +378,14 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
 
     SDK.OverrideMethod(_self, "OnMouseButton", function(original_fn, self, button, down, x, y)
         local action
+        local old_button = button
+        if _REVERSE_BUTTONS then
+            if button == _G.MOUSEBUTTON_LEFT then
+                button = _G.MOUSEBUTTON_RIGHT
+            elseif button == _G.MOUSEBUTTON_RIGHT then
+                button = _G.MOUSEBUTTON_LEFT
+            end
+        end
         if down and button == _G.MOUSEBUTTON_LEFT then
             action = GetBufferedModAction(owner, target)
         end
@@ -387,6 +395,7 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
         if action then
             action:Do()
         end
+        button = old_button
         original_fn(self, button, down, x, y)
     end, SDK.OVERRIDE.ORIGINAL_NONE)
 
@@ -396,15 +405,29 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
         local action = GetBufferedModAction(owner, target)
         if action then
             if _PUSH_WITH_RMB then
-                new_text = string.format(
-                    " %s %s\n %s %s",
-                    action.action.str,
-                    player_name,
-                    ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
-                    player_name
-                )
+                if _REVERSE_BUTTONS then
+                    new_text = string.format(
+                        " %s %s\n %s %s",
+                        ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
+                        player_name,
+                        action.action.str,
+                        player_name
+                    )
+                else
+                    new_text = string.format(
+                        " %s %s\n %s %s",
+                        action.action.str,
+                        player_name,
+                        ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
+                        player_name
+                    )
+                end
             else
-                new_text = string.format(" %s %s", action.action.str, player_name)
+                if _REVERSE_BUTTONS then
+                    new_text = string.format(" %s %s", action.action.str, player_name)
+                else
+                    new_text = string.format(" %s %s", action.action.str, player_name)
+                end
             end
         end
         self.name_label:SetString(new_text)
