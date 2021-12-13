@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased][]
 
+### Added
+
+- Add "Reverse buttons" configuration
+- Add "Target indicator usage" configuration
+- Add equipped "Bush Hat" and "Snurtle Shell Armor" hide support
+- Add following through wormholes support
+
+### Changed
+
+- Change author
+- Migrate to the new mod SDK
+
+### Removed
+
+- Remove "Hide changelog" configuration
+- Remove changelog from modinfo
+
 ## [0.21.0][] - 2020-08-26
 
 ### Added
