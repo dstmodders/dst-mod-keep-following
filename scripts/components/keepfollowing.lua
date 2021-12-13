@@ -601,7 +601,7 @@ function KeepFollowing:StartFollowingThread()
 
         Sleep(FRAMES)
     end, function()
-        return self.inst and self.inst:IsValid() and self:IsFollowing()
+        return self.inst and self.inst:IsValid() and self.leader and self:IsFollowing()
     end, function()
         if self.config.follow_method == "default" then
             self:StartFollowingPathThread()
@@ -661,7 +661,7 @@ function KeepFollowing:StartFollowingPathThread()
 
         Sleep(FRAMES)
     end, function()
-        return self.inst and self.inst:IsValid() and self:IsFollowing()
+        return self.inst and self.inst:IsValid() and self.leader and self:IsFollowing()
     end, function()
         self:DebugString("Started gathering path coordinates...")
     end)
@@ -787,7 +787,7 @@ function KeepFollowing:StartPushingThread()
             Sleep(FRAMES)
         end,
         function()
-            return self.inst and self.inst:IsValid() and self:IsPushing()
+            return self.inst and self.inst:IsValid() and self.leader and self:IsPushing()
         end,
         nil,
         function()
