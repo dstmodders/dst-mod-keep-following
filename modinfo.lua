@@ -162,6 +162,13 @@ configuration_options = {
 
     AddSection("General"),
 
+    AddBooleanConfig(
+        "reverse_buttons",
+        "Reverse buttons",
+        "When enabled, \238\132\128 (LMB) and \238\132\129 (RMB) will be swapped",
+        false
+    ),
+
     AddConfig(
         "compatibility",
         "Compatibility",
@@ -241,7 +248,7 @@ configuration_options = {
     AddBooleanConfig(
         "push_with_rmb",
         "Push with RMB",
-        "When enabled,  (RMB) + action key is used for pushing",
+        "When enabled, \238\132\129 (RMB) + action key is used for pushing",
         false
     ),
 
