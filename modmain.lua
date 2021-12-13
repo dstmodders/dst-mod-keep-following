@@ -355,80 +355,63 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
     -- Helpers
     --
 
-    local function GetBufferedModAction(player, _target)
+    local function GetOurMouseActions(player, _target)
         local keepfollowing = player.components.keepfollowing
-        local action
+        local lmb, rmb
         if TheInput:IsKeyDown(_KEY_ACTION) then
             if keepfollowing:CanBeLeader(_target) then
                 if _PUSH_WITH_RMB then
-                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
-                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(target) then
-                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(_target) then
+                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    action = BufferedAction(owner, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
                 end
             end
-        end
-        return action
-    end
 
+            if _PUSH_WITH_RMB then
+                if keepfollowing:CanBeLeader(_target) and keepfollowing:CanBePushed(_target) then
+                    rmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+                end
+            end
+
+            if _REVERSE_BUTTONS then
+                lmb, rmb = rmb, lmb
+            end
+        end
+        return lmb, rmb
+    end
     --
     -- Overrides
     --
 
     SDK.OverrideMethod(_self, "OnMouseButton", function(original_fn, self, button, down, x, y)
-        local action
-        local old_button = button
-        if _REVERSE_BUTTONS then
-            if button == _G.MOUSEBUTTON_LEFT then
-                button = _G.MOUSEBUTTON_RIGHT
-            elseif button == _G.MOUSEBUTTON_RIGHT then
-                button = _G.MOUSEBUTTON_LEFT
-            end
+        local lmb, rmb = GetOurMouseActions(owner, target)
+        if lmb and IsOurAction(lmb.action) and down and button == _G.MOUSEBUTTON_LEFT then
+            lmb:Do()
         end
-        if down and button == _G.MOUSEBUTTON_LEFT then
-            action = GetBufferedModAction(owner, target)
+        if rmb and IsOurAction(rmb.action) and down and button == _G.MOUSEBUTTON_RIGHT then
+            rmb:Do()
         end
-        if _PUSH_WITH_RMB and down and button == _G.MOUSEBUTTON_RIGHT then
-            action = BufferedAction(owner, target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
-        end
-        if action then
-            action:Do()
-        end
-        button = old_button
         original_fn(self, button, down, x, y)
     end, SDK.OVERRIDE.ORIGINAL_NONE)
 
     SDK.OverrideMethod(_self, "OnRawKey", function(original_fn, self, key, down)
         local player_name = self.name
         local new_text = player_name
-        local action = GetBufferedModAction(owner, target)
-        if action then
-            if _PUSH_WITH_RMB then
-                if _REVERSE_BUTTONS then
-                    new_text = string.format(
-                        " %s %s\n %s %s",
-                        ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
-                        player_name,
-                        action.action.str,
-                        player_name
-                    )
-                else
-                    new_text = string.format(
-                        " %s %s\n %s %s",
-                        action.action.str,
-                        player_name,
-                        ACTIONS.MOD_KEEP_FOLLOWING_PUSH.str,
-                        player_name
-                    )
-                end
-            else
-                if _REVERSE_BUTTONS then
-                    new_text = string.format(" %s %s", action.action.str, player_name)
-                else
-                    new_text = string.format(" %s %s", action.action.str, player_name)
-                end
-            end
+        local lmb, rmb = GetOurMouseActions(owner, target)
+        if lmb and rmb and IsOurAction(lmb.action) and IsOurAction(rmb.action) then
+            new_text = string.format(
+                " %s %s\n %s %s",
+                lmb.action.str,
+                player_name,
+                rmb.action.str,
+                player_name
+            )
+        elseif lmb and IsOurAction(lmb.action) then
+            new_text = string.format(" %s %s", lmb.action.str, player_name)
+        elseif rmb and IsOurAction(rmb.action) then
+            new_text = string.format(" %s %s", rmb.action.str, player_name)
         end
         self.name_label:SetString(new_text)
         original_fn(self, key, down)
