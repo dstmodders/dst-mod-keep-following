@@ -55,7 +55,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Add Docker certificates to access the remote host
-        if: ${{ !env.ACT }}
         run: |
           mkdir -p "${DOCKER_CERT_PATH}"
           echo "${DOCKER_TLS_CA}" > "${DOCKER_CERT_PATH}/ca.pem"
@@ -70,7 +69,6 @@ jobs:
           DOCKER_TLS_CERT: ${{ secrets.DOCKER_TLS_CERT }}
           DOCKER_TLS_KEY: ${{ secrets.DOCKER_TLS_KEY }}
       - name: Deploy Docker Stack
-        if: ${{ !env.ACT }}
         working-directory: ./docs/
         run: |
           docker stack rm "${DOCKER_STACK_NAME}"
