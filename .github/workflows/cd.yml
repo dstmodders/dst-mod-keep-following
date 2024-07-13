@@ -17,10 +17,8 @@ jobs:
       - name: Set a job-wide environment variables
         run: |
           {
-            echo "BRANCH_NAME=${GITHUB_REF##*/}"
             echo "DOCKER_IMAGE=${{ secrets.PRIVATE_REGISTRY }}/mod-keep-following/docs"
             echo "DOCKER_IMAGE_TAG=latest"
-            echo "GITHUB_JOB_NAME=docs"
           } >> "$GITHUB_ENV"
       - name: Generate documentation
         uses: lunarmodules/ldoc@v1.5.0
