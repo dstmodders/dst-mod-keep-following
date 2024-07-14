@@ -78,7 +78,7 @@ jobs:
         env:
           DOCKER_CERT_PATH: ${{ steps.docker.outputs.cert-path }}
           DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
-          DOCKER_IMAGE: ${{ steps.docker.outputs.image-name }}
+          DOCKER_IMAGE_NAME: ${{ steps.docker.outputs.image-name }}
           DOCKER_IMAGE_TAG: ${{ steps.docker.outputs.image-tag }}
           DOCKER_STACK_NODE_HOSTNAME: ${{ secrets.DOCKER_STACK_NODE_HOSTNAME }}
           DOCKER_TLS_VERIFY: 1
