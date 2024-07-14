@@ -52,7 +52,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm/v7
           pull: true
-          push: ${{ !env.ACT && github.ref == 'refs/heads/main' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
       - name: Add Docker certificates to access the remote host
         run: |
