@@ -84,9 +84,6 @@ jobs:
           # docker stack
           DOCKER_STACK_NAME: dstmodders_mod_keep_following
           DOCKER_STACK_NODE_HOSTNAME: ${{ secrets.DOCKER_STACK_NODE_HOSTNAME }}
-          # loki
-          LOKI_PIPELINE_STAGE_FILE: /etc/loki/pipelines/nginx.yml
-          LOKI_URL: ${{ secrets.LOKI_URL }}
           # nginx
           NGINX_CONF: /etc/nginx/nginx.conf
           # traefik
