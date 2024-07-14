@@ -3,8 +3,6 @@ version: '3.7'
 services:
   docs:
     image: '${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}'
-    networks:
-      - cluster
     volumes:
       - '${NGINX_CONF}:/etc/nginx/nginx.conf'
       - '/etc/localtime:/etc/localtime:ro'
@@ -36,5 +34,6 @@ services:
         - 'traefik.http.routers.${DOCS_TRAEFIK_HTTPS_ROUTER_NAME}.service=${DOCS_TRAEFIK_SERVICE_NAME}'
 
 networks:
-  cluster:
-    external: true
+  default:
+    external:
+      name: '${DOCS_DOCKER_STACK_NETWORK}'
