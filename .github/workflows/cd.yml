@@ -93,14 +93,3 @@ jobs:
           TRAEFIK_HOST: docs.dstmodders.com
           TRAEFIK_NAME: dstmodders-mod-keep-following-docs
           TRAEFIK_PATH_PREFIX: /keep-following/
-      - name: Send Slack notification
-        uses: dstmodders/action@main
-        with:
-          ignore-check-versions: true
-          ignore-set-output: true
-          slack-force-status: ${{ job.status }}
-          slack: true
-        env:
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
