@@ -93,4 +93,3 @@ jobs:
           DOCS_TRAEFIK_HTTP_ROUTER_NAME: ${{ vars.DOCS_TRAEFIK_HTTP_ROUTER_NAME }}
           DOCS_TRAEFIK_PATH_PREFIX: ${{ vars.DOCS_TRAEFIK_PATH_PREFIX }}
           DOCS_TRAEFIK_SERVICE_NAME: ${{ vars.DOCS_TRAEFIK_SERVICE_NAME }}
-          NGINX_CONF: /etc/nginx/nginx.conf

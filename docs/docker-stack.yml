@@ -4,7 +4,6 @@ services:
   docs:
     image: '${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}'
     volumes:
-      - '${NGINX_CONF}:/etc/nginx/nginx.conf'
       - '/etc/localtime:/etc/localtime:ro'
       - '/etc/timezone:/etc/timezone:ro'
     deploy:
