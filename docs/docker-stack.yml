@@ -3,9 +3,8 @@ version: '3.7'
 services:
   docs:
     image: '${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG}'
-    volumes:
-      - '/etc/localtime:/etc/localtime:ro'
-      - '/etc/timezone:/etc/timezone:ro'
+    environment:
+      TZ: '${DOCS_TZ}'
     deploy:
       mode: global
       placement:
