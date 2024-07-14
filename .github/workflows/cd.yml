@@ -68,19 +68,18 @@ jobs:
       - name: Deploy Docker Stack
         working-directory: ./docs/
         run: |
-          docker stack rm "${DOCKER_STACK_NAME}"
+          docker stack rm "${{ vars.DOCS_DOCKER_STACK_NAME }}"
           docker stack deploy \
             --with-registry-auth \
             --resolve-image=always \
             --compose-file=docker-stack.yml \
             --prune \
-            "${DOCKER_STACK_NAME}"
+            "${{ vars.DOCS_DOCKER_STACK_NAME }}"
         env:
           DOCKER_CERT_PATH: ${{ steps.docker.outputs.cert-path }}
           DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
           DOCKER_IMAGE: ${{ steps.docker.outputs.image-name }}
           DOCKER_IMAGE_TAG: ${{ steps.docker.outputs.image-tag }}
-          DOCKER_STACK_NAME: dstmodders_mod_keep_following
           DOCKER_STACK_NODE_HOSTNAME: ${{ secrets.DOCKER_STACK_NODE_HOSTNAME }}
           DOCKER_TLS_VERIFY: 1
           DOCS_DOCKER_STACK_NETWORK: ${{ vars.DOCS_DOCKER_STACK_NETWORK }}
