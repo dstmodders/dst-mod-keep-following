@@ -53,18 +53,18 @@ install:
 	@:$(call check_defined, DST_MODS)
 	@rsync -az \
 		--exclude '.*' \
-		--exclude 'busted.out' \
 		--exclude 'CHANGELOG.md' \
-		--exclude 'config.ld' \
 		--exclude 'CONTRIBUTING.md' \
+		--exclude 'Makefile' \
+		--exclude 'README.md' \
+		--exclude 'busted.out' \
+		--exclude 'config.ld' \
 		--exclude 'description.txt*' \
-		--exclude 'doc/' \
+		--exclude 'docs/' \
 		--exclude 'lcov.info' \
 		--exclude 'luacov*' \
-		--exclude 'Makefile' \
 		--exclude 'modicon.png' \
 		--exclude 'preview.*' \
-		--exclude 'README.md' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
 		--exclude 'workshop*' \
