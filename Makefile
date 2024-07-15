@@ -1,6 +1,7 @@
 GIT_LATEST_TAG = $$(git describe --abbrev=0)
 GIT_SUBMODULE_COMMIT = $$(git submodule foreach git rev-parse --short HEAD | tail -1)
 MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
 
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
@@ -86,12 +87,12 @@ luacheckreadglobals:
 	@luacheck . --formatter=plain | grep "undefined variable" | awk '{ print $$5 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
 
 modicon:
-	@:$(call check_defined, DS_KTOOLS_KTECH)
-	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
-	@prettier --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
+	@:$(call check_defined, KTOOLS_KTECH)
+	@${KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 prettier:
-	@prettier --list-different './**/*.md' './**/*.xml' './**/*.yml'
+	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --list-different './**/*.md' './**/*.xml' './**/*.yml'
 
 reinstall: uninstall install
 
