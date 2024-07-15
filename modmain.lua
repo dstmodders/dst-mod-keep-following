@@ -144,7 +144,7 @@ local function IsOurAction(action)
         or action == ACTIONS.MOD_KEEP_FOLLOWING_TENT_PUSH
 end
 
-SDK.OnLoadComponent("playeractionpicker", function(_self, player)
+SDK.OnLoadComponent("playeractionpicker", function(__self, player)
     if player ~= _G.ThePlayer then
         return
     end
@@ -156,8 +156,8 @@ SDK.OnLoadComponent("playeractionpicker", function(_self, player)
     -- Overrides
     --
 
-    SDK.OverrideMethod(_self, "DoGetMouseActions", function(original_fn, self, position, _target)
-        local lmb, rmb = original_fn(self, position, _target)
+    SDK.OverrideMethod(__self, "DoGetMouseActions", function(original_fn, self, position, __target)
+        local lmb, rmb = original_fn(self, position, __target)
         if TheInput:IsKeyDown(_KEY_ACTION) then
             local keepfollowing = player.components.keepfollowing
             local buffered = self.inst:GetBufferedAction()
@@ -228,7 +228,7 @@ SDK.OnLoadComponent("playeractionpicker", function(_self, player)
     end, SDK.OVERRIDE.ORIGINAL_NONE)
 end)
 
-SDK.OnLoadComponent("playercontroller", function(_self, player)
+SDK.OnLoadComponent("playercontroller", function(__self, player)
     if player ~= _G.ThePlayer then
         return
     end
@@ -292,7 +292,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
     -- Overrides
     --
 
-    SDK.OverrideMethod(_self, "OnControl", function(original_fn, self, control, down)
+    SDK.OverrideMethod(__self, "OnControl", function(original_fn, self, control, down)
         if SDK.Input.IsControlMove(control) or control == CONTROL_ACTION then
             KeepFollowingStop()
         end
@@ -315,7 +315,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
     end, SDK.OVERRIDE.ORIGINAL_NONE)
 
     if _COMPATIBILITY == "recommended" then
-        SDK.OverrideMethod(_self, "OnLeftClick", function(original_fn, self, down)
+        SDK.OverrideMethod(__self, "OnLeftClick", function(original_fn, self, down)
             if
                 not down
                 and not self:IsAOETargeting()
@@ -327,7 +327,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
             original_fn(self, down)
         end, SDK.OVERRIDE.ORIGINAL_NONE)
 
-        SDK.OverrideMethod(_self, "OnRightClick", function(original_fn, self, down)
+        SDK.OverrideMethod(__self, "OnRightClick", function(original_fn, self, down)
             if
                 not down
                 and not self:IsAOETargeting()
@@ -341,7 +341,7 @@ SDK.OnLoadComponent("playercontroller", function(_self, player)
     end
 end)
 
-SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
+SDK.OnLoadClass("widgets/targetindicator", function(__self, owner, target)
     local _TARGET_INDICATOR_USAGE = SDK.Config.GetModConfigData("target_indicator_usage")
 
     if _TARGET_INDICATOR_USAGE ~= "binded" then
@@ -355,23 +355,23 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
     -- Helpers
     --
 
-    local function GetOurMouseActions(player, _target)
+    local function GetOurMouseActions(player, __target)
         local keepfollowing = player.components.keepfollowing
         local lmb, rmb
         if TheInput:IsKeyDown(_KEY_ACTION) then
-            if keepfollowing:CanBeLeader(_target) then
+            if keepfollowing:CanBeLeader(__target) then
                 if _PUSH_WITH_RMB then
-                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
-                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(_target) then
-                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+                    lmb = BufferedAction(player, __target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                elseif TheInput:IsKeyDown(_KEY_PUSH) and keepfollowing:CanBePushed(__target) then
+                    lmb = BufferedAction(player, __target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 elseif not TheInput:IsKeyDown(_KEY_PUSH) then
-                    lmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
+                    lmb = BufferedAction(player, __target, ACTIONS.MOD_KEEP_FOLLOWING_FOLLOW)
                 end
             end
 
             if _PUSH_WITH_RMB then
-                if keepfollowing:CanBeLeader(_target) and keepfollowing:CanBePushed(_target) then
-                    rmb = BufferedAction(player, _target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
+                if keepfollowing:CanBeLeader(__target) and keepfollowing:CanBePushed(__target) then
+                    rmb = BufferedAction(player, __target, ACTIONS.MOD_KEEP_FOLLOWING_PUSH)
                 end
             end
 
@@ -386,7 +386,7 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
     -- Overrides
     --
 
-    SDK.OverrideMethod(_self, "OnMouseButton", function(original_fn, self, button, down, x, y)
+    SDK.OverrideMethod(__self, "OnMouseButton", function(original_fn, self, button, down, x, y)
         local lmb, rmb = GetOurMouseActions(owner, target)
         if lmb and down and button == _G.MOUSEBUTTON_LEFT then
             lmb:Do()
@@ -397,7 +397,7 @@ SDK.OnLoadClass("widgets/targetindicator", function(_self, owner, target)
         original_fn(self, button, down, x, y)
     end, SDK.OVERRIDE.ORIGINAL_NONE)
 
-    SDK.OverrideMethod(_self, "OnRawKey", function(original_fn, self, key, down)
+    SDK.OverrideMethod(__self, "OnRawKey", function(original_fn, self, key, down)
         local player_name = self.name
         local new_text = player_name
         local lmb, rmb = GetOurMouseActions(owner, target)
