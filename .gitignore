@@ -1,29 +1,17 @@
-### Intellij ###
-.idea/
-
-### VisualStudioCode ###
-.vscode/
-
-### Lua ###
-# luarocks build files
 *.src.rock
-*.zip
 *.tar.gz
-
-# luacov
-luacov.*
-
-### Project ###
-# general
+*.zip
 .github/slack*.json
+.idea/
+.vscode/
 busted.out
 coverage/
 description.txt
 lcov.info
+luacov.*
 modsettings.lua
 workshop/
 
-# doc
 doc/*
 !doc/.dockerignore
 !doc/docker-stack.yml
