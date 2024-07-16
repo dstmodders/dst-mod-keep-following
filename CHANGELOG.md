@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased][]
+## [Unreleased]
 
 ### Added
 
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Remove "Hide changelog" configuration
 - Remove changelog from modinfo
 
-## [0.21.0][] - 2020-08-26
+## [0.21.0] - 2020-08-26
 
 ### Added
 
@@ -37,13 +37,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve keybinds configurations
 - Improve mouse overrides
 
-## [0.20.1][] - 2020-08-25
+## [0.20.1] - 2020-08-25
 
 ### Fixed
 
 - Fix issue with `TEST` global
 
-## [0.20.0][] - 2020-08-25
+## [0.20.0] - 2020-08-25
 
 ### Added
 
@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Remove "Mobs" configuration in favour of the "all" behaviour
 
-## [0.19.0][] - 2019-10-04
+## [0.19.0] - 2019-10-04
 
 ### Changed
 
@@ -75,7 +75,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix `PlayerActionPicker:DoGetMouseActions()` override
 
-## [0.18.0][] - 2019-09-27
+## [0.18.0] - 2019-09-27
 
 ### Added
 
@@ -91,7 +91,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix issue forcing original actions in some cases
 - Fix pausing behaviour related to following interruptions
 
-## [0.17.0][] - 2019-09-23
+## [0.17.0] - 2019-09-23
 
 ### Changed
 
@@ -105,7 +105,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix following interruptions when lag compensation is off
 - Fix jumping on/off a boat issues while following
 
-## [0.16.0][] - 2019-09-21
+## [0.16.0] - 2019-09-21
 
 ### Added
 
@@ -116,7 +116,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix client/server position mismatch during interruptions
 - Fix some movement issues when lag compensation is off
 
-## [0.15.0][] - 2019-09-21
+## [0.15.0] - 2019-09-21
 
 ### Added
 
@@ -131,7 +131,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix selection issue with ActionQueue Reborn
 
-## [0.14.0][] - 2019-09-20
+## [0.14.0] - 2019-09-20
 
 ### Added
 
@@ -150,7 +150,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix keeping the target distance behaviour
 
-## [0.13.0][] - 2019-09-17
+## [0.13.0] - 2019-09-17
 
 ### Added
 
@@ -169,7 +169,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix actions not showing on dedicated when "Mobs" is set to "All"
 - Fix distance calculation between follower and leader
 
-## [0.12.0][] - 2019-09-16
+## [0.12.0] - 2019-09-16
 
 ### Added
 
@@ -186,7 +186,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix actions not showing in "Woodie's Weregoose" form
 - Fix actions not showing when a player becomes a ghost
 
-## [0.11.0][] - 2019-09-06
+## [0.11.0] - 2019-09-06
 
 ### Added
 
@@ -197,7 +197,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix an action not showing when "Push with RMB" is enabled
 - Fix behaviour when the leader doesn't exist anymore
 
-## [0.10.0][] - 2019-09-05
+## [0.10.0] - 2019-09-05
 
 ### Changed
 
@@ -209,7 +209,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix lag compensation state restoration after pushing
 
-## [0.9.0][] - 2019-08-25
+## [0.9.0] - 2019-08-25
 
 ### Added
 
@@ -221,7 +221,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Improve debug output
 
-## [0.8.0][] - 2019-08-23
+## [0.8.0] - 2019-08-23
 
 ### Added
 
@@ -233,7 +233,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve compatibility with some other mods
 - Improve debug output
 
-## [0.7.0][] - 2019-08-22
+## [0.7.0] - 2019-08-22
 
 ### Added
 
@@ -241,7 +241,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add support for "Catcoon", "Koalefant", "Volt Goat" and "Mosling"
 - Add support for stopping following/pushing on LMB click
 
-## [0.6.0][] - 2019-08-20
+## [0.6.0] - 2019-08-20
 
 ### Added
 
@@ -253,7 +253,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve compatibility with some other mods
 - Revert "Action key" and "Push key" configurations
 
-## [0.5.0][] - 2019-08-19
+## [0.5.0] - 2019-08-19
 
 ### Added
 
@@ -267,7 +267,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix crash when entering/leaving a cave
 
-## [0.4.0][] - 2019-08-19
+## [0.4.0] - 2019-08-19
 
 ### Added
 
@@ -283,14 +283,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Fix crash when lag compensation has been turned off
 
-## [0.3.0][] - 2019-08-18
+## [0.3.0] - 2019-08-18
 
 ### Added
 
 - Add support for following/pushing a Tent sleeper
 - Add support for pushing
 
-## [0.2.0][] - 2019-08-17
+## [0.2.0] - 2019-08-17
 
 ### Removed
 
