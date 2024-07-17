@@ -13,6 +13,7 @@ help:
 	@echo "   gitrelease            to commit modinfo.lua and CHANGELOG.md + add a new tag"
 	@echo "   install               to install the mod"
 	@echo "   ldoc                  to generate an LDoc documentation"
+	@echo "   ldocclean             to clean up generated LDoc documentation"
 	@echo "   lint                  to run code linting (Luacheck + Prettier)"
 	@echo "   luacheck              to run Luacheck"
 	@echo "   luacheckglobals       to print Luacheck globals (mutating/setting)"
@@ -71,9 +72,18 @@ install:
 		. \
 		"${DST_MODS}/mod-keep-following/"
 
-ldoc:
-	@find ./docs/* -type f -not -name Dockerfile -not -name docker-stack.yml -not -wholename ./docs/ldoc/ldoc.css -delete
+ldoc: ldocclean
 	@ldoc .
+
+ldocclean:
+	@find ./docs/ -type f \( \
+		-not -wholename './docs/ldoc/ldoc.css' \
+		-not -wholename './docs/.dockerignore' \
+		-not -wholename './docs/docker-stack.yml' \
+		-not -wholename './docs/Dockerfile' \
+	\) \
+	-delete
+	@rm -rf ./docs/classes/
 
 lint: luacheck prettier
 
