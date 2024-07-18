@@ -77,13 +77,17 @@ ldoc: ldocclean
 
 ldocclean:
 	@find ./docs/ -type f \( \
-		-not -wholename './docs/ldoc/ldoc.css' \
 		-not -wholename './docs/.dockerignore' \
-		-not -wholename './docs/docker-stack.yml' \
 		-not -wholename './docs/Dockerfile' \
+		-not -wholename './docs/docker-stack.yml' \
+		-not -wholename './docs/ldoc/ldoc.css' \
 	\) \
 	-delete
-	@rm -rf ./docs/classes/
+	@find ./docs/ -type d \( \
+		-not -wholename './docs/' \
+		-not -wholename './docs/ldoc' \
+	\) \
+	-delete
 
 lint: luacheck prettier
 
