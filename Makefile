@@ -120,7 +120,9 @@ release:
 	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
 
 test:
-	@busted .; luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
+	@busted .
+	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info
+	@luacov-console . && luacov-console -s
 
 testclean:
 	@find . \( -name 'busted.out' -o -name 'core' -o -name 'lcov.info' -o -name 'luacov*' \) -type f -delete
