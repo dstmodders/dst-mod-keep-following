@@ -1,5 +1,6 @@
 GIT_LATEST_TAG = $$(git describe --abbrev=0)
 MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
 
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
@@ -11,8 +12,10 @@ help:
 	@echo "   gitrelease     to commit modinfo.lua and CHANGELOG.md + add a new tag"
 	@echo "   install        to install the mod"
 	@echo "   ldoc           to generate an LDoc documentation"
-	@echo "   lint           to run code linting"
+	@echo "   lint           to run code linting (Luacheck + Prettier)"
+	@echo "   luacheck       to run Luacheck"
 	@echo "   modicon        to pack modicon"
+	@echo "   prettier       to run Prettier"
 	@echo "   reinstall      to uninstall and then install the mod"
 	@echo "   release        to update version"
 	@echo "   test           to run Busted tests"
@@ -74,19 +77,17 @@ ldoc:
 	@find ./doc/* -type f -not -name Dockerfile -not -name docker-stack.yml -not -wholename ./doc/ldoc/ldoc.css -delete
 	@ldoc .
 
-lint:
-	@EXIT=0; \
-		printf "Luacheck:\n\n"; luacheck . --exclude-files="here/" || EXIT=$$?; \
-		printf "\nPrettier:\n\n"; prettier --check \
-			'./**/*.md' \
-			'./**/*.xml' \
-			'./**/*.yml' \
-		|| EXIT=$$?; \
-		exit $${EXIT}
+lint: luacheck prettier
+
+luacheck:
+	@luacheck . --exclude-files="here/"
 
 modicon:
 	@:$(call check_defined, DS_KTOOLS_KTECH)
 	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+
+prettier:
+	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --list-different './**/*.md' './**/*.xml' './**/*.yml'
 
 reinstall: uninstall install
 
