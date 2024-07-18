@@ -8,23 +8,25 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 help:
 	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
-	@echo "   citest         to run Busted tests for CI"
-	@echo "   gitrelease     to commit modinfo.lua and CHANGELOG.md + add a new tag"
-	@echo "   install        to install the mod"
-	@echo "   ldoc           to generate an LDoc documentation"
-	@echo "   lint           to run code linting (Luacheck + Prettier)"
-	@echo "   luacheck       to run Luacheck"
-	@echo "   modicon        to pack modicon"
-	@echo "   prettier       to run Prettier"
-	@echo "   reinstall      to uninstall and then install the mod"
-	@echo "   release        to update version"
-	@echo "   stylua         to run StyLua"
-	@echo "   test           to run Busted tests"
-	@echo "   testclean      to clean up after tests"
-	@echo "   testcoverage   to print the tests coverage report"
-	@echo "   testlist       to list all existing tests"
-	@echo "   uninstall      to uninstall the mod"
-	@echo "   workshop       to prepare the Steam Workshop directory"
+	@echo "   citest                to run Busted tests for CI"
+	@echo "   gitrelease            to commit modinfo.lua and CHANGELOG.md + add a new tag"
+	@echo "   install               to install the mod"
+	@echo "   ldoc                  to generate an LDoc documentation"
+	@echo "   lint                  to run code linting (Luacheck + Prettier)"
+	@echo "   luacheck              to run Luacheck"
+	@echo "   luacheckglobals       to print Luacheck globals (mutating/setting)"
+	@echo "   luacheckreadglobals   to print Luacheck read_globals (reading)"
+	@echo "   modicon               to pack modicon"
+	@echo "   prettier              to run Prettier"
+	@echo "   reinstall             to uninstall and then install the mod"
+	@echo "   release               to update version"
+	@echo "   stylua                to run StyLua"
+	@echo "   test                  to run Busted tests"
+	@echo "   testclean             to clean up after tests"
+	@echo "   testcoverage          to print the tests coverage report"
+	@echo "   testlist              to list all existing tests"
+	@echo "   uninstall             to uninstall the mod"
+	@echo "   workshop              to prepare the Steam Workshop directory"
 
 citest:
 	@busted .; \
@@ -82,6 +84,12 @@ lint: luacheck prettier
 
 luacheck:
 	@luacheck . --exclude-files="here/"
+
+luacheckglobals:
+	@luacheck . --formatter=plain | grep 'non-standard' | awk '{ print $$6 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
+
+luacheckreadglobals:
+	@luacheck . --formatter=plain | grep "undefined variable" | awk '{ print $$5 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
 
 modicon:
 	@:$(call check_defined, DS_KTOOLS_KTECH)
