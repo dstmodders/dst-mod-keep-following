@@ -166,4 +166,4 @@ workshop:
 workshopclean:
 	@rm -rf ./workshop* ./steam-workshop.zip
 
-.PHONY: workshop
+.PHONY: dev gitrelease install ldoc ldocclean lint luacheck luacheckglobals luacheckreadglobals modicon prettier reinstall release test testclean testcoverage testlist uninstall updatesdk workshop workshopclean
