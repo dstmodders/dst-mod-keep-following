@@ -51,7 +51,7 @@ gitrelease:
 	@git verify-tag "v${MODINFO_VERSION}"
 
 install:
-	@:$(call check_defined, DST_MODS)
+	@:$(call check_defined, DS_MODS)
 	@rsync -az \
 		--exclude '.*' \
 		--exclude 'CHANGELOG.md' \
@@ -70,7 +70,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop*' \
 		. \
-		"${DST_MODS}/mod-keep-following/"
+		"${DS_MODS}/mod-keep-following/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -134,8 +134,8 @@ testlist:
 	@busted --list . | awk '{$$1=""}1' | awk '{gsub(/^[ \t]+|[ \t]+$$/,"");print}'
 
 uninstall:
-	@:$(call check_defined, DST_MODS)
-	@rm -rf "${DST_MODS}/mod-keep-following/"
+	@:$(call check_defined, DS_MODS)
+	@rm -rf "${DS_MODS}/mod-keep-following/"
 
 updatesdk:
 	@rm -rf scripts/devtools/sdk/*
