@@ -9,6 +9,7 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 help:
 	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
+	@echo "   clean                 to run ldocclean + testclean + workshopclean"
 	@echo "   dev                   to run reinstall + ldoc + lint + testclean + test"
 	@echo "   gitrelease            to commit modinfo.lua and CHANGELOG.md + add a new tag"
 	@echo "   install               to install the mod"
@@ -31,6 +32,8 @@ help:
 	@echo "   updatesdk             to update SDK to the latest version"
 	@echo "   workshop              to prepare the Steam Workshop directory + archive"
 	@echo "   workshopclean         to clean up Steam Workshop directory + archive"
+
+clean: ldocclean testclean workshopclean
 
 dev: reinstall ldoc lint testclean test
 
@@ -170,4 +173,4 @@ workshop:
 workshopclean:
 	@rm -rf ./workshop* ./steam-workshop.zip
 
-.PHONY: dev gitrelease install ldoc ldocclean lint luacheck luacheckglobals luacheckreadglobals modicon prettier reinstall release test testclean testcoverage testlist uninstall updatesdk workshop workshopclean
+.PHONY: clean dev gitrelease install ldoc ldocclean lint luacheck luacheckglobals luacheckreadglobals modicon prettier reinstall release test testclean testcoverage testlist uninstall updatesdk workshop workshopclean
