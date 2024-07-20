@@ -226,11 +226,17 @@ configuration_options = {
         },
     }, "default"),
 
-    AddConfig("follow_distance", "Follow distance", "How close can a follower approach a leader?", {
-        { description = "1.5m", data = 1.5 },
-        { description = "2.5m", data = 2.5 },
-        { description = "3.5m", data = 3.5 },
-    }, 2.5),
+    AddConfig(
+        "follow_distance",
+        "Follow distance",
+        "How close can a follower approach a leader?",
+        {
+            { description = "1.5m", data = 1.5 },
+            { description = "2.5m", data = 2.5 },
+            { description = "3.5m", data = 3.5 },
+        },
+        2.5
+    ),
 
     AddBooleanConfig(
         "follow_distance_keeping",

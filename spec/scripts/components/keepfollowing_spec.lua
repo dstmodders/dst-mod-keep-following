@@ -294,9 +294,9 @@ describe("KeepFollowing", function()
                         assert.spy(entity.Physics.GetCollisionGroup).was_called(0)
                         keepfollowing:CanBePushed(entity)
                         assert.spy(entity.Physics.GetCollisionGroup).was_called(called)
-                        assert.spy(entity.Physics.GetCollisionGroup).was_called_with(
-                            match.is_ref(entity.Physics)
-                        )
+                        assert
+                            .spy(entity.Physics.GetCollisionGroup)
+                            .was_called_with(match.is_ref(entity.Physics))
                     end)
 
                     it("should return false", function()
@@ -342,10 +342,9 @@ describe("KeepFollowing", function()
                     assert.spy(keepfollowing.inst.HasTag).was_called(0)
                     keepfollowing:CanBePushed(entity)
                     assert.spy(keepfollowing.inst.HasTag).was_called(1)
-                    assert.spy(keepfollowing.inst.HasTag).was_called_with(
-                        match.is_ref(keepfollowing.inst),
-                        "playerghost"
-                    )
+                    assert
+                        .spy(keepfollowing.inst.HasTag)
+                        .was_called_with(match.is_ref(keepfollowing.inst), "playerghost")
                 end)
 
                 describe('and the passed entity has a "player" tag', function()
@@ -463,10 +462,9 @@ describe("KeepFollowing", function()
                     assert.spy(keepfollowing.CanBeFollowed).was_called(0)
                     keepfollowing:CanBeLeader(entity)
                     assert.spy(keepfollowing.CanBeFollowed).was_called(1)
-                    assert.spy(keepfollowing.CanBeFollowed).was_called_with(
-                        match.is_ref(keepfollowing),
-                        match.is_ref(entity)
-                    )
+                    assert
+                        .spy(keepfollowing.CanBeFollowed)
+                        .was_called_with(match.is_ref(keepfollowing), match.is_ref(entity))
                 end)
             end
 
@@ -779,9 +777,9 @@ describe("KeepFollowing", function()
                     assert.spy(keepfollowing.StartFollowingThread).was_called(0)
                     keepfollowing:StartFollowing(leader)
                     assert.spy(keepfollowing.StartFollowingThread).was_called(1)
-                    assert.spy(keepfollowing.StartFollowingThread).was_called_with(
-                        match.is_ref(keepfollowing)
-                    )
+                    assert
+                        .spy(keepfollowing.StartFollowingThread)
+                        .was_called_with(match.is_ref(keepfollowing))
                 end)
 
                 it("should return true", function()
@@ -1099,9 +1097,9 @@ describe("KeepFollowing", function()
                     assert.spy(keepfollowing.StartPushingThread).was_called(0)
                     keepfollowing:StartPushing(leader)
                     assert.spy(keepfollowing.StartPushingThread).was_called(1)
-                    assert.spy(keepfollowing.StartPushingThread).was_called_with(
-                        match.is_ref(keepfollowing)
-                    )
+                    assert
+                        .spy(keepfollowing.StartPushingThread)
+                        .was_called_with(match.is_ref(keepfollowing))
                 end)
 
                 it("should return true", function()

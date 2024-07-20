@@ -177,8 +177,7 @@ function KeepFollowing:CanBePushed(entity)
 
     local collision_group = SDK.Utils.Chain.Get(entity, "Physics", "GetCollisionGroup", true)
     if
-        collision_group
-            == COLLISION.FLYERS -- different flyers don't collide with characters
+        collision_group == COLLISION.FLYERS -- different flyers don't collide with characters
         or collision_group == COLLISION.SANITY -- Shadow Creatures also don't collide
         or entity:HasTag("bird") -- so does birds
     then
