@@ -56,7 +56,7 @@ install:
 		--exclude 'busted.out' \
 		--exclude 'config.ld' \
 		--exclude 'description.txt*' \
-		--exclude 'doc/' \
+		--exclude 'docs/' \
 		--exclude 'lcov.info' \
 		--exclude 'luacov*' \
 		--exclude 'modicon.png' \
@@ -71,16 +71,16 @@ ldoc: ldocclean
 	@ldoc .
 
 ldocclean:
-	@find ./doc/ -type f \( \
-		-not -wholename './doc/.dockerignore' \
-		-not -wholename './doc/Dockerfile' \
-		-not -wholename './doc/docker-stack.yml' \
-		-not -wholename './doc/ldoc/ldoc.css' \
+	@find ./docs/ -type f \( \
+		-not -wholename './docs/.dockerignore' \
+		-not -wholename './docs/Dockerfile' \
+		-not -wholename './docs/docker-stack.yml' \
+		-not -wholename './docs/ldoc/ldoc.css' \
 	\) \
 	-delete
-	@find ./doc/ -type d \( \
-		-not -wholename './doc/' \
-		-not -wholename './doc/ldoc' \
+	@find ./docs/ -type d \( \
+		-not -wholename './docs/' \
+		-not -wholename './docs/ldoc' \
 	\) \
 	-delete
 

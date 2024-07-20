@@ -12,8 +12,8 @@ luacov.*
 modsettings.lua
 workshop/
 
-doc/*
-!doc/.dockerignore
-!doc/docker-stack.yml
-!doc/Dockerfile
-!doc/ldoc/
+docs/*
+!docs/.dockerignore
+!docs/docker-stack.yml
+!docs/Dockerfile
+!docs/ldoc/
