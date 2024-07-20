@@ -46,7 +46,7 @@ gitrelease:
 	@git verify-tag "v${MODINFO_VERSION}"
 
 install:
-	@:$(call check_defined, DST_MODS)
+	@:$(call check_defined, DS_MODS)
 	@rsync -az \
 		--exclude '.*' \
 		--exclude 'CHANGELOG.md' \
@@ -65,7 +65,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop/' \
 		. \
-		"${DST_MODS}/dst-mod-keep-following/"
+		"${DS_MODS}/dst-mod-keep-following/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -96,8 +96,8 @@ luacheckreadglobals:
 	@luacheck . --formatter=plain | grep "undefined variable" | awk '{ print $$5 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
 
 modicon:
-	@:$(call check_defined, DS_KTOOLS_KTECH)
-	@${DS_KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+	@:$(call check_defined, KTOOLS_KTECH)
+	@${KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
 
 prettier:
 	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --list-different './**/*.md' './**/*.xml' './**/*.yml'
@@ -129,8 +129,8 @@ testlist:
 	@busted --list . | awk '{$$1=""}1' | awk '{gsub(/^[ \t]+|[ \t]+$$/,"");print}'
 
 uninstall:
-	@:$(call check_defined, DST_MODS)
-	@rm -Rf "${DST_MODS}/dst-mod-keep-following/"
+	@:$(call check_defined, DS_MODS)
+	@rm -Rf "${DS_MODS}/dst-mod-keep-following/"
 
 workshop:
 	@rm -Rf ./workshop/
