@@ -22,6 +22,7 @@ help:
 	@echo "   prettier              to run Prettier"
 	@echo "   reinstall             to uninstall and then install the mod"
 	@echo "   release               to update version"
+	@echo "   stylua                to run StyLua"
 	@echo "   test                  to run Busted tests"
 	@echo "   testclean             to clean up after tests"
 	@echo "   testcoverage          to print the tests coverage report"
@@ -118,6 +119,9 @@ release:
 	@sed -i "s/^version.*$$/version = \"${MOD_VERSION}\"/g" ./modinfo.lua && echo ' Done' || echo ' Error'
 	@printf '2/2: Syncing LDoc release code occurrences...'
 	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
+
+stylua:
+	@stylua . .luacheckrc .luacov config.ld
 
 test:
 	@busted .
