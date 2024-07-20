@@ -311,7 +311,7 @@ describe("Debug", function()
                     assert.spy(debug.DebugString).was_called(1)
                     assert
                         .spy(debug.DebugString)
-                        .was_called_with(match.is_ref(debug), "hello", "world", "1.", "Time: 1.0000")
+                        .was_called_with(match.is_ref(debug), "hello", "world", "1.", "Time: 1.0000") -- luacheck: only
                 end)
 
                 it("should unset self.start_time", function()

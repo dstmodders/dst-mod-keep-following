@@ -352,7 +352,7 @@ describe("KeepFollowing", function()
                     assert.spy(_G.SendRPCToServer).was_called(1)
                     assert
                         .spy(_G.SendRPCToServer)
-                        .was_called_with(match.is_ref(_G.RPC.LeftClick), _G.ACTIONS.WALKTO.code, 1, -1)
+                        .was_called_with(match.is_ref(_G.RPC.LeftClick), _G.ACTIONS.WALKTO.code, 1, -1) -- luacheck: only
                 end)
 
                 it("should call inst:EnableMovementPrediction() with true", function()
@@ -544,8 +544,8 @@ describe("KeepFollowing", function()
             local function TestHasValidTag(tag, result)
                 describe('and has a "' .. tag .. '" tag', function()
                     before_each(function()
-                        entity.HasTag = spy.new(function(_, _tag)
-                            return _tag == tag
+                        entity.HasTag = spy.new(function(_, __tag)
+                            return __tag == tag
                         end)
                     end)
 

@@ -218,15 +218,15 @@ end
 function Utils.HideChangelog(modname, enable)
     if modname and enable and not BaseGetModInfo then
         BaseGetModInfo = _G.KnownModIndex.GetModInfo
-        _G.KnownModIndex.GetModInfo = function(_self, _modname)
+        _G.KnownModIndex.GetModInfo = function(__self, __modname)
             if
-                _modname == modname
-                and _self.savedata
-                and _self.savedata.known_mods
-                and _self.savedata.known_mods[modname]
+                __modname == modname
+                and __self.savedata
+                and __self.savedata.known_mods
+                and __self.savedata.known_mods[modname]
             then
                 local TrimString = _G.TrimString
-                local modinfo = _self.savedata.known_mods[modname].modinfo
+                local modinfo = __self.savedata.known_mods[modname].modinfo
                 if modinfo and type(modinfo.description) == "string" then
                     local changelog = modinfo.description:find("v" .. modinfo.version, 0, true)
                     if type(changelog) == "number" then
@@ -234,7 +234,7 @@ function Utils.HideChangelog(modname, enable)
                     end
                 end
             end
-            return BaseGetModInfo(_self, _modname)
+            return BaseGetModInfo(__self, __modname)
         end
         return true
     elseif BaseGetModInfo then
