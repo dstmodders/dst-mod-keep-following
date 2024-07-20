@@ -117,7 +117,9 @@ stylua:
 	@stylua . .luacheckrc .luacov config.ld
 
 test:
-	@busted .; luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
+	@busted .
+	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info
+	@luacov-console . && luacov-console -s
 
 testclean:
 	@rm -f lcov.info luacov*
