@@ -2,13 +2,5 @@
   "$schema": "https://json.schemastore.org/prettierrc",
   "singleQuote": true,
   "trailingComma": "all",
-  "endOfLine": "lf",
-  "overrides": [
-    {
-      "files": "*.xml",
-      "options": {
-        "parser": "xml"
-      }
-    }
-  ]
+  "endOfLine": "lf"
 }
