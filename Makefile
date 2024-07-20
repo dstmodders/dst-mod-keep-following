@@ -65,7 +65,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop/' \
 		. \
-		"${DS_MODS}/dst-mod-keep-following/"
+		"${DS_MODS}/mod-keep-following/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -130,7 +130,7 @@ testlist:
 
 uninstall:
 	@:$(call check_defined, DS_MODS)
-	@rm -Rf "${DS_MODS}/dst-mod-keep-following/"
+	@rm -Rf "${DS_MODS}/mod-keep-following/"
 
 workshop:
 	@rm -Rf ./workshop/
