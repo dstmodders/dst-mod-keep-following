@@ -49,18 +49,18 @@ install:
 	@:$(call check_defined, DST_MODS)
 	@rsync -az \
 		--exclude '.*' \
-		--exclude 'busted.out' \
 		--exclude 'CHANGELOG.md' \
-		--exclude 'config.ld' \
 		--exclude 'CONTRIBUTING.md' \
+		--exclude 'Makefile' \
+		--exclude 'README.md' \
+		--exclude 'busted.out' \
+		--exclude 'config.ld' \
 		--exclude 'description.txt*' \
 		--exclude 'doc/' \
 		--exclude 'lcov.info' \
 		--exclude 'luacov*' \
-		--exclude 'Makefile' \
 		--exclude 'modicon.png' \
 		--exclude 'preview.gif' \
-		--exclude 'README.md' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
 		--exclude 'workshop/' \
@@ -77,12 +77,12 @@ ldocclean:
 		-not -wholename './doc/docker-stack.yml' \
 		-not -wholename './doc/ldoc/ldoc.css' \
 	\) \
-	  -delete
+	-delete
 	@find ./doc/ -type d \( \
-	  -not -wholename './doc/' \
-	  -not -wholename './doc/ldoc' \
+		-not -wholename './doc/' \
+		-not -wholename './doc/ldoc' \
 	\) \
-	  -delete
+	-delete
 
 lint: luacheck prettier
 
