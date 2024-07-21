@@ -45,6 +45,8 @@ jobs:
           busted: true
           ignore-set-output: true
           slack: true
+      - name: Test with coverage
+        run: docker run --rm -t -v "$(pwd):/opt/mod-keep-following/" -w /opt/mod-keep-following/ dstmodders/dst-mod:latest make test
       - name: Upload coverage to Codecov
         if: ${{ !env.ACT && success() }}
         uses: codecov/codecov-action@v4
