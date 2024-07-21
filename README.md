@@ -1,8 +1,8 @@
 # mod-keep-following
 
-[![CI](https://img.shields.io/github/workflow/status/dstmodders/mod-keep-following/CI?label=ci)](https://github.com/dstmodders/mod-keep-following/actions/workflows/ci.yml)
-[![Deploy](https://img.shields.io/github/workflow/status/dstmodders/mod-keep-following/Deploy?label=deploy)](https://github.com/dstmodders/mod-keep-following/actions/workflows/deploy.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/dstmodders/mod-keep-following.svg)](https://codecov.io/gh/dstmodders/mod-keep-following)
+[![CI]](https://github.com/dstmodders/mod-keep-following/actions/workflows/ci.yml)
+[![CD]](https://github.com/dstmodders/mod-keep-following/actions/workflows/deploy.yml)
+[![Codecov]](https://codecov.io/gh/dstmodders/mod-keep-following)
 
 [![Keep Following](preview.gif)](https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557)
 
@@ -53,6 +53,9 @@ https://docs.dstmodders.com/keep-following/
 
 Released under the [MIT License](https://opensource.org/licenses/MIT).
 
+[cd]: https://img.shields.io/github/actions/workflow/status/dstmodders/mod-keep-following/cd.yml?branch=main&label=cd&logo=github
+[ci]: https://img.shields.io/github/actions/workflow/status/dstmodders/mod-keep-following/ci.yml?branch=main&label=ci&logo=github
+[codecov]: https://img.shields.io/codecov/c/github/dstmodders/mod-keep-following/main?logo=codecov&label=codecov
 [don't starve together]: https://www.klei.com/games/dont-starve-together
 [ldoc]: https://stevedonovan.github.io/ldoc/
 [steam workshop]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
