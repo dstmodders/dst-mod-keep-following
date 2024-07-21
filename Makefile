@@ -132,14 +132,14 @@ stylua:
 
 test:
 	@busted .
-	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info
-	@luacov-console . && luacov-console -s
+	@$(MAKE) --no-print-directory testcoverage
 
 testclean:
 	@find . \( -name 'busted.out' -o -name 'core' -o -name 'lcov.info' -o -name 'luacov*' \) -type f -delete
 
 testcoverage:
-	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info; luacov-console . && luacov-console -s
+	@luacov -r lcov > /dev/null 2>&1 && cp luacov.report.out lcov.info
+	@luacov-console . && luacov-console -s
 
 testlist:
 	@busted --list . | awk '{$$1=""}1' | awk '{gsub(/^[ \t]+|[ \t]+$$/,"");print}'
