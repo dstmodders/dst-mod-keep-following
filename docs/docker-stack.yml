@@ -33,5 +33,5 @@ services:
 
 networks:
   default:
-    external:
-      name: '${DOCS_DOCKER_STACK_NETWORK}'
+    name: '${DOCS_DOCKER_STACK_NETWORK}'
+    external: true
