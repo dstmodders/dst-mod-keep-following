@@ -56,7 +56,11 @@ gitrelease:
 
 install:
 	@:$(call check_defined, DS_MODS)
-	@rsync -az \
+	@normalized_ds_mods="$${DS_MODS}"; \
+	if [ "$${normalized_ds_mods}" = "$${normalized_ds_mods%/}/" ]; then \
+		normalized_ds_mods="$${normalized_ds_mods%/}"; \
+	fi; \
+	rsync -az \
 		--exclude '.*' \
 		--exclude 'CHANGELOG.md' \
 		--exclude 'CONTRIBUTING.md' \
@@ -74,7 +78,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop*' \
 		. \
-		"${DS_MODS}/mod-keep-following/"
+		"$${normalized_ds_mods}/mod-keep-following/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -142,7 +146,11 @@ testlist:
 
 uninstall:
 	@:$(call check_defined, DS_MODS)
-	@rm -rf "${DS_MODS}/mod-keep-following/"
+	@normalized_ds_mods="$${DS_MODS}"; \
+	if [ "$${normalized_ds_mods}" = "$${normalized_ds_mods%/}/" ]; then \
+		normalized_ds_mods="$${normalized_ds_mods%/}"; \
+	fi; \
+	rm -rf "$${normalized_ds_mods}/mod-keep-following/"
 
 updatesdk:
 	@rm -rf scripts/devtools/sdk/*
