@@ -114,7 +114,7 @@ release:
 	@find . -type f -regex '.*\.lua' -exec sed -i "s/@release.*$$/@release ${MOD_VERSION}/g" {} \; && echo ' Done' || echo ' Error'
 
 stylua:
-	@stylua . .luacheckrc .luacov config.ld
+	@stylua . .busted .luacheckrc .luacov config.ld
 
 test:
 	@busted .
