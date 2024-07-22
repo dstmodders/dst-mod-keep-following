@@ -78,6 +78,7 @@ install:
 		--exclude 'preview.*' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
+		--exclude 'steam-workshop.zip' \
 		--exclude 'workshop*' \
 		. \
 		"$${normalized_ds_mods}/${NAME}/"
