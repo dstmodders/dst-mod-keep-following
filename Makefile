@@ -1,7 +1,9 @@
 GIT_LATEST_TAG = $$(git describe --abbrev=0)
 GIT_SUBMODULE_COMMIT = $$(git submodule foreach git rev-parse --short HEAD | tail -1)
 MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+NAME = mod-keep-following
 PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
+WORKSHOP_ID = 1896055525
 
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
@@ -78,7 +80,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop*' \
 		. \
-		"$${normalized_ds_mods}/mod-keep-following/"
+		"$${normalized_ds_mods}/${NAME}/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -150,7 +152,7 @@ uninstall:
 	if [ "$${normalized_ds_mods}" = "$${normalized_ds_mods%/}/" ]; then \
 		normalized_ds_mods="$${normalized_ds_mods%/}"; \
 	fi; \
-	rm -rf "$${normalized_ds_mods}/mod-keep-following/"
+	rm -rf "$${normalized_ds_mods}/${NAME}/"
 
 updatesdk:
 	@rm -rf scripts/devtools/sdk/*
@@ -174,9 +176,9 @@ workshop:
 	@rm -rf ./workshop/scripts/keepfollowing/sdk/Makefile
 	@rm -rf ./workshop/scripts/keepfollowing/sdk/readme
 	@rm -rf ./workshop/scripts/keepfollowing/sdk/spec
-	@cp -r ./workshop/ ./workshop-1896055525/
-	@zip -r ./steam-workshop.zip ./workshop-1896055525/
-	@rm -rf ./workshop-1896055525/
+	@cp -r ./workshop/ "./workshop-${WORKSHOP_ID}/"
+	@zip -r ./steam-workshop.zip "./workshop-${WORKSHOP_ID}/"
+	@rm -rf "./workshop-${WORKSHOP_ID}/"
 
 workshopclean:
 	@rm -rf ./workshop* ./steam-workshop.zip
