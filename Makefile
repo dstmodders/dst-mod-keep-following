@@ -17,7 +17,7 @@ help:
 	@echo "   install               to install the mod"
 	@echo "   ldoc                  to generate an LDoc documentation"
 	@echo "   ldocclean             to clean up generated LDoc documentation"
-	@echo "   lint                  to run code linting (Luacheck + Prettier)"
+	@echo "   lint                  to run code linting (luacheck)"
 	@echo "   luacheck              to run Luacheck"
 	@echo "   luacheckglobals       to print Luacheck globals (mutating/setting)"
 	@echo "   luacheckreadglobals   to print Luacheck read_globals (reading)"
@@ -100,7 +100,7 @@ ldocclean:
 	\) \
 	-delete
 
-lint: luacheck prettier
+lint: luacheck
 
 luacheck:
 	@luacheck . --exclude-files="here/"
@@ -117,7 +117,8 @@ modicon:
 	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 prettier:
-	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --list-different './**/*.md' './**/*.xml' './**/*.yml'
+	@prettier --no-color --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" -w './**/*.md' './**/*.xml' './**/*.yml'
+	@prettier --no-color --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 reinstall: uninstall install
 
