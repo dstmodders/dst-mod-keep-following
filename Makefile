@@ -98,6 +98,7 @@ luacheckreadglobals:
 modicon:
 	@:$(call check_defined, KTOOLS_KTECH)
 	@${KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
+	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 prettier:
 	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --list-different './**/*.md' './**/*.xml' './**/*.yml'
