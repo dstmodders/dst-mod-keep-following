@@ -29,6 +29,7 @@ help:
 	@echo "   testlist              to list all existing tests"
 	@echo "   uninstall             to uninstall the mod"
 	@echo "   workshop              to prepare the Steam Workshop directory + archive"
+	@echo "   workshopclean         to clean up Steam Workshop directory + archive"
 
 gitrelease:
 	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
@@ -158,5 +159,8 @@ workshop:
 	@cp -r ./workshop/ "./workshop-${WORKSHOP_ID}/"
 	@zip -r ./steam-workshop.zip "./workshop-${WORKSHOP_ID}/"
 	@rm -rf "./workshop-${WORKSHOP_ID}/"
+
+workshopclean:
+	@rm -rf ./workshop* ./steam-workshop.zip
 
 .PHONY: ldoc modicon workshop
