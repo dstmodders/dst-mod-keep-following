@@ -2,6 +2,7 @@ GIT_LATEST_TAG = $$(git describe --abbrev=0)
 MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
 NAME = mod-keep-following
 PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
+WORKSHOP_ID = 1896055525
 
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
@@ -27,7 +28,7 @@ help:
 	@echo "   testcoverage          to print the tests coverage report"
 	@echo "   testlist              to list all existing tests"
 	@echo "   uninstall             to uninstall the mod"
-	@echo "   workshop              to prepare the Steam Workshop directory"
+	@echo "   workshop              to prepare the Steam Workshop directory + archive"
 
 gitrelease:
 	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
@@ -146,13 +147,16 @@ uninstall:
 	rm -rf "$${normalized_ds_mods}/${NAME}/"
 
 workshop:
-	@rm -Rf ./workshop/
+	@rm -rf ./workshop*
 	@mkdir -p ./workshop/
-	@cp -R ./LICENSE ./workshop/LICENSE
-	@cp -R ./modicon.tex ./workshop/
-	@cp -R ./modicon.xml ./workshop/
-	@cp -R ./modinfo.lua ./workshop/
-	@cp -R ./modmain.lua ./workshop/
-	@cp -R ./scripts/ ./workshop/
+	@cp -r ./LICENSE ./workshop/
+	@cp -r ./modicon.tex ./workshop/
+	@cp -r ./modicon.xml ./workshop/
+	@cp -r ./modinfo.lua ./workshop/
+	@cp -r ./modmain.lua ./workshop/
+	@cp -r ./scripts/ ./workshop/
+	@cp -r ./workshop/ "./workshop-${WORKSHOP_ID}/"
+	@zip -r ./steam-workshop.zip "./workshop-${WORKSHOP_ID}/"
+	@rm -rf "./workshop-${WORKSHOP_ID}/"
 
 .PHONY: ldoc modicon workshop
