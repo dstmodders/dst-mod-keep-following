@@ -1,5 +1,6 @@
 GIT_LATEST_TAG = $$(git describe --abbrev=0)
 MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+NAME = mod-keep-following
 PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
 
 # Source: https://stackoverflow.com/a/10858332
@@ -69,7 +70,7 @@ install:
 		--exclude 'spec/' \
 		--exclude 'workshop/' \
 		. \
-		"$${normalized_ds_mods}/mod-keep-following/"
+		"$${normalized_ds_mods}/${NAME}/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -142,7 +143,7 @@ uninstall:
 	if [ "$${normalized_ds_mods}" = "$${normalized_ds_mods%/}/" ]; then \
 		normalized_ds_mods="$${normalized_ds_mods%/}"; \
 	fi; \
-	rm -rf "$${normalized_ds_mods}/mod-keep-following/"
+	rm -rf "$${normalized_ds_mods}/${NAME}/"
 
 workshop:
 	@rm -Rf ./workshop/
