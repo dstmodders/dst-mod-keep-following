@@ -1,4 +1,4 @@
-# dst-mod-keep-following
+# mod-keep-following
 
 [![GitHub Workflow CI Status][]](https://github.com/dstmodders/mod-keep-following/actions?query=workflow%3ACI)
 [![GitHub Workflow Documentation Status][]](https://github.com/dstmodders/mod-keep-following/actions?query=workflow%3ADocumentation)

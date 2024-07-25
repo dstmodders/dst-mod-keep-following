@@ -28,7 +28,7 @@ To learn more, consider checking out the corresponding [Docker Hub][] image:
 
 ```shell script
 $ git clone https://github.com/dstmodders/mod-keep-following
-$ cd ./dst-mod-keep-following/
+$ cd ./mod-keep-following/
 $ export DST_MODS="${HOME}/.steam/steam/steamapps/common/Don't Starve Together/mods/"
 $ docker pull viktorpopkov/dst-mod
 $ docker run --rm -u 'dst-mod' -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" viktorpopkov/dst-mod
@@ -38,7 +38,7 @@ $ docker run --rm -u 'dst-mod' -itv "$(pwd):/mod/" -v "${DST_MODS}:/mods/" vikto
 
 ```powershell
 PS C:\> git clone https://github.com/dstmodders/mod-keep-following
-PS C:\> cd .\dst-mod-keep-following\
+PS C:\> cd .\mod-keep-following\
 PS C:\> $Env:DST_MODS = "C:\Program Files (x86)\Steam\steamapps\common\Don't Starve Together\mods\"
 PS C:\> docker pull viktorpopkov/dst-mod
 PS C:\> docker run --rm -u 'dst-mod' -itv "${PWD}:/mod/" -v "$($Env:DST_MODS):/mods/" viktorpopkov/dst-mod
@@ -198,7 +198,7 @@ For communication, I RECOMMEND using [Slack][].
 For project management, I use [Trello][], the [Agile][] software development
 approach along with the [Scrum][] structure.
 
-The board: [https://trello.com/b/De8QnsZd/dst-mod-keep-following][]
+The board: [https://trello.com/b/De8QnsZd/mod-keep-following][]
 
 #### Labels
 
@@ -355,7 +355,7 @@ Please use 'make <target>' where '<target>' is one of:
 [github]: https://github.com/
 [gnu make]: https://www.gnu.org/software/make/
 [https://hub.docker.com/r/viktorpopkov/dst-mod]: https://hub.docker.com/r/viktorpopkov/dst-mod
-[https://trello.com/b/de8qnszd/dst-mod-keep-following]: https://trello.com/b/De8QnsZd/dst-mod-keep-following
+[https://trello.com/b/de8qnszd/mod-keep-following]: https://trello.com/b/De8QnsZd/mod-keep-following
 [ktools]: https://github.com/nsimplex/ktools
 [lcov]: http://ltp.sourceforge.net/coverage/lcov.php
 [ldoc]: https://stevedonovan.github.io/ldoc/
