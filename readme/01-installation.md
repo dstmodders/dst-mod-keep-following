@@ -51,6 +51,6 @@ $ make install
 [https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557]: https://steamcommunity.com/sharedfiles/filedetails/?id=1835465557
 [makefile]: https://en.wikipedia.org/wiki/Makefile
 [nmake]: https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx
-[releases]: https://github.com/victorpopkov/dst-mod-keep-following/releases
+[releases]: https://github.com/dstmodders/mod-keep-following/releases
 [steam workshop]: https://steamcommunity.com/app/322330/workshop/
 [steam]: https://store.steampowered.com/
