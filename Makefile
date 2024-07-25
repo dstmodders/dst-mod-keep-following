@@ -1,8 +1,8 @@
-GIT_LATEST_TAG = $$(git describe --abbrev=0)
-MODINFO_VERSION = $$(grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
-NAME = mod-keep-following
-PRETTIER_GLOBAL_DIR = /usr/local/share/.config/yarn/global
-WORKSHOP_ID = 1896055525
+GIT_LATEST_TAG := $(shell git describe --abbrev=0)
+MODINFO_VERSION := $(shell grep '^version.*=' < modinfo.lua | awk -F'= ' '{ print $$2 }' | tr -d '"')
+NAME := mod-keep-following
+PRETTIER_GLOBAL_DIR := /usr/local/share/.config/yarn/global
+WORKSHOP_ID := 1896055525
 
 # Source: https://stackoverflow.com/a/10858332
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))))
@@ -10,29 +10,29 @@ check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(valu
 
 help:
 	@printf "Please use 'make <target>' where '<target>' is one of:\n\n"
-	@echo "   clean                 to run ldocclean + testclean + workshopclean"
-	@echo "   dev                   to run reinstall + ldoc + lint + testclean + test"
-	@echo "   format                to run code formatting (prettier + stylua)"
-	@echo "   gitrelease            to commit modinfo.lua and CHANGELOG.md + add a new tag"
-	@echo "   install               to install the mod"
-	@echo "   ldoc                  to generate an LDoc documentation"
-	@echo "   ldocclean             to clean up generated LDoc documentation"
-	@echo "   lint                  to run code linting (luacheck)"
-	@echo "   luacheck              to run Luacheck"
-	@echo "   luacheckglobals       to print Luacheck globals (mutating/setting)"
-	@echo "   luacheckreadglobals   to print Luacheck read_globals (reading)"
-	@echo "   modicon               to pack modicon"
-	@echo "   prettier              to run Prettier"
-	@echo "   reinstall             to uninstall and then install the mod"
-	@echo "   release               to update version"
-	@echo "   stylua                to run StyLua"
-	@echo "   test                  to run Busted tests"
-	@echo "   testclean             to clean up after tests"
-	@echo "   testcoverage          to print the tests coverage report"
-	@echo "   testlist              to list all existing tests"
-	@echo "   uninstall             to uninstall the mod"
-	@echo "   workshop              to prepare the Steam Workshop directory + archive"
-	@echo "   workshopclean         to clean up Steam Workshop directory + archive"
+	@echo '   clean                 to run ldocclean + testclean + workshopclean'
+	@echo '   dev                   to run reinstall + ldoc + lint + testclean + test'
+	@echo '   format                to run code formatting (prettier + stylua)'
+	@echo '   gitrelease            to commit modinfo.lua and CHANGELOG.md + add a new tag'
+	@echo '   install               to install the mod'
+	@echo '   ldoc                  to generate an LDoc documentation'
+	@echo '   ldocclean             to clean up generated LDoc documentation'
+	@echo '   lint                  to run code linting (luacheck)'
+	@echo '   luacheck              to run Luacheck'
+	@echo '   luacheckglobals       to print Luacheck globals (mutating/setting)'
+	@echo '   luacheckreadglobals   to print Luacheck read_globals (reading)'
+	@echo '   modicon               to pack modicon'
+	@echo '   prettier              to run Prettier'
+	@echo '   reinstall             to uninstall and then install the mod'
+	@echo '   release               to update version'
+	@echo '   stylua                to run StyLua'
+	@echo '   test                  to run Busted tests'
+	@echo '   testclean             to clean up after tests'
+	@echo '   testcoverage          to print the tests coverage report'
+	@echo '   testlist              to list all existing tests'
+	@echo '   uninstall             to uninstall the mod'
+	@echo '   workshop              to prepare the Steam Workshop directory + archive'
+	@echo '   workshopclean         to clean up Steam Workshop directory + archive'
 
 clean: ldocclean testclean workshopclean
 
@@ -41,21 +41,21 @@ dev: reinstall ldoc lint testclean test
 format: prettier stylua
 
 gitrelease:
-	@echo "Latest Git tag: ${GIT_LATEST_TAG}"
-	@echo "Modinfo version: ${MODINFO_VERSION}\n"
+	@echo "Latest Git tag: $(GIT_LATEST_TAG)"
+	@echo "Modinfo version: $(MODINFO_VERSION)\n"
 
 	@printf '1/5: Resetting (git reset)...'
 	@git reset > /dev/null 2>&1 && echo ' Done' || echo ' Error'
-	@printf '2/5: Adding and commiting modinfo.lua...'
+	@printf '2/5: Adding and committing modinfo.lua...'
 	@git add modinfo.lua > /dev/null 2>&1
 	@git commit -m 'Update modinfo: version and description' > /dev/null 2>&1 && echo ' Done' || echo ' Error'
-	@printf '3/5: Adding and commiting CHANGELOG.md...'
+	@printf '3/5: Adding and committing CHANGELOG.md...'
 	@git add CHANGELOG.md > /dev/null 2>&1
-	@git commit -m "Update CHANGELOG.md: release ${MODINFO_VERSION}" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
-	@printf "4/5: Creating a signed tag (v${MODINFO_VERSION})..."
-	@git tag -s "v${MODINFO_VERSION}" -m "Release v${MODINFO_VERSION}" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
-	@echo "5/5: Verifying tag (v${MODINFO_VERSION})...\n"
-	@git verify-tag "v${MODINFO_VERSION}"
+	@git commit -m "Update CHANGELOG.md: release $(MODINFO_VERSION)" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@printf "4/5: Creating a signed tag (v$(MODINFO_VERSION))..."
+	@git tag -s "v$(MODINFO_VERSION)" -m "Release v$(MODINFO_VERSION)" > /dev/null 2>&1 && echo ' Done' || echo ' Error'
+	@echo "5/5: Verifying tag (v$(MODINFO_VERSION))...\n"
+	@git verify-tag "v$(MODINFO_VERSION)"
 
 install:
 	@:$(call check_defined, DS_MODS)
@@ -82,7 +82,7 @@ install:
 		--exclude 'steam-workshop.zip' \
 		--exclude 'workshop*' \
 		. \
-		"$${normalized_ds_mods}/${NAME}/"
+		"$${normalized_ds_mods}/$(NAME)/"
 
 ldoc: ldocclean
 	@ldoc .
@@ -104,22 +104,22 @@ ldocclean:
 lint: luacheck
 
 luacheck:
-	@luacheck . --exclude-files="here/"
+	@luacheck . --exclude-files='here/'
 
 luacheckglobals:
 	@luacheck . --formatter=plain | grep 'non-standard' | awk '{ print $$6 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
 
 luacheckreadglobals:
-	@luacheck . --formatter=plain | grep "undefined variable" | awk '{ print $$5 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
+	@luacheck . --formatter=plain | grep 'undefined variable' | awk '{ print $$5 }' | sed -e "s/^'//" -e "s/'$$//" | sort -u
 
 modicon:
 	@:$(call check_defined, KTOOLS_KTECH)
 	@${KTOOLS_KTECH} ./modicon.png . --atlas ./modicon.xml --square
-	@prettier --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
+	@prettier --plugin "$(PRETTIER_GLOBAL_DIR)/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 prettier:
-	@prettier --no-color --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --write './**/*.md' './**/*.xml' './**/*.yml'
-	@prettier --no-color --plugin "${PRETTIER_GLOBAL_DIR}/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
+	@prettier --no-color --plugin "$(PRETTIER_GLOBAL_DIR)/node_modules/@prettier/plugin-xml/src/plugin.js" --write './**/*.md' './**/*.xml' './**/*.yml'
+	@prettier --no-color --plugin "$(PRETTIER_GLOBAL_DIR)/node_modules/@prettier/plugin-xml/src/plugin.js" --xml-whitespace-sensitivity='ignore' --write './modicon.xml'
 
 reinstall: uninstall install
 
@@ -155,7 +155,7 @@ uninstall:
 	if [ "$${normalized_ds_mods}" = "$${normalized_ds_mods%/}/" ]; then \
 		normalized_ds_mods="$${normalized_ds_mods%/}"; \
 	fi; \
-	rm -rf "$${normalized_ds_mods}/${NAME}/"
+	rm -rf "$${normalized_ds_mods}/$(NAME)/"
 
 workshop:
 	@rm -rf ./workshop*
@@ -166,9 +166,9 @@ workshop:
 	@cp -r ./modinfo.lua ./workshop/
 	@cp -r ./modmain.lua ./workshop/
 	@cp -r ./scripts/ ./workshop/
-	@cp -r ./workshop/ "./workshop-${WORKSHOP_ID}/"
-	@zip -r ./steam-workshop.zip "./workshop-${WORKSHOP_ID}/"
-	@rm -rf "./workshop-${WORKSHOP_ID}/"
+	@cp -r ./workshop/ "./workshop-$(WORKSHOP_ID)/"
+	@zip -r ./steam-workshop.zip "./workshop-$(WORKSHOP_ID)/"
+	@rm -rf "./workshop-$(WORKSHOP_ID)/"
 
 workshopclean:
 	@rm -rf ./workshop* ./steam-workshop.zip
