@@ -67,10 +67,11 @@ install:
 		--exclude 'lcov.info' \
 		--exclude 'luacov*' \
 		--exclude 'modicon.png' \
-		--exclude 'preview.gif' \
+		--exclude 'preview.*' \
 		--exclude 'readme/' \
 		--exclude 'spec/' \
-		--exclude 'workshop/' \
+		--exclude 'steam-workshop.zip' \
+		--exclude 'workshop*' \
 		. \
 		"$${normalized_ds_mods}/${NAME}/"
 
