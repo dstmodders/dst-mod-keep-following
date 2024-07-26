@@ -3,7 +3,7 @@ return {
         coverage = true,
     },
     default = {
-        verbose = true,
         helper = "spec/helper",
+        verbose = true,
     },
 }
