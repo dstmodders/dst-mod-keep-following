@@ -35,12 +35,6 @@ std = {
 }
 
 files["modinfo.lua"] = {
-    max_code_line_length = 250,
-    max_comment_line_length = 100,
-    max_line_length = 100,
-    max_string_line_length = 250,
-
-    -- globals
     globals = {
         "all_clients_require_mod",
         "api_version",
@@ -52,8 +46,8 @@ files["modinfo.lua"] = {
         "dst_compatible",
         "folder_name",
         "forumthread",
-        "icon_atlas",
         "icon",
+        "icon_atlas",
         "name",
         "priority",
         "reign_of_giants_compatible",
@@ -62,84 +56,18 @@ files["modinfo.lua"] = {
     },
 }
 
-files["modmain.lua"] = {
-    max_code_line_length = 100,
+files["**/*.lua"] = {
     max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
 
     -- globals
     globals = {
-        "_G",
-        "GLOBAL",
-    },
-    read_globals = {
-        "AddAction",
-        "AddComponentPostInit",
-        "GetModConfigData",
-        "modname",
-    },
-}
-
-files["scripts/**/*.lua"] = {
-    max_code_line_length = 100,
-    max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
-
-    -- globals
-    globals = {
-        -- general
-        "_G",
-        "Networking_Say",
-        "SendRPCToServer",
-        "TheWorld",
-
-        -- project
-        "Debug",
-    },
-    read_globals = {
-        -- general
-        "AllPlayers",
-        "BufferedAction",
-        "KnownModIndex",
-
-        -- constants
-        "ACTIONS",
-        "COLLISION",
-        "FRAMES",
-        "RPC",
-
-        -- threads
-        "KillThreadsWithID",
-        "scheduler",
-        "Sleep",
-        "StartThread",
-    },
-}
-
-files["spec/**/*.lua"] = {
-    max_code_line_length = 100,
-    max_comment_line_length = 250,
-    max_line_length = 100,
-    max_string_line_length = 100,
-
-    -- globals
-    globals = {
-        -- general
-        "_G",
-        "Class",
-        "ClassRegistry",
-        "package",
-        "ToVector3",
-        "Vector3",
-
-        -- project
         "AssertChainNil",
         "AssertGetter",
         "AssertMethodExists",
         "AssertMethodIsMissing",
         "AssertSetter",
+        "Class",
+        "ClassRegistry",
         "DebugSpy",
         "DebugSpyAssert",
         "DebugSpyAssertWasCalled",
@@ -147,12 +75,35 @@ files["spec/**/*.lua"] = {
         "DebugSpyInit",
         "DebugSpyTerm",
         "Empty",
+        "GLOBAL",
         "ReturnValueFn",
         "ReturnValues",
         "ReturnValuesFn",
+        "ToVector3",
+        "Vector3",
+        "_G",
+        "package",
     },
     read_globals = {
+        "ACTIONS",
+        "AddAction",
+        "AddComponentPostInit",
+        "AllPlayers",
+        "BufferedAction",
+        "COLLISION",
+        "FRAMES",
+        "GLOBAL",
+        "GetModConfigData",
+        "KillThreadsWithID",
+        "KnownModIndex",
+        "RPC",
+        "SendRPCToServer",
+        "Sleep",
+        "StartThread",
+        "TheWorld",
+        "modname",
         "rawget",
+        "scheduler",
         "setmetatable",
     },
 }
