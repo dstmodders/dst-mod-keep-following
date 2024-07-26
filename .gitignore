@@ -1,7 +1,3 @@
-*.src.rock
-*.tar.gz
-*.zip
-.github/slack*.json
 .idea/
 .vscode/
 busted.out
@@ -9,8 +5,8 @@ coverage/
 description.txt
 lcov.info
 luacov.*
-modsettings.lua
-workshop/
+steam-workshop.zip
+workshop*/
 
 docs/*
 !docs/.dockerignore
