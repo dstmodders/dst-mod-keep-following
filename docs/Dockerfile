@@ -1,4 +1,3 @@
-FROM nginx:1.19.2 AS nginx
+FROM nginx:1.27.0-alpine3.19-slim
 
-# Project
 COPY ./ /usr/share/nginx/html/
