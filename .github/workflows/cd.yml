@@ -1,0 +1,98 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - no-sdk
+
+permissions: read-all
+
+jobs:
+  docs:
+    environment: production-no-sdk
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set docker outputs
+        id: docker
+        run: |
+          {
+            echo 'cert-path=/home/runner/.docker/deploy'
+            echo 'image-name=${{ secrets.DOCKER_REGISTRY_HOST }}/mod-keep-following/docs'
+            echo 'image-tag=no-sdk'
+          } >> "$GITHUB_OUTPUT"
+      - name: Generate documentation
+        uses: lunarmodules/ldoc@v1.5.0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to the private registry
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_HOST }}
+          username: ${{ secrets.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASS }}
+      - name: Generate an image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=true
+          images: ${{ steps.docker.outputs.image-name }}
+          labels: maintainer=victor@popkov.me
+      - name: Build an image
+        uses: docker/build-push-action@v6
+        with:
+          cache-from: type=registry,ref=${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          cache-to: type=inline
+          context: ./docs/
+          file: ./docs/Dockerfile
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          pull: true
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+      - name: Add Docker certificates to access the remote host
+        run: |
+          mkdir -p "${DOCKER_CERT_PATH}"
+          echo "${{ secrets.DOCKER_TLS_CA }}" > "${DOCKER_CERT_PATH}/ca.pem"
+          echo "${{ secrets.DOCKER_TLS_CERT }}" > "${DOCKER_CERT_PATH}/cert.pem"
+          echo "${{ secrets.DOCKER_TLS_KEY }}" > "${DOCKER_CERT_PATH}/key.pem"
+          chmod 400 "${DOCKER_CERT_PATH}/ca.pem"
+          chmod 400 "${DOCKER_CERT_PATH}/cert.pem"
+          chmod 400 "${DOCKER_CERT_PATH}/key.pem"
+        env:
+          DOCKER_CERT_PATH: ${{ steps.docker.outputs.cert-path }}
+      - name: Deploy Docker Stack
+        working-directory: ./docs/
+        run: |
+          docker stack rm "${{ vars.DOCS_DOCKER_STACK_NAME }}"
+          docker stack deploy \
+            --with-registry-auth \
+            --resolve-image=always \
+            --compose-file=docker-stack.yml \
+            --prune \
+            "${{ vars.DOCS_DOCKER_STACK_NAME }}"
+        env:
+          DOCKER_CERT_PATH: ${{ steps.docker.outputs.cert-path }}
+          DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
+          DOCKER_IMAGE_NAME: ${{ steps.docker.outputs.image-name }}
+          DOCKER_IMAGE_TAG: ${{ steps.docker.outputs.image-tag }}
+          DOCKER_STACK_NODE_HOSTNAME: ${{ secrets.DOCKER_STACK_NODE_HOSTNAME }}
+          DOCKER_TLS_VERIFY: 1
+          DOCS_DOCKER_STACK_NETWORK: ${{ vars.DOCS_DOCKER_STACK_NETWORK }}
+          DOCS_TRAEFIK_HOST: ${{ vars.DOCS_TRAEFIK_HOST }}
+          DOCS_TRAEFIK_HTTPS_ROUTER_ENTRYPOINTS: ${{ vars.DOCS_TRAEFIK_HTTPS_ROUTER_ENTRYPOINTS }}
+          DOCS_TRAEFIK_HTTPS_ROUTER_MIDDLEWARES: ${{ vars.DOCS_TRAEFIK_HTTPS_ROUTER_MIDDLEWARES }}
+          DOCS_TRAEFIK_HTTPS_ROUTER_NAME: ${{ vars.DOCS_TRAEFIK_HTTPS_ROUTER_NAME }}
+          DOCS_TRAEFIK_HTTP_ROUTER_ENTRYPOINTS: ${{ vars.DOCS_TRAEFIK_HTTP_ROUTER_ENTRYPOINTS }}
+          DOCS_TRAEFIK_HTTP_ROUTER_MIDDLEWARES: ${{ vars.DOCS_TRAEFIK_HTTP_ROUTER_MIDDLEWARES }}
+          DOCS_TRAEFIK_HTTP_ROUTER_NAME: ${{ vars.DOCS_TRAEFIK_HTTP_ROUTER_NAME }}
+          DOCS_TRAEFIK_PATH_PREFIX: ${{ vars.DOCS_TRAEFIK_PATH_PREFIX }}
+          DOCS_TRAEFIK_SERVICE_NAME: ${{ vars.DOCS_TRAEFIK_SERVICE_NAME }}
+          DOCS_TZ: ${{ vars.DOCS_TZ }}
