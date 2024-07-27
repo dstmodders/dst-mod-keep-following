@@ -43,6 +43,14 @@ jobs:
           busted: true
           ignore-set-output: true
           slack: true
+      - name: Test with coverage
+        run: |
+          docker run --rm -t \
+            -v "$(pwd):/opt/mod-keep-following/" \
+            -w /opt/mod-keep-following/ \
+            -u "$(id -u):$(id -g)" \
+            dstmodders/dst-mod:latest \
+            /bin/bash -c 'busted . && luacov -r lcov && cp luacov.report.out lcov.info'
       - name: Upload coverage to Codecov
         if: ${{ !env.ACT && success() }}
         uses: codecov/codecov-action@v4
