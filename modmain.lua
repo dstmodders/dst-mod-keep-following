@@ -3,7 +3,7 @@
 --
 -- **Source Code:** [https://github.com/victorpopkov/dst-mod-keep-following](https://github.com/victorpopkov/dst-mod-keep-following)
 --
--- @author Victor Popkov
+-- @author [Depressed DST Modders](https://github.com/dstmodders)
 -- @copyright 2019
 -- @license MIT
 -- @release 0.21.0

@@ -9,7 +9,7 @@ description = [[Version: ]] .. version .. "\n\n" ..
     [[- Improved interruptions behaviour]] .. "\n" ..
     [[- Improved keybinds configurations]] .. "\n" ..
     [[- Improved mouse overrides]]
-author = "Demonblink"
+author = "Depressed DST Modders"
 api_version = 10
 forumthread = ""
 
