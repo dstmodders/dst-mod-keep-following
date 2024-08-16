@@ -22,7 +22,7 @@ description = [[Version: ]]
     .. [[- Improved keybinds configurations]]
     .. "\n"
     .. [[- Improved mouse overrides]]
-author = "Demonblink"
+author = "Depressed DST Modders"
 api_version = 10
 forumthread = ""
 
