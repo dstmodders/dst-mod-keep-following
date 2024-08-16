@@ -16,7 +16,7 @@
 -- @classmod KeepFollowing
 --
 -- @author [Depressed DST Modders](https://github.com/dstmodders)
--- @copyright 2019
+-- @copyright 2019-2024
 -- @license MIT
 -- @release 0.22.0-alpha
 ----
