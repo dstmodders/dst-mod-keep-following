@@ -8,20 +8,6 @@ description = [[Version: ]]
     .. "\n\n"
     .. [[You can also use the above key combinations on a Tent/Siesta Lean-to used by another ]]
     .. [[player to keep following or pushing him.]]
-    .. "\n\n"
-    .. [[v]]
-    .. version
-    .. [[:]]
-    .. "\n"
-    .. [[- Added compatibility configuration]]
-    .. "\n"
-    .. [[- Changed following configurations]]
-    .. "\n"
-    .. [[- Improved interruptions behaviour]]
-    .. "\n"
-    .. [[- Improved keybinds configurations]]
-    .. "\n"
-    .. [[- Improved mouse overrides]]
 author = "Depressed DST Modders"
 api_version = 10
 forumthread = ""
@@ -278,12 +264,5 @@ configuration_options = {
     ),
 
     AddSection("Other"),
-    AddConfig(
-        "Hide changelog",
-        "hide_changelog",
-        boolean,
-        true,
-        "Should the changelog in the mod description be hidden?\nMods should be reloaded to take effect"
-    ),
     AddConfig("Debug", "debug", boolean, false, "Should the debug mode be enabled?"),
 }
