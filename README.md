@@ -38,7 +38,6 @@ needs:
 | **Push with RMB**         | _No_      | Should the RMB in combination with an action key be used for pushing? |
 | **Push mass checking**    | _Yes_     | Should the mass difference checking be enabled?                       |
 | **Push lag compensation** | _Yes_     | Should the lag compensation be automatically disabled while pushing?  |
-| **Hide changelog**        | _Yes_     | Should the changelog in the mod description be hidden?                |
 | **Debug**                 | _No_      | Should the debug mode be enabled?                                     |
 
 ## Documentation

@@ -406,10 +406,3 @@ end
 AddPlayerPostInit(OnPlayerActivated, OnPlayerDeactivated)
 AddComponentPostInit("playeractionpicker", PlayerActionPickerPostInit)
 AddComponentPostInit("playercontroller", PlayerControllerPostInit)
-
---- KnownModIndex
--- @section knownmodindex
-
-if GetModConfigData("hide_changelog") then
-    Utils.HideChangelog(modname, true)
-end

@@ -19,9 +19,6 @@
 ----
 local Utils = {}
 
--- base (to store original functions after overrides)
-local BaseGetModInfo
-
 --- Helpers
 -- @section helpers
 
@@ -202,46 +199,6 @@ function Utils.WalkToPoint(inst, pt)
     else
         SendRPCToServer(RPC.LeftClick, ACTIONS.WALKTO.code, pt.x, pt.z)
     end
-end
-
---- Modmain
--- @section modmain
-
---- Hide the modinfo changelog.
---
--- Overrides the global `KnownModIndex.GetModInfo` to hide the changelog if it's included in the
--- description.
---
--- @tparam string modname
--- @tparam boolean enable
--- @treturn boolean
-function Utils.HideChangelog(modname, enable)
-    if modname and enable and not BaseGetModInfo then
-        BaseGetModInfo = _G.KnownModIndex.GetModInfo
-        _G.KnownModIndex.GetModInfo = function(__self, __modname)
-            if
-                __modname == modname
-                and __self.savedata
-                and __self.savedata.known_mods
-                and __self.savedata.known_mods[modname]
-            then
-                local TrimString = _G.TrimString
-                local modinfo = __self.savedata.known_mods[modname].modinfo
-                if modinfo and type(modinfo.description) == "string" then
-                    local changelog = modinfo.description:find("v" .. modinfo.version, 0, true)
-                    if type(changelog) == "number" then
-                        modinfo.description = TrimString(modinfo.description:sub(1, changelog - 1))
-                    end
-                end
-            end
-            return BaseGetModInfo(__self, __modname)
-        end
-        return true
-    elseif BaseGetModInfo then
-        _G.KnownModIndex.GetModInfo = BaseGetModInfo
-        BaseGetModInfo = nil
-    end
-    return false
 end
 
 --- Thread

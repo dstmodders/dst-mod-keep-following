@@ -389,12 +389,6 @@ describe("Debug", function()
                         { name = "", label = "General" },
                         { name = "test", label = "Test", default = "hello" },
                         { name = "", label = "Other" },
-                        {
-                            name = "hide_changelog",
-                            label = "Hide changelog",
-                            default = true,
-                            saved = true,
-                        },
                         { name = "debug", label = "Debug", default = false, saved = true },
                     }),
                 }
@@ -412,7 +406,7 @@ describe("Debug", function()
                 it("should call DebugString() with corresponding arguments", function()
                     assert.spy(debug.DebugString).was_called(0)
                     debug:DebugModConfigs()
-                    assert.spy(debug.DebugString).was_called(5)
+                    assert.spy(debug.DebugString).was_called(4)
 
                     assert
                         .spy(debug.DebugString)
@@ -426,9 +420,6 @@ describe("Debug", function()
                         .spy(debug.DebugString)
                         .was_called_with(match.is_ref(debug), "[config]", "[section]", "Other")
 
-                    assert
-                        .spy(debug.DebugString)
-                        .was_called_with(match.is_ref(debug), "[config]", "Hide changelog:", true)
                     assert
                         .spy(debug.DebugString)
                         .was_called_with(match.is_ref(debug), "[config]", "Debug:", true)
