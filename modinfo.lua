@@ -41,8 +41,8 @@ end
 local function AddBooleanConfig(name, label, hover, default)
     default = default == nil and true or default
     return AddConfig(name, label, hover, {
-        { description = "Enabled", data = true },
         { description = "Disabled", data = false },
+        { description = "Enabled", data = true },
     }, default)
 end
 
@@ -131,10 +131,6 @@ local function AddSection(title)
     return AddConfig("", title, nil, { { description = "", data = 0 } }, 0)
 end
 
---
--- Configuration
---
-
 configuration_options = {
     --
     -- Keybinds
@@ -144,14 +140,14 @@ configuration_options = {
 
     AddKeyListConfig(
         "key_action",
-        "Action key",
+        "Action Key",
         "Key used for both following and pushing",
         "KEY_SHIFT"
     ),
 
     AddKeyListConfig(
         "key_push",
-        "Push key",
+        "Push Key",
         "Key used in combination with an action key for pushing",
         "KEY_CTRL"
     ),
@@ -164,7 +160,7 @@ configuration_options = {
 
     AddBooleanConfig(
         "reverse_buttons",
-        "Reverse buttons",
+        "Reverse Buttons",
         "When enabled, \238\132\128 (LMB) and \238\132\129 (RMB) will be swapped",
         false
     ),
@@ -190,7 +186,7 @@ configuration_options = {
 
     AddConfig(
         "target_indicator_usage",
-        "Target indicator usage",
+        "Target Indicator Usage",
         "How should the target indicator interact with the action key?",
         {
             {
@@ -213,7 +209,7 @@ configuration_options = {
 
     AddSection("Following"),
 
-    AddConfig("follow_method", "Follow method", "Which follow method should be used?", {
+    AddConfig("follow_method", "Follow Method", "Which follow method should be used?", {
         {
             description = "Default",
             hover = "Default: player follows a leader step-by-step",
@@ -228,7 +224,7 @@ configuration_options = {
 
     AddConfig(
         "follow_distance",
-        "Follow distance",
+        "Follow Distance",
         "How close can a follower approach a leader?",
         {
             { description = "1.5m", data = 1.5 },
@@ -240,7 +236,7 @@ configuration_options = {
 
     AddBooleanConfig(
         "follow_distance_keeping",
-        "Follow distance keeping",
+        "Follow Distance Keeping",
         "When enabled, a follower moves away from a leader within the follow distance",
         false
     ),
@@ -253,14 +249,14 @@ configuration_options = {
 
     AddBooleanConfig(
         "push_with_rmb",
-        "Push with RMB",
+        "Push With RMB",
         "When enabled, \238\132\129 (RMB) + action key is used for pushing",
         false
     ),
 
     AddBooleanConfig(
         "push_mass_checking",
-        "Push mass checking",
+        "Push Mass Checking",
         [[When enabled, disables pushing entities with very high mass.]]
             .. "\n"
             .. [[Ignored when pushing players as a ghost]]
@@ -268,7 +264,7 @@ configuration_options = {
 
     AddBooleanConfig(
         "push_lag_compensation",
-        "Push lag compensation",
+        "Push Lag Compensation",
         [[When enabled, automatically disables the lag compensation during pushing]]
     ),
 

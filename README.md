@@ -30,17 +30,17 @@ needs:
 
 | Configuration               | Default       | Description                                                                  |
 | --------------------------- | ------------- | ---------------------------------------------------------------------------- |
-| **Action key**              | _Shift_       | Key used for both following and pushing                                      |
-| **Push key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
-| **Reverse buttons**         | _Disabled_    | When enabled, (LMB) and (RMB) will be swapped                                |
+| **Action Key**              | _Shift_       | Key used for both following and pushing                                      |
+| **Push Key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
+| **Reverse Buttons**         | _Disabled_    | When enabled, LMB and RMB will be swapped                                    |
 | **Compatibility**           | _Recommended_ | Which compatibility mode should be used?                                     |
-| **Target indicator usage**  | _Binded_      | How should the target indicator interact with the action key?                |
-| **Follow method**           | _Default_     | Which follow method should be used?                                          |
-| **Follow distance**         | _2.5m_        | How close can a follower approach a leader?                                  |
-| **Follow distance keeping** | _Disabled_    | When enabled, a follower moves away from a leader within the follow distance |
-| **Push with RMB**           | _Disabled_    | When enabled, (RMB) + action key is used for pushing                         |
-| **Push mass checking**      | _Enabled_     | When enabled, disables pushing entities with very high mass.                 |
-| **Push lag compensation**   | _Enabled_     | When enabled, automatically disables the lag compensation during pushing     |
+| **Target Indicator Usage**  | _Binded_      | How should the target indicator interact with the action key?                |
+| **Follow Method**           | _Default_     | Which follow method should be used?                                          |
+| **Follow Distance**         | _2.5m_        | How close can a follower approach a leader?                                  |
+| **Follow Distance Keeping** | _Disabled_    | When enabled, a follower moves away from a leader within the follow distance |
+| **Push With RMB**           | _Disabled_    | When enabled, RMB + action key is used for pushing                           |
+| **Push Mass Checking**      | _Enabled_     | When enabled, disables pushing entities with very high mass.                 |
+| **Push Lag Compensation**   | _Enabled_     | When enabled, automatically disables the lag compensation during pushing     |
 | **Debug**                   | _Disabled_    | When enabled, displays debug data in the console.                            |
 
 ## Documentation
