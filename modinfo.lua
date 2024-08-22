@@ -33,18 +33,26 @@ if not folder_name:find("workshop-") then
 end
 
 --
--- Helpers
+-- Configuration
 --
 
-local function AddConfig(label, name, options, default, hover)
+local function AddConfig(name, label, hover, options, default)
     return { label = label, name = name, options = options, default = default, hover = hover or "" }
 end
 
-local function AddSection(title)
-    return AddConfig(title, "", { { description = "", data = 0 } }, 0)
+local function AddBooleanConfig(name, label, hover, default)
+    default = default == nil and true or default
+    return AddConfig(name, label, hover, {
+        { description = "Disabled", data = false },
+        { description = "Enabled", data = true },
+    }, default)
 end
 
-local function CreateKeyList()
+local function AddKeyListConfig(name, label, hover, default)
+    if default == nil then
+        default = false
+    end
+
     -- helpers
     local function AddDisabled(t)
         t[#t + 1] = { description = "Disabled", data = false }
@@ -109,160 +117,143 @@ local function CreateKeyList()
     end
 
     -- key list
-    local key_list = {}
+    local list = {}
 
-    AddDisabled(key_list)
-    AddArrowKeys(key_list)
-    AddFunctionKeys(key_list)
-    AddTypewriterKeys(key_list)
-    AddNavigationKeys(key_list)
-    AddKeysByName(key_list, { "Escape", "Pause", "Print" })
+    AddDisabled(list)
+    AddArrowKeys(list)
+    AddFunctionKeys(list)
+    AddTypewriterKeys(list)
+    AddNavigationKeys(list)
+    AddKeysByName(list, { "Escape", "Pause", "Print" })
 
-    return key_list
+    return AddConfig(name, label, hover, list, default)
 end
 
---
--- Configuration
---
-
-local key_list = CreateKeyList()
-
-local boolean = {
-    { description = "Yes", data = true },
-    { description = "No", data = false },
-}
-
-local compatibilities = {
-    {
-        description = "Recommended",
-        data = "recommended",
-        hover = "Recommended: overrides both on control and on left/right clicks",
-    },
-    {
-        description = "Alternative",
-        data = "alternative",
-        hover = "Alternative: overrides only on control",
-    },
-}
-
-local follow_methods = {
-    {
-        description = "Default",
-        data = "default",
-        hover = "Default: player follows a leader step-by-step",
-    },
-    {
-        description = "Closest",
-        data = "closest",
-        hover = "Closest: player goes to the closest target point from a leader",
-    },
-}
-
-local follow_distances = {
-    { description = "1.5m", data = 1.5 },
-    { description = "2.5m", data = 2.5 },
-    { description = "3.5m", data = 3.5 },
-}
-
-local follow_distance_keeping = {
-    {
-        description = "Yes",
-        data = true,
-        hover = "Yes: move away from a leader within the follow distance",
-    },
-    { description = "No", data = false, hover = "No: stay still within the follow distance" },
-}
-
-local push_with_rmb = {
-    {
-        description = "Yes",
-        data = true,
-        hover = 'Yes: the "push key" becomes disabled in favour of the RMB',
-    },
-    { description = "No", data = false, hover = 'No: the "push key" is used for pushing' },
-}
-
-local push_mass_checking = {
-    {
-        description = "Yes",
-        data = true,
-        hover = "Yes: limits pushing to entities with an appropriate mass difference",
-    },
-    { description = "No", data = false, hover = "No: no limitations for the mass difference" },
-}
+local function AddSection(title)
+    return AddConfig("", title, nil, { { description = "", data = 0 } }, 0)
+end
 
 configuration_options = {
+    --
+    -- Keybinds
+    --
+
     AddSection("Keybinds"),
-    AddConfig(
-        "Action key",
+
+    AddKeyListConfig(
         "key_action",
-        key_list,
-        "KEY_SHIFT",
-        "Key used for both following and pushing"
+        "Action Key",
+        "Key used for both following and pushing",
+        "KEY_SHIFT"
     ),
-    AddConfig(
-        "Push key",
+
+    AddKeyListConfig(
         "key_push",
-        key_list,
-        "KEY_CTRL",
-        "Key used in combination with an action key for pushing"
+        "Push Key",
+        "Key used in combination with an action key for pushing",
+        "KEY_CTRL"
     ),
+
+    --
+    -- General
+    --
 
     AddSection("General"),
+
     AddConfig(
-        "Compatibility",
         "compatibility",
-        compatibilities,
-        "recommended",
-        "Which compatibility mode should be used?\nMay fix some issues with other mods"
+        "Compatibility",
+        "Which compatibility mode should be used?\nMay fix some issues with other mods",
+        {
+            {
+                description = "Recommended",
+                hover = "Recommended: overrides both on control and on left/right clicks",
+                data = "recommended",
+            },
+            {
+                description = "Alternative",
+                hover = "Alternative: overrides only on control",
+                data = "alternative",
+            },
+        },
+        "recommended"
     ),
+
+    --
+    -- Following
+    --
 
     AddSection("Following"),
+
+    AddConfig("follow_method", "Follow Method", "Which follow method should be used?", {
+        {
+            description = "Default",
+            hover = "Default: player follows a leader step-by-step",
+            data = "default",
+        },
+        {
+            description = "Closest",
+            hover = "Closest: player goes to the closest target point from a leader",
+            data = "closest",
+        },
+    }, "default"),
+
     AddConfig(
-        "Follow method",
-        "follow_method",
-        follow_methods,
-        "default",
-        "Which follow method should be used?"
-    ),
-    AddConfig(
-        "Follow distance",
         "follow_distance",
-        follow_distances,
-        2.5,
-        "How close can you approach the leader?"
+        "Follow Distance",
+        "How close can a follower approach a leader?",
+        {
+            { description = "1.5m", data = 1.5 },
+            { description = "2.5m", data = 2.5 },
+            { description = "3.5m", data = 3.5 },
+        },
+        2.5
     ),
-    AddConfig(
-        "Follow distance keeping",
+
+    AddBooleanConfig(
         "follow_distance_keeping",
-        follow_distance_keeping,
-        false,
-        "Should the follower keep the distance from the leader?"
+        "Follow Distance Keeping",
+        "When enabled, a follower moves away from a leader within the follow distance",
+        false
     ),
+
+    --
+    -- Pushing
+    --
 
     AddSection("Pushing"),
-    AddConfig(
-        "Push with RMB",
+
+    AddBooleanConfig(
         "push_with_rmb",
-        push_with_rmb,
-        false,
-        "Should the  (RMB) in combination with an action key be used for pushing?"
-    ),
-    AddConfig(
-        "Push mass checking",
-        "push_mass_checking",
-        push_mass_checking,
-        true,
-        "Should the mass difference checking be enabled?\nIgnored for pushing players as a ghost"
-    ),
-    AddConfig(
-        "Push lag compensation",
-        "push_lag_compensation",
-        boolean,
-        true,
-        "Should the lag compensation be automatically disabled while pushing?"
+        "Push With RMB",
+        "When enabled, \238\132\129 (RMB) + action key is used for pushing",
+        false
     ),
 
+    AddBooleanConfig(
+        "push_mass_checking",
+        "Push Mass Checking",
+        [[When enabled, disables pushing entities with very high mass.]]
+            .. "\n"
+            .. [[Ignored when pushing players as a ghost]]
+    ),
+
+    AddBooleanConfig(
+        "push_lag_compensation",
+        "Push Lag Compensation",
+        [[When enabled, automatically disables the lag compensation during pushing]]
+    ),
+
+    --
+    -- Other
+    --
+
     AddSection("Other"),
-    AddConfig("Debug", "debug", boolean, false, "Should the debug mode be enabled?"),
+
+    AddBooleanConfig(
+        "debug",
+        "Debug",
+        "When enabled, displays debug data in the console.\nUsed mainly for development",
+        false
+    ),
 }
