@@ -33,6 +33,7 @@ needs:
 | **Action Key**              | _Shift_       | Key used for both following and pushing                                      |
 | **Push Key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
 | **Compatibility**           | _Recommended_ | Which compatibility mode should be used?                                     |
+| **Target Entities**         | _Default_     | Which target entities should be used for following and pushing?              |
 | **Follow Method**           | _Default_     | Which follow method should be used?                                          |
 | **Follow Distance**         | _2.5m_        | How close can a follower approach a leader?                                  |
 | **Follow Distance Keeping** | _Disabled_    | When enabled, a follower moves away from a leader within the follow distance |
