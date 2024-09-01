@@ -214,71 +214,88 @@ describe("KeepFollowing", function()
         end)
 
         describe("CanBeFollowed", function()
-            local function TestHasValidTag(tag, result)
-                describe('and has a "' .. tag .. '" tag', function()
-                    before_each(function()
-                        entity.HasTag = spy.new(function(_, __tag)
-                            return __tag == tag
-                        end)
-                    end)
-
-                    if result then
-                        it("should return true", function()
-                            assert.is_true(keepfollowing:CanBeFollowed(entity))
-                        end)
-                    else
-                        it("should return false", function()
-                            assert.is_false(keepfollowing:CanBeFollowed(entity))
-                        end)
+            before_each(function()
+                entity.entity.IsValid = spy.new(ReturnValueFn(true))
+                entity.HasTag = spy.new(function(_, tag)
+                    if tag == "locomotor" then
+                        return true
                     end
-                end)
-            end
-
-            describe("when some chain fields are missing", function()
-                it("should return false", function()
-                    AssertChainNil(function()
-                        assert.is_false(keepfollowing:CanBeFollowed(entity))
-                    end, entity, "entity", "IsValid")
+                    return false
                 end)
             end)
 
-            describe("when an entity.entity:IsValid() is false", function()
-                before_each(function()
-                    entity.entity.IsValid = spy.new(ReturnValueFn(false))
-                end)
-
-                TestHasValidTag("locomotor", false)
-                TestHasValidTag("balloon", false)
-
-                describe("and doesn't have a corresponding tag", function()
-                    before_each(function()
-                        entity.entity.IsValid = spy.new(ReturnValueFn(false))
-                    end)
-
-                    it("should return false", function()
-                        assert.is_false(keepfollowing:CanBeFollowed(entity))
-                    end)
-                end)
+            it("should return false if the entity is invalid", function()
+                entity.entity.IsValid = spy.new(ReturnValueFn(false))
+                assert.is_false(keepfollowing:CanBeFollowed(entity))
+                assert.spy(entity.entity.IsValid).was_called(1)
+                assert.spy(entity.HasTag).was_called(0)
             end)
 
-            describe("when entity.entity:IsValid() is true", function()
-                before_each(function()
-                    entity.entity.IsValid = spy.new(ReturnValueFn(true))
+            it('should return false if the entity doesn\'t have the "locomotor" tag', function()
+                entity.HasTag = spy.new(function(_, tag)
+                    if tag == "locomotor" then
+                        return false
+                    end
+                    return true
                 end)
-
-                TestHasValidTag("locomotor", true)
-                TestHasValidTag("balloon", true)
-
-                describe("and doesn't have a corresponding tag", function()
-                    before_each(function()
-                        entity.entity.IsValid = spy.new(ReturnValueFn(false))
-                    end)
-
-                    it("should return false", function()
-                        assert.is_false(keepfollowing:CanBeFollowed(entity))
-                    end)
-                end)
+                assert.is_false(keepfollowing:CanBeFollowed(entity))
+                assert.spy(entity.entity.IsValid).was_called(1)
+                assert.spy(entity.HasTag).was_called(1)
             end)
+
+            it('should return false if the entity has the "balloon" tag', function()
+                local HasTag = entity.HasTag
+                entity.HasTag = spy.new(function(_, tag)
+                    if tag == "balloon" then
+                        return true
+                    end
+                    return HasTag(entity, tag)
+                end)
+                assert.is_false(keepfollowing:CanBeFollowed(entity))
+                assert.spy(entity.entity.IsValid).was_called(1)
+                assert.spy(entity.HasTag).was_called(2)
+            end)
+
+            it('should return true if the "target_entities" configuration is "default"', function()
+                keepfollowing.config.target_entities = "default"
+                assert.is_true(keepfollowing:CanBeFollowed(entity))
+                assert.spy(entity.entity.IsValid).was_called(1)
+                assert.spy(entity.HasTag).was_called(2)
+            end)
+
+            it(
+                'should return true if the "target_entities" configuration is "friendly" and entity is not hostile',
+                function()
+                    local HasTag = entity.HasTag
+                    keepfollowing.config.target_entities = "friendly"
+                    entity.HasTag = spy.new(function(_, tag)
+                        if tag == "hostile" then
+                            return false
+                        end
+                        return HasTag(entity, tag)
+                    end)
+                    assert.is_true(keepfollowing:CanBeFollowed(entity))
+                    assert.spy(entity.entity.IsValid).was_called(1)
+                    assert.spy(entity.HasTag).was_called(3)
+                end
+            )
+
+            it(
+                'should return true if the "target_entities" configuration is "players" and entity is a player',
+                function()
+                    local HasTag = entity.HasTag
+                    keepfollowing.config.target_entities = "players"
+                    entity.HasTag = spy.new(function(_, tag)
+                        if tag == "player" then
+                            return true
+                        end
+                        return HasTag(entity, tag)
+                    end)
+                    assert.is_true(keepfollowing:CanBeFollowed(entity))
+                    assert.spy(entity.entity.IsValid).was_called(1)
+                    assert.spy(entity.HasTag).was_called(3)
+                end
+            )
         end)
 
         describe("CanBePushed", function()

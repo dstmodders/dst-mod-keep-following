@@ -122,6 +122,7 @@ SDK.OnPlayerActivated(function(world, player)
             "follow_method",
             "push_lag_compensation",
             "push_mass_checking",
+            "target_entities",
         }
 
         for _, config in ipairs(configs) do

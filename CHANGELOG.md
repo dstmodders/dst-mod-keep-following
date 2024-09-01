@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add "Reverse buttons" configuration
+- Add "Target Entities" configuration
 - Add "Target indicator usage" configuration
 - Add equipped "Bush Hat" and "Snurtle Shell Armor" hide support
 - Add following through wormholes support
