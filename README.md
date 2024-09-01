@@ -34,6 +34,7 @@ needs:
 | **Push Key**                | _Ctrl_        | Key used in combination with an action key for pushing                       |
 | **Reverse Buttons**         | _Disabled_    | When enabled, LMB and RMB will be swapped                                    |
 | **Compatibility**           | _Recommended_ | Which compatibility mode should be used?                                     |
+| **Target Entities**         | _Default_     | Which target entities should be used for following and pushing?              |
 | **Target Indicator Usage**  | _Binded_      | How should the target indicator interact with the action key?                |
 | **Follow Method**           | _Default_     | Which follow method should be used?                                          |
 | **Follow Distance**         | _2.5m_        | How close can a follower approach a leader?                                  |

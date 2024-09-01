@@ -185,6 +185,30 @@ configuration_options = {
     ),
 
     AddConfig(
+        "target_entities",
+        "Target Entities",
+        "Which target entities should be used for following and pushing?",
+        {
+            {
+                description = "Default",
+                hover = "Default: target most entities with the ability to move",
+                data = "default",
+            },
+            {
+                description = "Friendly",
+                hover = "Friendly: target only non-hostile entities with the ability to move",
+                data = "friendly",
+            },
+            {
+                description = "Players",
+                hover = "Players: target only players",
+                data = "players",
+            },
+        },
+        "default"
+    ),
+
+    AddConfig(
         "target_indicator_usage",
         "Target Indicator Usage",
         "How should the target indicator interact with the action key?",
