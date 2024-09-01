@@ -143,14 +143,31 @@ end
 
 --- Checks if an entity can be followed.
 --
--- Checks whether an entity is valid and has either a `locomotor` or `balloon` tag.
+-- Checks whether an entity is valid and has either a `locomotor` or `balloon` tag. It also respects
+-- the "Target Entities" configuration options.
 --
 -- @tparam EntityScript entity An entity as a potential leader to follow
 -- @treturn boolean
-function KeepFollowing:CanBeFollowed(entity) -- luacheck: only
-    return Utils.ChainGet(entity, "entity", "IsValid", true)
-            and (entity:HasTag("locomotor") or entity:HasTag("balloon"))
-        or false
+function KeepFollowing:CanBeFollowed(entity)
+    if
+        not Utils.ChainGet(entity, "entity", "IsValid", true)
+        or not entity:HasTag("locomotor")
+        or entity:HasTag("balloon")
+    then
+        return false
+    end
+
+    local target_entities = self.config.target_entities
+
+    if target_entities == "default" then
+        return true
+    elseif target_entities == "friendly" then
+        return not entity:HasTag("hostile")
+    elseif target_entities == "players" then
+        return entity:HasTag("player")
+    end
+
+    return false
 end
 
 --- Checks if an entity can be pushed.
@@ -733,6 +750,7 @@ function KeepFollowing:DoInit(inst)
         follow_method = "default",
         push_lag_compensation = true,
         push_mass_checking = true,
+        target_entities = "default",
     }
 
     -- update
