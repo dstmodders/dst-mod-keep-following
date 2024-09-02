@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Remove "Hide changelog" configuration
+- Remove "Hide Changelog" configuration
 - Remove changelog from modinfo
 
 ## [0.21.0] - 2020-08-26
@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add "Hide changelog" configuration
+- Add "Hide Changelog" configuration
 - Add tests and documentation
 
 ### Changed
@@ -54,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Remove "Mobs" configuration in favour of the "all" behaviour
+- Remove "Mobs" configuration in favour of the "All" behaviour
 
 ## [0.19.0] - 2019-10-04
 
@@ -117,8 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add "Following method" configuration
-- Add "Push mass checking" configuration
+- Add "Following Method" configuration
+- Add "Push Mass Checking" configuration
 
 ### Changed
 
@@ -242,19 +242,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add "Keep target distance" configuration
+- Add "Keep Target Distance" configuration
 - Add support for "Bunnymen"
 
 ### Changed
 
 - Improve compatibility with some other mods
-- Revert "Action key" and "Push key" configurations
+- Revert "Action Key" and "Push Key" configurations
 
 ## [0.5.0] - 2019-08-19
 
 ### Added
 
-- Add "Action key" and "Push key" configurations
+- Add "Action Key" and "Push Key" configurations
 
 ### Changed
 
