@@ -212,32 +212,26 @@ configuration_options = {
     AddConfig("follow_method", "Follow Method", "Which follow method should be used?", {
         {
             description = "Default",
-            hover = "Default: player follows a leader step-by-step",
+            hover = "Default: you follow the target step-by-step",
             data = "default",
         },
         {
             description = "Closest",
-            hover = "Closest: player goes to the closest target point from a leader",
+            hover = "Closest: you go to the closest point to the target",
             data = "closest",
         },
     }, "default"),
 
-    AddConfig(
-        "follow_distance",
-        "Follow Distance",
-        "How close can a follower approach a leader?",
-        {
-            { description = "1.5m", data = 1.5 },
-            { description = "2.5m", data = 2.5 },
-            { description = "3.5m", data = 3.5 },
-        },
-        2.5
-    ),
+    AddConfig("follow_distance", "Follow Distance", "How close can you approach the target?", {
+        { description = "1.5m", data = 1.5 },
+        { description = "2.5m", data = 2.5 },
+        { description = "3.5m", data = 3.5 },
+    }, 2.5),
 
     AddBooleanConfig(
         "follow_distance_keeping",
         "Follow Distance Keeping",
-        "When enabled, a follower moves away from a leader within the follow distance",
+        "When enabled, you move away from the target within the follow distance",
         false
     ),
 
